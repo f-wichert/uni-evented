@@ -5,8 +5,8 @@ import { NavigationContainer, TypedNavigator } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
-import LoginScreen from './src/screens/LoginScreen';
-import ViewEventScreen from './src/screens/ViewEventScreen';
+import LoginScreen from './screens/LoginScreen';
+import ViewEventScreen from './screens/ViewEventScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();

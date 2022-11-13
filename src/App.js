@@ -9,11 +9,11 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 
 import userReducer from './UserReducer';
 
-import MapScreen from './src/screens/MapScreen';
-import SettingsScreen from './src/screens/SettingsScreen';
-import ViewEventScreen from './src/screens/ViewEventScreen';
-import ProfileScreen from './src/screens/ProfileScreen';
-import DiscoverScreen from './src/screens/DiscoverScreen';
+import MapScreen from './screens/MapScreen';
+import SettingsScreen from './screens/SettingsScreen';
+import ViewEventScreen from './screens/ViewEventScreen';
+import ProfileScreen from './screens/ProfileScreen';
+import DiscoverScreen from './screens/DiscoverScreen';
 
 const store = createStore(userReducer);
 
