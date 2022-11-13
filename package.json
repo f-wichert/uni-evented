@@ -1,49 +1,49 @@
 {
-  "name": "evented",
-  "version": "1.0.0",
-  "main": "node_modules/expo/AppEntry.js",
-  "scripts": {
-    "start": "expo start",
-    "android": "expo start --android",
-    "ios": "expo start --ios",
-    "web": "expo start --web",
-    "tsc": "tsc",
-    "lint": "eslint .",
-    "format": "prettier . --write",
-    "format:check": "prettier . --check"
-  },
-  "dependencies": {
-    "@react-navigation/bottom-tabs": "^6.4.0",
-    "@react-navigation/native": "^6.0.13",
-    "@react-navigation/native-stack": "^6.9.1",
-    "expo": "~47.0.3",
-    "expo-status-bar": "~1.4.2",
-    "react": "18.1.0",
-    "react-dom": "18.1.0",
-    "react-native": "0.70.5",
-    "react-native-web": "~0.18.9",
-    "react-navigation": "^4.4.4"
-  },
-  "devDependencies": {
-    "@babel/core": "^7.12.9",
-    "@types/react": "~18.0.14",
-    "@types/react-native": "~0.70.6",
-    "@typescript-eslint/eslint-plugin": "^5.42.1",
-    "@typescript-eslint/parser": "^5.42.1",
-    "eslint": "^8.27.0",
-    "eslint-config-prettier": "^8.5.0",
-    "eslint-config-universe": "^11.1.1",
-    "eslint-plugin-react": "^7.31.10",
-    "husky": "^8.0.2",
-    "lint-staged": "^13.0.3",
-    "prettier": "^2.7.1",
-    "typescript": "^4.8.4"
-  },
-  "private": true,
-  "lint-staged": {
-    "**/*.{js,ts}": [
-      "npm run format",
-      "npm run lint"
-    ]
-  }
+    "name": "evented",
+    "version": "1.0.0",
+    "main": "node_modules/expo/AppEntry.js",
+    "scripts": {
+        "start": "expo start",
+        "android": "expo start --android",
+        "ios": "expo start --ios",
+        "web": "expo start --web",
+        "tsc": "tsc",
+        "lint": "eslint .",
+        "format": "prettier . --write",
+        "format:check": "prettier . --check"
+    },
+    "dependencies": {
+        "@react-navigation/bottom-tabs": "^6.4.0",
+        "@react-navigation/native": "^6.0.13",
+        "@react-navigation/native-stack": "^6.9.1",
+        "expo": "~47.0.3",
+        "expo-status-bar": "~1.4.2",
+        "react": "18.1.0",
+        "react-dom": "18.1.0",
+        "react-native": "0.70.5",
+        "react-native-web": "~0.18.9",
+        "react-navigation": "^4.4.4"
+    },
+    "devDependencies": {
+        "@babel/core": "^7.12.9",
+        "@types/react": "~18.0.14",
+        "@types/react-native": "~0.70.6",
+        "@typescript-eslint/eslint-plugin": "^5.42.1",
+        "@typescript-eslint/parser": "^5.42.1",
+        "eslint": "^8.27.0",
+        "eslint-config-prettier": "^8.5.0",
+        "eslint-config-universe": "^11.1.1",
+        "eslint-plugin-react": "^7.31.10",
+        "husky": "^8.0.2",
+        "lint-staged": "^13.0.3",
+        "prettier": "^2.7.1",
+        "typescript": "^4.8.4"
+    },
+    "private": true,
+    "lint-staged": {
+        "**/*.{js,ts}": [
+            "npm run format",
+            "npm run lint"
+        ]
+    }
 }

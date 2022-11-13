@@ -11,9 +11,7 @@ import ViewEventScreen from './screens/ViewEventScreen';
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
-function TabScreen(params:type) {
-  
-}
+function TabScreen(params: type) {}
 
 export default function App() {
     return (
@@ -25,20 +23,17 @@ export default function App() {
                     component={LoginScreen}
                     // options={{ headerShown: false }}
                 />
-                <Stack.Screen 
-                    name="EventScreen"
-                    component={ViewEventScreen}
-                />
+                <Stack.Screen name="EventScreen" component={ViewEventScreen} />
             </Stack.Navigator>
         </NavigationContainer>
-        {/* </Provider> */}
+        // {/* </Provider> */}
     );
 }
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
+    container: {
+        flex: 1,
+        backgroundColor: '#fff',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
 });

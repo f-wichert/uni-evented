@@ -15,15 +15,12 @@ import ViewEventScreen from './screens/ViewEventScreen';
 import ProfileScreen from './screens/ProfileScreen';
 import DiscoverScreen from './screens/DiscoverScreen';
 
-
-
 const store = createStore(userReducer);
 
 function TabScreen({ navigation, route }) {
-
     return (
         <Tab.Navigator
-                screenOptions={({ route }) => ({
+            screenOptions={({ route }) => ({
                 tabBarIcon: ({ focused, color, size }) => {
                     let iconName;
 
@@ -34,7 +31,7 @@ function TabScreen({ navigation, route }) {
                     } else if (route.name === 'Map') {
                         iconName = focused ? 'map' : 'map-outline';
                     } else if (route.name === 'Profile') {
-                        iconName = focused ? 'person' : 'person-outline'
+                        iconName = focused ? 'person' : 'person-outline';
                     }
 
                     // You can return any component that you like here!
@@ -42,13 +39,13 @@ function TabScreen({ navigation, route }) {
                 },
                 tabBarActiveTintColor: 'tomato',
                 tabBarInactiveTintColor: 'gray',
-                })}
-            >
-                <Tab.Screen name="Discover" component={DiscoverScreen} />
-                <Tab.Screen name="Map" component={MapScreen} />
-                <Tab.Screen name="Profile" component={ProfileScreen} options={{headerShown: false}}/>
+            })}
+        >
+            <Tab.Screen name="Discover" component={DiscoverScreen} />
+            <Tab.Screen name="Map" component={MapScreen} />
+            <Tab.Screen name="Profile" component={ProfileScreen} options={{ headerShown: false }} />
         </Tab.Navigator>
-    )
+    );
 }
 
 const Stack = createNativeStackNavigator();
@@ -57,19 +54,16 @@ const Tab = createBottomTabNavigator();
 export default function App() {
     return (
         <Provider store={store}>
-        <NavigationContainer>
-            <Stack.Navigator>
-                <Stack.Screen
-                    name="TabScreen"
-                    component={TabScreen}
-                    options={{ headerShown: false }}
-                />
-                <Stack.Screen 
-                    name="EventScreen"
-                    component={ViewEventScreen}
-                />
-            </Stack.Navigator>
-        </NavigationContainer>
+            <NavigationContainer>
+                <Stack.Navigator>
+                    <Stack.Screen
+                        name="TabScreen"
+                        component={TabScreen}
+                        options={{ headerShown: false }}
+                    />
+                    <Stack.Screen name="EventScreen" component={ViewEventScreen} />
+                </Stack.Navigator>
+            </NavigationContainer>
         </Provider>
     );
 }

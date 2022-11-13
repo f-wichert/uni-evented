@@ -4,9 +4,7 @@ import { View, Text } from 'react-native';
 function LoginScreen(props) {
     return (
         <View>
-            <Text>
-                Login Screen!
-            </Text>
+            <Text>Login Screen!</Text>
         </View>
     );
 }

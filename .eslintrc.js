@@ -16,5 +16,5 @@ module.exports = {
         project: ['./tsconfig.json'],
     },
     plugins: ['@typescript-eslint'],
-    root: true
+    root: true,
 };

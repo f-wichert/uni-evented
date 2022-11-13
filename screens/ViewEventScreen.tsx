@@ -4,9 +4,7 @@ import { View, Text } from 'react-native';
 function ViewEventScreen(props) {
     return (
         <View>
-            <Text>
-                View Event Screen!
-            </Text>
+            <Text>View Event Screen!</Text>
         </View>
     );
 }
