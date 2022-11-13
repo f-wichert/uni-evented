@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text } from 'react-native';
 
-function ViewEventScreen(props) {
+function ViewEventScreen() {
     return (
         <View>
             <Text>View Event Screen!</Text>

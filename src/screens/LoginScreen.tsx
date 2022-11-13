@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text } from 'react-native';
 
-function LoginScreen(props) {
+function LoginScreen() {
     return (
         <View>
             <Text>Login Screen!</Text>
