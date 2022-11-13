@@ -1,2 +1,5 @@
 .eslintrc.js
 dist/
+babel.config.js
+# TODO: remove
+App.js

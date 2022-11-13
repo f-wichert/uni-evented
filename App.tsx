@@ -11,7 +11,7 @@ import ViewEventScreen from './screens/ViewEventScreen';
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
-function TabScreen(params: type) {}
+// function TabScreen(params: type) {}
 
 export default function App() {
     return (
