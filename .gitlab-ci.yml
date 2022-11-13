@@ -1,0 +1,32 @@
+image: node:18-slim
+
+default:
+  tags:
+    - evented
+  cache:
+    # global
+    - key: npm-cache
+      paths:
+        - Evented/.npm/
+    # per branch
+    - key: "node-modules-$CI_COMMIT_REF_SLUG"
+      paths:
+        - Evented/node_modules/
+  before_script:
+    # TODO: remove this and change `Evented/` above as well
+    - cd Evented/
+
+stages:
+  - install
+  - lint
+
+
+install:
+  stage: install
+  script:
+    npm ci --cache .npm --prefer-offline
+
+tsc:
+  stage: lint
+  script:
+    npm run check
