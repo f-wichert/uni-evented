@@ -26,7 +26,13 @@ install:
   script:
     npm ci --cache .npm --prefer-offline
 
-tsc:
+build:
   stage: lint
   script:
-    npm run check
+    npm run tsc
+
+check:
+  stage: lint
+  script: |
+    npm run format:check
+    npm run lint
