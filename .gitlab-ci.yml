@@ -7,14 +7,11 @@ default:
     # global
     - key: npm-cache
       paths:
-        - Evented/.npm/
+        - .npm/
     # per branch
     - key: "node-modules-$CI_COMMIT_REF_SLUG"
       paths:
-        - Evented/node_modules/
-  before_script:
-    # TODO: remove this and change `Evented/` above as well
-    - cd Evented/
+        - node_modules/
 
 stages:
   - install
