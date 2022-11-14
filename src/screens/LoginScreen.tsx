@@ -1,11 +1,11 @@
 import React from 'react';
-import { StyleSheet, View, Text, TextInput, Button } from 'react-native';
+import { StyleSheet, View, Text, TextInput, Button, Image, TouchableHighlight } from 'react-native';
 
 function LoginScreen(props) {
 
     function login() {
         console.log(`log: ${user}`);
-        
+        props.navigation.navigate('TabScreen');
         return true
     }
 
@@ -15,10 +15,16 @@ function LoginScreen(props) {
 
     return (
         <View style={styles.container}>
-            <Text style={{
-                fontSize: 34,
-                fontWeight: 'bold'
-            }}>Evented</Text>
+            <Image 
+                style={styles.art}
+                source={require('../../assets/yellow_splash.png')}
+            />
+            <View style={styles.headerText}>
+                <Text style={{
+                    fontSize: 44,
+                    fontWeight: 'bold'
+                }}>Login</Text>
+            </View>
             <TextInput 
                 style={styles.userInput} 
                 onChangeText={setUser} />
@@ -26,18 +32,36 @@ function LoginScreen(props) {
                 style={styles.passwordInput} 
                 secureTextEntry={true} 
                 onChangeText={setPassword} />
-            <Button 
-                title={'Join!'}
-                onPress={login} />
+            
+            <TouchableHighlight
+                style={styles.loginButton}
+                // activeOpacity={0.6}
+                onPress={login}
+            >
+                <Text
+                    style={{
+                        fontSize: 18,
+                        fontWeight: 'bold'
+                    }}
+                >Join!</Text>
+            </TouchableHighlight>
         </View>
     );
 }
 
+{/* <Button 
+                title={'Join!'}
+                style={styles.loginButton}
+                onPress={login} /> */}
+
+
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center'
+        margin: 40,
+        // justifyContent: 'center',
+        // backgroundColor: 'red'
+        // alignItems: 'center'
     },
     userInput: {
         height: 40,
@@ -53,7 +77,26 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderRadius: 5
     },
-
+    headerText: {
+        height: 80,
+        marginTop: 200,
+        justifyContent: 'center',
+        // backgroundColor: 'red'
+    },
+    loginButton: {
+        width: 110,
+        height: 40,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#fcba03',
+        borderRadius: 20
+    },
+    art: {
+        height: 260,
+        width: 400,
+        position: 'absolute',
+        transform: [{translateX: 80}, {rotate: '-120deg'}],
+    }
 });
 
 export default LoginScreen;
