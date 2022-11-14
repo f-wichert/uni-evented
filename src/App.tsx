@@ -11,7 +11,13 @@ import ViewEventScreen from './screens/ViewEventScreen';
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
-// function TabScreen(params: type) {}
+function TabScreen(params) {
+    return (
+        <View>
+            <Text>TabScreen!</Text>
+        </View>
+    );
+}
 
 export default function App() {
     return (
@@ -22,6 +28,11 @@ export default function App() {
                     name="LoginScreen"
                     component={LoginScreen}
                     // options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                        name="TabScreen"
+                        component={TabScreen}
+                        options={{ headerShown: false }}
                 />
                 <Stack.Screen name="EventScreen" component={ViewEventScreen} />
             </Stack.Navigator>
