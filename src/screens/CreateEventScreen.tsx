@@ -7,6 +7,8 @@ function CreateEventScreen() {
 
     const [name, setName] = useState('');
     const [location, setLocation] = useState('');
+    const [start, setStart] = useState('');
+    const [end, setEnd] = useState('');
     // Dropdown State
     const [open, setOpen] = useState(false);
     const [value, setValue] = useState([]);
@@ -40,8 +42,18 @@ function CreateEventScreen() {
             />
             <TextInput 
                 style={[styles.textInput,]}
-                placeholder="Select location"
+                placeholder="Select Location"
                 onChangeText={setLocation}
+            />
+            <TextInput 
+                style={[styles.textInput,]}
+                placeholder="Select Start"
+                onChangeText={setStart}
+            />
+            <TextInput 
+                style={[styles.textInput,]}
+                placeholder="Select End (optional)"
+                onChangeText={setEnd}
             />
             <DropDownPicker
                 style={[styles.dropdown]}
@@ -57,6 +69,8 @@ function CreateEventScreen() {
                 placeholder="Select up to three tags"
                 maxHeight={300}
                 categorySelectable={false}
+                mode="BADGE"
+                badgeDotColors={["#e76f51", "#00b4d8", "#e9c46a", "#e76f51", "#8ac926", "#00b4d8", "#e9c46a"]}
             /> 
             <Button
                 color='orange'
