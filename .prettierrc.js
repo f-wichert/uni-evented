@@ -2,7 +2,7 @@
 // these are mostly just the defaults but specified anyway because why not
 module.exports = {
     printWidth: 100,
-    tabWidth: 4,
+    tabWidth: 2,
     useTabs: false,
     semi: true,
     singleQuote: true,

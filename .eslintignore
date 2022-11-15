@@ -2,5 +2,4 @@
 dist/
 babel.config.js
 metro.config.js
-# TODO: remove
-App.js
+.expo/
