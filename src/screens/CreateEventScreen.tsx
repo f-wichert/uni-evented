@@ -1,7 +1,9 @@
 import React, { useState, } from 'react';
-import {StyleSheet, View, Text, TextInput, Button, Alert} from 'react-native';
+import {StyleSheet, View, Text, TextInput, Button, Alert, Dimensions} from 'react-native';
 import DropDownPicker from 'react-native-dropdown-picker';
 
+var width = Dimensions.get("window").width; 
+var height = Dimensions.get("window").height; 
 
 function CreateEventScreen() {
 
@@ -86,17 +88,22 @@ const styles = StyleSheet.create({
         flex: 1,
         padding: 20,
         backgroundColor: '#fff',
+        justifyContent: 'space-around',
+        width: width,
+        alignItems: 'center',
     },
     textInput: {
         borderBottomColor: 'black',
         borderBottomWidth: 0.25,
         fontSize: 25,
         margin: 10,
-        paddingBottom: 5
+        paddingBottom: 5,
+        width: 0.9 *  width,
     },
     dropdown: {
         marginTop: 10,
         marginBottom: 10,
+        width: 0.9 *  width,
     },
     text: {
         fontSize: 25,
@@ -105,6 +112,7 @@ const styles = StyleSheet.create({
     button: {
         borderRadius: 25,
         backgroundColor: 'black',
+        width: width * 0.75,
     }
 });
 
