@@ -43,7 +43,7 @@
   },
   "private": true,
   "lint-staged": {
-    "**/*.{js,ts}": [
+    "**/*.{js,ts,jsx,tsx}": [
       "npm run format",
       "npm run lint"
     ]
