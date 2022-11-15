@@ -11,6 +11,7 @@ import LoginScreen from './screens/LoginScreen';
 import ViewEventScreen from './screens/ViewEventScreen';
 import DiscoverScreen from './screens/DiscoverScreen';
 import MapScreen from './screens/MapScreen';
+import CreateEventScreen from './screens/CreateEventScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -31,6 +32,9 @@ function TabScreen(params) {
                     } else if (route.name === 'Profile') {
                         iconName = focused ? 'person' : 'person-outline';
                     }
+                    else if (route.name === 'Create') {
+                        iconName = focused ? 'add' : 'add-outline';
+                    }
 
                     // You can return any component that you like here!
                     return <Ionicons name={iconName} size={size} color={color} />;
@@ -40,6 +44,7 @@ function TabScreen(params) {
             })}
         >
             <Tab.Screen name="Discover" component={DiscoverScreen} />
+            <Tab.Screen name="Create" component={CreateEventScreen} />
             <Tab.Screen name="Map" component={MapScreen} />
         </Tab.Navigator>
     );
