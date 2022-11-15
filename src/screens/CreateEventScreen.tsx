@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { StyleSheet, View, Text, TextInput, Button, Alert, Dimensions } from 'react-native';
+import { Alert, Button, Dimensions, StyleSheet, TextInput, View } from 'react-native';
 import DropDownPicker from 'react-native-dropdown-picker';
 
 var width = Dimensions.get('window').width;

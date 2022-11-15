@@ -1,17 +1,16 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet } from 'react-native';
 
-import { NavigationContainer, TypedNavigator } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 import Ionicons from '@expo/vector-icons/Ionicons';
 
-import LoginScreen from './screens/LoginScreen';
-import ViewEventScreen from './screens/ViewEventScreen';
-import DiscoverScreen from './screens/DiscoverScreen';
-import MapScreen from './screens/MapScreen';
 import CreateEventScreen from './screens/CreateEventScreen';
+import DiscoverScreen from './screens/DiscoverScreen';
+import LoginScreen from './screens/LoginScreen';
+import MapScreen from './screens/MapScreen';
+import ViewEventScreen from './screens/ViewEventScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();

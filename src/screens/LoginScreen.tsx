@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, View, Text, TextInput, Button, Image, TouchableHighlight } from 'react-native';
+import { Image, StyleSheet, Text, TextInput, TouchableHighlight, View } from 'react-native';
 
 function LoginScreen(props) {
   function login() {
