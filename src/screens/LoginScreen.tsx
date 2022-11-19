@@ -1,29 +1,30 @@
-import React, { useContext } from 'react';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { useContext, useState } from 'react';
 import { Image, StyleSheet, Text, TextInput, TouchableHighlight, View } from 'react-native';
 
+import yellowSplash from '../../assets/yellow_splash.png';
+import { RootNavigatorParams } from '../App';
 import { Context as AuthContext } from '../contexts/authContext';
+import { asyncHandler } from '../util';
 
-function LoginScreen(props) {
+type ComponentProps = NativeStackScreenProps<RootNavigatorParams, 'LoginScreen'>;
+
+function LoginScreen(props: ComponentProps) {
   async function login() {
     console.log(`log: ${user}`);
-    // TODO: something like
-    // try {
-    //   await signin({ email: user, password: password }, state.token);
-    // } catch (e) {
-    //   showToast(e.message);
-    // }
-    await signin({ email: user, password: password }, state.token);
+    // TODO: require these to be non-empty in the UI
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    await signin({ email: user!, password: password! });
     props.navigation.navigate('TabScreen');
-    return true;
   }
 
-  const [user, setUser] = React.useState();
-  const [password, setPassword] = React.useState();
-  const { state, signin } = useContext(AuthContext);
+  const [user, setUser] = useState<string | undefined>('test');
+  const [password, setPassword] = useState<string | undefined>('testtest');
+  const { /* state, */ signin } = useContext(AuthContext);
 
   return (
     <View style={styles.container}>
-      <Image style={styles.art} source={require('../../assets/yellow_splash.png')} />
+      <Image style={styles.art} source={yellowSplash} />
       <View style={styles.headerText}>
         <Text
           style={{
@@ -40,7 +41,7 @@ function LoginScreen(props) {
       <TouchableHighlight
         style={styles.loginButton}
         // activeOpacity={0.6}
-        onPress={login}
+        onPress={asyncHandler(login)}
       >
         <Text
           style={{

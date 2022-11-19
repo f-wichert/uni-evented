@@ -30,3 +30,11 @@ export async function request(
 
   return (await response.json()) as JSONObject;
 }
+
+// used for passing async functions to react event handlers like `onPress`
+// TODO: display some kind of message to the user if there's an error here?
+export function asyncHandler<Args extends unknown[]>(
+  handler: (...args: Args) => Promise<void>
+): (...args: Args) => void {
+  return (...args) => void handler(...args);
+}

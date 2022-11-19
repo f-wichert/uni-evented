@@ -1,5 +1,3 @@
-import { StyleSheet } from 'react-native';
-
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -12,27 +10,45 @@ import DiscoverScreen from './screens/DiscoverScreen';
 import LoginScreen from './screens/LoginScreen';
 import MapScreen from './screens/MapScreen';
 import ViewEventScreen from './screens/ViewEventScreen';
+import { IoniconsName } from './types';
 
-const Stack = createNativeStackNavigator();
-const Tab = createBottomTabNavigator();
+// https://reactnavigation.org/docs/typescript/
 
-function TabScreen(params) {
+export type RootNavigatorParams = {
+  LoginScreen: undefined;
+  TabScreen: undefined;
+  EventScreen: undefined;
+};
+
+const Stack = createNativeStackNavigator<RootNavigatorParams>();
+
+export type TabNavigatorParams = {
+  Discover: undefined;
+  Create: undefined;
+  Map: undefined;
+};
+
+const Tab = createBottomTabNavigator<TabNavigatorParams>();
+
+function TabScreen() {
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
         tabBarIcon: ({ focused, color, size }) => {
-          let iconName;
+          let iconName: IoniconsName;
 
           if (route.name === 'Discover') {
             iconName = focused ? 'play' : 'play-outline';
-          } else if (route.name === 'Settings') {
-            iconName = focused ? 'settings' : 'settings-outline';
+            // } else if (route.name === 'Settings') {
+            //   iconName = focused ? 'settings' : 'settings-outline';
           } else if (route.name === 'Map') {
             iconName = focused ? 'map' : 'map-outline';
-          } else if (route.name === 'Profile') {
-            iconName = focused ? 'person' : 'person-outline';
+            // } else if (route.name === 'Profile') {
+            //   iconName = focused ? 'person' : 'person-outline';
           } else if (route.name === 'Create') {
             iconName = focused ? 'add' : 'add-outline';
+          } else {
+            throw new Error(`Unknown route '${route.name}'`);
           }
 
           // You can return any component that you like here!
@@ -66,11 +82,3 @@ export default function App() {
     </AuthProvider>
   );
 }
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});

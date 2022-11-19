@@ -2,34 +2,40 @@ import React, { useState } from 'react';
 import { Alert, Button, Dimensions, StyleSheet, TextInput, View } from 'react-native';
 import DropDownPicker from 'react-native-dropdown-picker';
 
-var width = Dimensions.get('window').width;
-var height = Dimensions.get('window').height;
+const width = Dimensions.get('window').width;
+// const height = Dimensions.get('window').height;
+
+const tags = [
+  { label: 'Activity', value: 'activity' },
+  { label: 'Party', value: 'party', parent: 'activity' },
+  { label: 'Boardgames', value: 'boardgames', parent: 'activity' },
+  { label: 'Sports', value: 'sports', parent: 'activity' },
+  { label: 'Drinking', value: 'drinking', parent: 'activity' },
+  { label: 'Chilling', value: 'chilling', parent: 'activity' },
+  { label: 'Music', value: 'music' },
+  { label: 'Jazz', value: 'jazz', parent: 'music' },
+  { label: 'Techno', value: 'techno', parent: 'music' },
+  { label: 'Rock', value: 'rock', parent: 'music' },
+  { label: 'R&B', value: 'rnb', parent: 'music' },
+  { label: 'Reggae', value: 'reggae', parent: 'music' },
+] as const;
+type TagValue = typeof tags[number]['value'];
 
 function CreateEventScreen() {
   const [name, setName] = useState('');
   const [location, setLocation] = useState('');
   const [start, setStart] = useState('');
   const [end, setEnd] = useState('');
+
   // Dropdown State
   const [open, setOpen] = useState(false);
-  const [value, setValue] = useState([]);
-  const [items, setItems] = useState([
-    { label: 'Activity', value: 'activity' },
-    { label: 'Party', value: 'party', parent: 'activity' },
-    { label: 'Boardgames', value: 'boardgames', parent: 'activity' },
-    { label: 'Sports', value: 'sports', parent: 'activity' },
-    { label: 'Drinking', value: 'drinking', parent: 'activity' },
-    { label: 'Chilling', value: 'chilling', parent: 'activity' },
-    { label: 'Music', value: 'music' },
-    { label: 'Jazz', value: 'jazz', parent: 'music' },
-    { label: 'Techno', value: 'techno', parent: 'music' },
-    { label: 'Rock', value: 'rock', parent: 'music' },
-    { label: 'R&B', value: 'rnb', parent: 'music' },
-    { label: 'Reggae', value: 'reggae', parent: 'music' },
-  ]);
+  const [value, setValue] = useState([] as TagValue[]);
+  const [items, setItems] = useState([...tags]);
 
   function createEvent() {
-    Alert.alert(`Event created! \nTags: ${value}`);
+    Alert.alert(
+      `Event created!\nName: ${name}\nLocation: ${location}\nStart: ${start}\nEnd: ${end}\nTags: ${value}`
+    );
   }
 
   return (
