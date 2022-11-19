@@ -1,11 +1,23 @@
+import { Dispatch } from 'react';
 import { request } from '../util';
 import createDataContext from './createDataContext';
 
 interface State {
-  token: string;
+  token: string | null;
 }
 
-const authReducer = (state: State, action: any): State => {
+interface SignInAction {
+  type: 'signin';
+  payload: { token: string };
+}
+
+interface SignOutAction {
+  type: 'signout';
+}
+
+type Action = SignInAction | SignOutAction;
+
+const authReducer = (state: State, action: Action): State => {
   switch (action.type) {
     case 'signout':
       return { token: null };
@@ -18,12 +30,9 @@ const authReducer = (state: State, action: any): State => {
   }
 };
 
-const signin = (dispatch) => {
-  return async ({ email, password }, token) => {
-    // Do some API Request here
-    console.log('Signin');
-
-    const data = await request('POST', '/auth/login', token, {
+const signin = (dispatch: Dispatch<Action>) => {
+  return async ({ email, password }: { email: string; password: string }) => {
+    const data = await request('POST', '/auth/login', null, {
       username: email,
       password: password,
     });
@@ -32,19 +41,19 @@ const signin = (dispatch) => {
     dispatch({
       type: 'signin',
       payload: {
-        token: data.token,
+        token: data.token as string,
       },
     });
   };
 };
 
-const signout = (dispatch) => {
+const signout = (dispatch: Dispatch<Action>) => {
   return () => {
     dispatch({ type: 'signout' });
   };
 };
 
-export const { Provider, Context } = createDataContext(
+export const { Context, Provider } = createDataContext(
   authReducer,
   { signin, signout },
   { token: null }

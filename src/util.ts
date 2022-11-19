@@ -1,3 +1,5 @@
+import { JSONObject } from './types';
+
 // TODO: make this configurable somehow?
 const BASE_URL = 'http://10.0.2.2:3001/api';
 
@@ -5,11 +7,11 @@ export async function request(
   method: string,
   route: string,
   token: string | null,
-  data?: Record<string, any>
-): Promise<Record<string, any>> {
+  data?: JSONObject
+): Promise<JSONObject> {
   const url = `${BASE_URL}/${route}`;
 
-  const headers = {
+  const headers: Record<string, string> = {
     'Content-Type': 'application/json',
   };
   if (token) {
@@ -26,5 +28,5 @@ export async function request(
     throw new Error(`invalid response status: ${response.status}`);
   }
 
-  return await response.json();
+  return (await response.json()) as JSONObject;
 }
