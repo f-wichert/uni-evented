@@ -9,13 +9,13 @@ import { asyncHandler } from '../util';
 
 type ComponentProps = NativeStackScreenProps<RootNavigatorParams, 'LoginScreen'>;
 
-function LoginScreen(props: ComponentProps) {
+function LoginScreen({ navigation }: ComponentProps) {
   async function login() {
     console.log(`log: ${user}`);
     // TODO: require these to be non-empty in the UI
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     await signin({ email: user!, password: password! });
-    props.navigation.navigate('TabScreen');
+    navigation.navigate('TabScreen');
   }
 
   const [user, setUser] = useState<string | undefined>();
