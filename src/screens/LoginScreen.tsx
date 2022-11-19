@@ -18,8 +18,8 @@ function LoginScreen(props: ComponentProps) {
     props.navigation.navigate('TabScreen');
   }
 
-  const [user, setUser] = useState<string | undefined>('test');
-  const [password, setPassword] = useState<string | undefined>('testtest');
+  const [user, setUser] = useState<string | undefined>();
+  const [password, setPassword] = useState<string | undefined>();
   const { /* state, */ signin } = useContext(AuthContext);
 
   return (
