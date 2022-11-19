@@ -1,15 +1,25 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Image, StyleSheet, Text, TextInput, TouchableHighlight, View } from 'react-native';
 
+import { Context as AuthContext } from '../contexts/authContext';
+
 function LoginScreen(props) {
-  function login() {
+  async function login() {
     console.log(`log: ${user}`);
+    // TODO: something like
+    // try {
+    //   await signin({ email: user, password: password }, state.token);
+    // } catch (e) {
+    //   showToast(e.message);
+    // }
+    await signin({ email: user, password: password }, state.token);
     props.navigation.navigate('TabScreen');
     return true;
   }
 
   const [user, setUser] = React.useState();
   const [password, setPassword] = React.useState();
+  const { state, signin } = useContext(AuthContext);
 
   return (
     <View style={styles.container}>
@@ -46,7 +56,7 @@ function LoginScreen(props) {
 }
 
 {
-  /* <Button 
+  /* <Button
                 title={'Join!'}
                 style={styles.loginButton}
                 onPress={login} /> */

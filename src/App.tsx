@@ -6,6 +6,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 import Ionicons from '@expo/vector-icons/Ionicons';
 
+import { Provider as AuthProvider } from './contexts/authContext';
 import CreateEventScreen from './screens/CreateEventScreen';
 import DiscoverScreen from './screens/DiscoverScreen';
 import LoginScreen from './screens/LoginScreen';
@@ -50,15 +51,19 @@ function TabScreen(params) {
 
 export default function App() {
   return (
-    // <Provider store={store}>
-    <NavigationContainer>
-      <Stack.Navigator>
-        <Stack.Screen name="LoginScreen" component={LoginScreen} options={{ headerShown: false }} />
-        <Stack.Screen name="TabScreen" component={TabScreen} options={{ headerShown: false }} />
-        <Stack.Screen name="EventScreen" component={ViewEventScreen} />
-      </Stack.Navigator>
-    </NavigationContainer>
-    // {/* </Provider> */}
+    <AuthProvider>
+      <NavigationContainer>
+        <Stack.Navigator>
+          <Stack.Screen
+            name="LoginScreen"
+            component={LoginScreen}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen name="TabScreen" component={TabScreen} options={{ headerShown: false }} />
+          <Stack.Screen name="EventScreen" component={ViewEventScreen} />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </AuthProvider>
   );
 }
 const styles = StyleSheet.create({
