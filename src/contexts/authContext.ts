@@ -6,16 +6,10 @@ interface State {
   token: string | null;
 }
 
-interface SignInAction {
-  type: 'signin';
-  payload: { token: string };
-}
-
-interface SignOutAction {
-  type: 'signout';
-}
-
-type Action = SignInAction | SignOutAction;
+// prettier-ignore
+type Action =
+  | {type: 'signin', payload: { token: string }}
+  | {type: 'signout'};
 
 const authReducer = (state: State, action: Action): State => {
   switch (action.type) {

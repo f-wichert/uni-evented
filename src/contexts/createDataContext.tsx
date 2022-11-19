@@ -11,11 +11,12 @@ interface ActionData {
   payload?: any;
 }
 
-type Action<TActionData> = (d: Dispatch<TActionData>) => (...args: any[]) => void;
+type ActionCreator<TActionData> = (d: Dispatch<TActionData>) => (...args: any[]) => void;
 
 type BoundActions<T, TActionData> = {
   [K in keyof T]: T[K] extends (d: Dispatch<TActionData>) => infer R ? R : never;
 };
+
 type ContextValue<TState, TActions, TActionData> = {
   state: TState;
 } & BoundActions<TActions, TActionData>;
@@ -23,7 +24,7 @@ type ContextValue<TState, TActions, TActionData> = {
 // creates a context+provider with a state and action methods
 export default function createDataContext<
   TState,
-  TActions extends Record<string, Action<TActionData>>,
+  TActions extends Record<string, ActionCreator<TActionData>>,
   TActionData extends ActionData
 >(reducer: Reducer<TState, TActionData>, actions: TActions, defaultValue: TState) {
   const Context = createContext({} as ContextValue<TState, TActions, TActionData>);
