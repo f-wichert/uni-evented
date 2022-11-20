@@ -80,7 +80,7 @@ function LoginScreen({ navigation }: ComponentProps) {
           color: '#bdbdbd'
           }}
         >
-          Don't have an account?
+          Don't have an account? 
         </Text>
         <Text style={{
           fontSize: 15,
