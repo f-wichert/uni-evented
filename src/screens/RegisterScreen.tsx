@@ -1,6 +1,6 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useContext, useState } from 'react';
-import { Image, StyleSheet, Text, TextInput, TouchableHighlight, View } from 'react-native';
+import { Image, ImageBackground, StyleSheet, Text, TextInput, TouchableHighlight, View } from 'react-native';
 
 import Ionicons from '@expo/vector-icons/Ionicons';
 
@@ -9,108 +9,134 @@ import { RootNavigatorParams } from '../App';
 import { Context as AuthContext } from '../contexts/authContext';
 import { asyncHandler } from '../util';
 
-type ComponentProps = NativeStackScreenProps<RootNavigatorParams, 'LoginScreen'>;
+type ComponentProps = NativeStackScreenProps<RootNavigatorParams, 'RegisterScreen'>;
 
-function LoginScreen({ navigation }: ComponentProps) {
+function RegisterScreen({ navigation }: ComponentProps) {
   async function login() {
     console.log(`log: ${user}`);
     // TODO: require these to be non-empty in the UI
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    await signin({ email: user!, password: password! });d
+    await signup({ email: user!, password: password! });
     navigation.navigate('TabScreen');
   }
 
   const [user, setUser] = useState<string | undefined>();
+  const [email, setEmail] = useState<string | undefined>();
   const [password, setPassword] = useState<string | undefined>();
-  const { /* state, */ signin } = useContext(AuthContext);
+  const [passwordCtrl, setPasswordCtrl] = useState<string | undefined>();
+  const { /* state, */ signup } = useContext(AuthContext);
 
   return (
     <View style={styles.container}>
       <Image style={styles.art} source={yellowSplash} />
       
-      <View style={styles.headerText}>
-        <Text
-          style={{
-            fontSize: 44,
+      <View style={styles.textBlock}>
+        <View style={styles.headerText}>
+          <Text
+            style={{
+              fontSize: 44,
+              fontWeight: 'bold',
+            }}
+          >
+            Register
+          </Text>
+          <Text style={{
+            fontSize: 15,
             fontWeight: 'bold',
-          }}
-        >
-          Login
-        </Text>
-        <Text style={{
-          fontSize: 15,
-          fontWeight: 'bold',
-          color: '#bdbdbd'
-        }}>
-          Please sign in to continue.
-        </Text>
+            color: '#bdbdbd'
+          }}>
+            Please sign in to continue.
+          </Text>
+        </View>
       </View>
       
-      <View style={{...styles.userInputBox, ...styles.elevation}}>
-        <Ionicons name={'person-outline'} size={20} color={'black'} />
-        <TextInput 
-          style={styles.userInput} 
-          onChangeText={setUser} 
-          onFocus={() => console.log('focused')}/>
-      </View>
-      <View style={{...styles.passwInputBox, ...styles.elevation}}>
-        <Ionicons name={'lock-closed-outline'} size={20} color={'black'} />
-        <TextInput style={styles.passwordInput} secureTextEntry={true} onChangeText={setPassword} />
-      </View>
+      <View style={styles.dataBlock}>
+        <View style={{...styles.userInputBox, ...styles.elevation}}>
+          <Ionicons name={'person-outline'} size={20} color={'black'} />
+          <TextInput 
+            style={styles.userInput} 
+            onChangeText={setUser} 
+            onFocus={() => console.log('focused')}/>
+        </View>
+        <View style={{...styles.passwInputBox, ...styles.elevation}}>
+          <Ionicons name={'mail-outline'} size={20} color={'black'} />
+          <TextInput style={styles.passwordInput} secureTextEntry={true} onChangeText={setEmail} />
+        </View>
+        <View style={{...styles.passwInputBox, ...styles.elevation}}>
+          <Ionicons name={'lock-closed-outline'} size={20} color={'black'} />
+          <TextInput style={styles.passwordInput} secureTextEntry={true} onChangeText={setPassword} />
+        </View>
+        <View style={{...styles.passwInputBox, ...styles.elevation}}>
+          <Ionicons name={'lock-closed-outline'} size={20} color={'black'} />
+          <TextInput style={styles.passwordInput} secureTextEntry={true} onChangeText={setPasswordCtrl} />
+        </View>
 
-      <TouchableHighlight
+
+        <TouchableHighlight
         style={styles.loginButton}
         // activeOpacity={0.6}
         onPress={asyncHandler(login)}
-      >
-        <Text
-          style={{
-            fontSize: 18,
-            fontWeight: 'bold',
-          }}
         >
-          Join!
-        </Text>
-      </TouchableHighlight>
+          <ImageBackground source={yellowSplash} resizeMode="contain" style={styles.image} >
+            <Text
+              style={{
+                fontSize: 18,
+                fontWeight: 'bold',
+              }}
+            >
+              Join!
+            </Text>
+          </ImageBackground>
+        </TouchableHighlight>
 
-      <View style={styles.footerText}>
-        <Text style={{
-          fontSize: 15,
-          fontWeight: 'bold',
-          color: '#bdbdbd'
-          }}
-        >
-          Don't have an account?
-        </Text>
-        <Text style={{
-          fontSize: 15,
-          fontWeight: 'bold',
-          color: '#D9B611'
-          }}
-        >
-           Sign up
-        </Text>
       </View>
 
+      
+      <View style={styles.infoBlock}>
+        <View style={styles.footerText}>
+          <Text style={{
+            fontSize: 15,
+            fontWeight: 'bold',
+            color: '#bdbdbd'
+            }}
+          >
+            Already got an account?
+          </Text>
+          <Text style={{
+            fontSize: 15,
+            fontWeight: 'bold',
+            color: '#D9B611'
+            }}
+            onPress={() => navigation.navigate('LoginScreen')}
+          >
+            Login
+          </Text>
+        </View>
+      </View>
 
     </View>
   );
-}
-
-{
-  /* <Button
-                title={'Join!'}
-                style={styles.loginButton}
-                onPress={login} /> */
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     margin: 40,
-    // justifyContent: 'center',
-    // backgroundColor: 'red'
-    // alignItems: 'center'
+  },
+  textBlock: {
+    flex: 25,
+    // backgroundColor: 'blue',
+    flexDirection: 'column-reverse',
+    marginBottom: 50
+  },
+  dataBlock: {
+    flex: 30,
+    // backgroundColor: 'green'
+  },
+  infoBlock: {
+    flex: 10,
+    // backgroundColor: 'yellow',
+    flexDirection: 'column-reverse'
   },
   userInputBox: {
     height: 40,
@@ -152,8 +178,8 @@ const styles = StyleSheet.create({
   },
   headerText: {
     height: 80,
-    marginTop: 200,
-    marginBottom: 70,
+    // marginTop: 200,
+    // marginBottom: 70,
     justifyContent: 'center',
     // backgroundColor: 'red'
   },
@@ -164,7 +190,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#D9B611',
     borderRadius: 20,
-    marginBottom: 170
+    // marginBottom: 170d
   },
   art: {
     height: 260,
@@ -186,7 +212,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     flexDirection: 'row',
     // bottom: 
+  },
+  image: {
+    flex: 1,
+    justifyContent: 'center',
+    // height: 20,
+    // width: 20
   }
 });
 
-export default LoginScreen;
+export default RegisterScreen;
