@@ -23,7 +23,10 @@
     "react-native": "0.70.5",
     "react-native-dropdown-picker": "^5.4.3",
     "react-native-web": "~0.18.9",
-    "react-navigation": "^4.4.4"
+    "react-navigation": "^4.4.4",
+    "@react-native-community/datetimepicker": "6.5.2",
+    "expo-location": "~15.0.1",
+    "expo-camera": "~13.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",
