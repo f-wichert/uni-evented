@@ -31,7 +31,7 @@ export async function request(
     return (await response.json()) as JSONObject;
 }
 
-export async function request2(
+export async function requestData(
     method: string,
     route: string,
     token: string | null,

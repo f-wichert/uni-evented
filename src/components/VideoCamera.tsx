@@ -3,7 +3,7 @@ import { Alert, Button, Dimensions, StyleSheet, TextInput, View, Text, Platform,
 import { Context as AuthContext } from '../contexts/authContext';
 import { Camera, CameraType } from 'expo-camera';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { request, request2 } from '../util';
+import { request, requestData } from '../util';
 
 function VideoCamera(props) {
     const [hasPermission, setHasPermission] = useState(null);
@@ -25,7 +25,7 @@ function VideoCamera(props) {
 
     const uploadVideo = async (uri: String) => {
         console.log('trying to upload')
-        await request2('POST', '/upload/clip', state.token, createFormData(uri))
+        await requestData('POST', '/upload/clip', state.token, createFormData(uri))
             .then(() => {
                 console.log('video uploaded')
             })
