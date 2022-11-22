@@ -7,6 +7,7 @@ import { Provider as AuthProvider } from './contexts/authContext';
 import CreateEventScreen from './screens/CreateEventScreen';
 import DiscoverScreen from './screens/DiscoverScreen';
 import LoginScreen from './screens/LoginScreen';
+import RegisterScreen from './screens/RegisterScreen';
 import MapScreen from './screens/MapScreen';
 import ViewEventScreen from './screens/ViewEventScreen';
 import { IoniconsName } from './types';
@@ -81,6 +82,11 @@ export default function App() {
                     <Stack.Screen
                         name="LoginScreen"
                         component={LoginScreen}
+                        options={{ headerShown: false }}
+                    />
+                    <Stack.Screen 
+                        name="RegisterScreen"
+                        component={RegisterScreen}
                         options={{ headerShown: false }}
                     />
                     <Stack.Screen name="TabScreen" component={TabScreen} options={{ headerShown: false }} />
