@@ -16,7 +16,7 @@ function LoginScreen({ navigation }: ComponentProps) {
         console.log(`log: ${user}`);
         // TODO: require these to be non-empty in the UI
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        await signin({ email: user!, password: password! });
+        // await signin({ email: user!, password: password! });
         navigation.navigate('TabScreen');
     }
 
