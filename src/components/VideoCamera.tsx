@@ -3,12 +3,30 @@ import { Alert, Button, Dimensions, StyleSheet, TextInput, View, Text, Platform,
 import { Context as AuthContext } from '../contexts/authContext';
 import { Camera, CameraType } from 'expo-camera';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { request, request2 } from '../util';
 
 function VideoCamera(props) {
     const [hasPermission, setHasPermission] = useState(null);
     const [type, setType] = useState(CameraType.back);
     const [recording, setRecording] = useState(false);
     const cameraRef = useRef(null);
+    const { state } = useContext(AuthContext);
+
+    const createFormData = (uri) => {
+        // Here uri means the url of the video you captured
+        const form = new FormData();
+        form.append("File", {
+            name: "SampleVideo",
+            uri: uri,
+            type: "video/mp4",
+        });
+        return form;
+    }
+
+    const uploadVideo = async (uri: String) => {
+        console.log('trying to upload')
+        await request2('POST', '/upload/clip', state.token, createFormData(uri));
+    };
 
     useEffect(() => {
         (async () => {
@@ -61,7 +79,7 @@ function VideoCamera(props) {
                                     setRecording(true);
                                     cameraRef.current.recordAsync()
                                         .then((obj) => {
-                                            console.log(obj.uri);
+                                            uploadVideo(obj.uri);
                                             props.onFinish(false);
                                         })
                                 } else {

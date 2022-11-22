@@ -34,7 +34,7 @@ const authReducer = (state: State, action: Action): State => {
 
 const signin = (dispatch: Dispatch<Action>) => {
     return async ({ email, password }: { email: string; password: string }) => {
-        const data = await request('POST', '/auth/login', null, {
+        const data = await request('POST', '/auth/register', null, {
             username: email,
             password: password,
         });
