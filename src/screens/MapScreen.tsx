@@ -40,7 +40,8 @@ function MapScreen() {
                             latitude: location.coords.latitude,
                             longitude: location.coords.longitude,
                         }}
-                        title='You'
+                        title='Your position'
+                        description="That's where you currently are!"
                     />
                 </MapView >
                 : null
