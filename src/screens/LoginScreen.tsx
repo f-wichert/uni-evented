@@ -16,7 +16,7 @@ function LoginScreen({ navigation }: ComponentProps) {
     console.log(`log: ${user}`);
     // TODO: require these to be non-empty in the UI
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    await signin({ email: user!, password: password! });d
+    // await signin({ email: user!, password: password! });
     navigation.navigate('TabScreen');
   }
 
@@ -28,89 +28,98 @@ function LoginScreen({ navigation }: ComponentProps) {
     <View style={styles.container}>
       <Image style={styles.art} source={yellowSplash} />
       
-      <View style={styles.headerText}>
-        <Text
-          style={{
-            fontSize: 44,
+      <View style={styles.textBlock}>
+        <View style={styles.headerText}>
+          <Text
+            style={{
+              fontSize: 44,
+              fontWeight: 'bold',
+            }}
+          >
+            Login
+          </Text>
+          <Text style={{
+            fontSize: 15,
             fontWeight: 'bold',
-          }}
-        >
-          Login
-        </Text>
-        <Text style={{
-          fontSize: 15,
-          fontWeight: 'bold',
-          color: '#bdbdbd'
-        }}>
-          Please sign in to continue.
-        </Text>
+            color: '#bdbdbd'
+          }}>
+            Please sign in to continue.
+          </Text>
+        </View>
       </View>
       
-      <View style={{...styles.userInputBox, ...styles.elevation}}>
-        <Ionicons name={'person-outline'} size={20} color={'black'} />
-        <TextInput 
-          style={styles.userInput} 
-          onChangeText={setUser} 
-          onFocus={() => console.log('focused')}/>
-      </View>
-      <View style={{...styles.passwInputBox, ...styles.elevation}}>
-        <Ionicons name={'lock-closed-outline'} size={20} color={'black'} />
-        <TextInput style={styles.passwordInput} secureTextEntry={true} onChangeText={setPassword} />
-      </View>
+      <View style={styles.dataBlock}>
+        <View style={{...styles.userInputBox, ...styles.elevation}}>
+          <Ionicons name={'person-outline'} size={20} color={'black'} />
+          <TextInput 
+            style={styles.userInput} 
+            onChangeText={setUser} 
+            onFocus={() => console.log('focused')}/>
+        </View>
+        <View style={{...styles.passwInputBox, ...styles.elevation}}>
+          <Ionicons name={'lock-closed-outline'} size={20} color={'black'} />
+          <TextInput style={styles.passwordInput} secureTextEntry={true} onChangeText={setPassword} />
+        </View>
 
-      <TouchableHighlight
+        <TouchableHighlight
         style={styles.loginButton}
         // activeOpacity={0.6}
         onPress={asyncHandler(login)}
-      >
-        <Text
-          style={{
-            fontSize: 18,
-            fontWeight: 'bold',
-          }}
         >
-          Join!
-        </Text>
-      </TouchableHighlight>
+          <Text
+            style={{
+              fontSize: 18,
+              fontWeight: 'bold',
+            }}
+          >
+            Join!
+          </Text>
+        </TouchableHighlight>
 
-      <View style={styles.footerText}>
-        <Text style={{
-          fontSize: 15,
-          fontWeight: 'bold',
-          color: '#bdbdbd'
-          }}
-        >
-          Don't have an account?
-        </Text>
-        <Text style={{
-          fontSize: 15,
-          fontWeight: 'bold',
-          color: '#D9B611'
-          }}
-        >
-           Sign up
-        </Text>
       </View>
 
+      
+      <View style={styles.infoBlock}>
+        <View style={styles.footerText}>
+          <Text style={{
+            fontSize: 15,
+            fontWeight: 'bold',
+            color: '#bdbdbd'
+            }}
+          >
+            Don't have an account?
+          </Text>
+          <Text style={{
+            fontSize: 15,
+            fontWeight: 'bold',
+            color: '#D9B611'
+            }}
+          >
+            Sign up
+          </Text>
+        </View>
+      </View>
 
     </View>
   );
-}
-
-{
-  /* <Button
-                title={'Join!'}
-                style={styles.loginButton}
-                onPress={login} /> */
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     margin: 40,
-    // justifyContent: 'center',
-    // backgroundColor: 'red'
-    // alignItems: 'center'
+  },
+  textBlock: {
+    flex: 1,
+    backgroundColor: 'blue'
+  },
+  dataBlock: {
+    flex: 1,
+    backgroundColor: 'green'
+  },
+  infoBlock: {
+    flex: 1,
+    backgroundColor: 'yellow'
   },
   userInputBox: {
     height: 40,
@@ -155,7 +164,7 @@ const styles = StyleSheet.create({
     marginTop: 200,
     marginBottom: 70,
     justifyContent: 'center',
-    // backgroundColor: 'red'
+    backgroundColor: 'red'
   },
   loginButton: {
     width: 110,
