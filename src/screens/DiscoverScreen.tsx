@@ -30,7 +30,7 @@ function getDiscoverData() {
 
 function DiscoverScreen(props) {
   async function updateClips() {
-    const data = await request('GET', '/info/all_clips', null, {});
+    const data = await request('GET', '/info/all_clips', null);
     console.log(`Fetched data: ${JSON.stringify(data)}`);
     
 
