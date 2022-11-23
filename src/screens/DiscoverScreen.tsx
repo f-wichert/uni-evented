@@ -8,65 +8,53 @@ import { request } from '../util';
 
 import Discover from '../components/Discover';
 
-const BASE_URL = 'http://10.0.2.2:3001/api'
+// const BASE_URL = 'http://10.0.2.2:3001/api'
+const BASE_URL = 'http://192.168.2.104:3001/api';
 const BASE_CLIP_NAME = 'output.m3u8'
 
 function getDiscoverData() {
-  return [{
-      id: 1,
-      name: 'Hulahoop',
-      score: 7,
-      src: `${BASE_URL}/hls/test_clip/${BASE_CLIP_NAME}`,
-      src_tt: 'https://media1.giphy.com/media/26tPghhb310muUkEw/giphy.gif?cid=790b761196948897dfeab8f83d9f6f966f882d3aa2f52cad&rid=giphy.gif&ct=g',
-      src_t: 'https://images.pexels.com/photos/799443/pexels-photo-799443.jpeg?auto=compress&cs=tinysrgb&w=1600'
-  },
-  {
-      id: 2,
-      score: 2,
-      src: `${BASE_URL}/hls/test_clip/${BASE_CLIP_NAME}`,
-      src_t: 'https://media0.giphy.com/media/mOZ7nolkGapzpDnvgW/giphy.gif?cid=ecf05e4712jtgto9d53xxd976gle9kjw0t0odr46blolq6bk&rid=giphy.gif&ct=g'
-  },]
+    return [];
 }
 
 function DiscoverScreen(props) {
-  async function updateClips() {
-    const data = await request('GET', '/info/all_clips', null);
-    console.log(`Fetched data: ${JSON.stringify(data)}`);
-    
+    async function updateClips() {
+        const data = await request('GET', '/info/all_clips', null);
+        console.log(`Fetched data: ${JSON.stringify(data)}`);
 
-    var new_clips = []
-    for (const clip in data) {
-      new_clips.push({
-        id: clip.id,
-        src: `${BASE_URL}/hls/${clip.id}/index.m3u8`
-      })
+
+        var new_clips = []
+        for (const clip of data) {
+            new_clips.push({
+                id: clip.id,
+                src: `${BASE_URL}/hls/${clip.id}/index.m3u8`
+            })
+        }
+
+        setDiscoverData(new_clips)
+
     }
 
-    setDiscoverData([...discoverData, ...new_clips])
+    const width = Dimensions.get('window').width;
+    // var discoverData = getDiscoverData();
 
-  }
+    const [discoverData, setDiscoverData] = React.useState(getDiscoverData);
 
-  const width = Dimensions.get('window').width;
-  // var discoverData = getDiscoverData();
+    React.useEffect(() => {
+        // Use `setOptions` to update the button that we previously specified
+        // Now the button includes an `onPress` handler to update the discoverData
+        props.navigation.setOptions({
+            headerRight: () => (
+                <Button
+                    // onPress={() => setDiscoverData([...discoverData, { id: 4 }])} 
+                    onPress={() => updateClips()}
+                    title="Reload" />
+            ),
+        });
+    }, [props.navigation]);
 
-  const [discoverData, setDiscoverData] = React.useState(getDiscoverData);
-
-  React.useEffect(() => {
-    // Use `setOptions` to update the button that we previously specified
-    // Now the button includes an `onPress` handler to update the discoverData
-    props.navigation.setOptions({
-      headerRight: () => (
-        <Button
-          // onPress={() => setDiscoverData([...discoverData, { id: 4 }])} 
-          onPress={() => updateClips()}
-          title="Reload" />
-      ),
-    });
-  }, [props.navigation]);
-
-  return (
-    <View style={styles.container}>
-      <GestureHandlerRootView>
+    return (
+        <View style={styles.container}>
+            <GestureHandlerRootView>
                 <Carousel
                     vertical={true}
                     width={width}
@@ -84,17 +72,17 @@ function DiscoverScreen(props) {
                     )}
                 />
             </GestureHandlerRootView>
-    </View>
-  );
+        </View>
+    );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
+    container: {
+        flex: 1,
+        backgroundColor: '#fff',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
 });
 
 export default DiscoverScreen;
