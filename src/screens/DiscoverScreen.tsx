@@ -36,9 +36,11 @@ function DiscoverScreen(props) {
     for (const clip in data) {
       new_clips.push({
         id: clip.id,
-        src: `${BASE_URL}/hls/${clip.id}/${BASE_CLIP_NAME}`
+        src: `${BASE_URL}/hls/${clip.id}/index.m3u8`
       })
     }
+
+    setDiscoverData([...discoverData, ...new_clips])
 
   }
 
@@ -53,7 +55,8 @@ function DiscoverScreen(props) {
     props.navigation.setOptions({
       headerRight: () => (
         <Button
-          onPress={() => setDiscoverData([...discoverData, { id: 4 }])} 
+          // onPress={() => setDiscoverData([...discoverData, { id: 4 }])} 
+          onPress={() => updateClips()}
           title="Reload" />
       ),
     });
