@@ -1,17 +1,16 @@
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import React, { useContext } from 'react';
-import Ionicons from '@expo/vector-icons/Ionicons';
-import { Provider as AuthProvider } from './contexts/authContext';
+import { Context as AuthContext, Provider as AuthProvider } from './contexts/authContext';
 import CreateEventScreen from './screens/CreateEventScreen';
 import DiscoverScreen from './screens/DiscoverScreen';
 import LoginScreen from './screens/LoginScreen';
-import RegisterScreen from './screens/RegisterScreen';
 import MapScreen from './screens/MapScreen';
+import RegisterScreen from './screens/RegisterScreen';
 import ViewEventScreen from './screens/ViewEventScreen';
 import { IoniconsName } from './types';
-import { Context as AuthContext } from './contexts/authContext';
 
 // https://reactnavigation.org/docs/typescript/
 
@@ -66,9 +65,11 @@ function TabScreen() {
             initialRouteName={state.eventActive ? 'Event' : 'Discover'}
         >
             <Tab.Screen name="Discover" component={DiscoverScreen} />
-            {state.eventActive ?
-                <Tab.Screen name="Event" component={ViewEventScreen} /> :
-                <Tab.Screen name="Create" component={CreateEventScreen} />}
+            {state.eventActive ? (
+                <Tab.Screen name="Event" component={ViewEventScreen} />
+            ) : (
+                <Tab.Screen name="Create" component={CreateEventScreen} />
+            )}
             <Tab.Screen name="Map" component={MapScreen} />
         </Tab.Navigator>
     );
@@ -84,12 +85,16 @@ export default function App() {
                         component={LoginScreen}
                         options={{ headerShown: false }}
                     />
-                    <Stack.Screen 
+                    <Stack.Screen
                         name="RegisterScreen"
                         component={RegisterScreen}
                         options={{ headerShown: false }}
                     />
-                    <Stack.Screen name="TabScreen" component={TabScreen} options={{ headerShown: false }} />
+                    <Stack.Screen
+                        name="TabScreen"
+                        component={TabScreen}
+                        options={{ headerShown: false }}
+                    />
                     {/* <Stack.Screen name="EventScreen" component={ViewEventScreen} /> */}
                 </Stack.Navigator>
             </NavigationContainer>

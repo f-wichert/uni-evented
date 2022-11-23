@@ -8,5 +8,5 @@ export type IoniconsName = IconName<typeof Ionicons>;
 export type JSONValue = string | number | boolean | JSONObject | JSONValue[];
 
 export interface JSONObject {
-  [x: string]: JSONValue;
+    [x: string]: JSONValue;
 }

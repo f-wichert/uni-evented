@@ -48,7 +48,7 @@ export async function requestData(
 
     const response = await fetch(url, {
         method: method,
-        body: data,//JSON.stringify(data),
+        body: data, //JSON.stringify(data),
         headers: headers,
     });
     if (response.status !== 200) {

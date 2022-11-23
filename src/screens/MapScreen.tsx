@@ -1,19 +1,15 @@
-import React, { useState, useContext, useEffect, useRef } from 'react';
-import { Alert, Button, Dimensions, StyleSheet, TextInput, View, Text, Platform, TouchableOpacity } from 'react-native';
-import { Context as AuthContext } from '../contexts/authContext';
-import MapView, { Marker } from 'react-native-maps';
-import Ionicons from '@expo/vector-icons/Ionicons';
 import * as Location from 'expo-location';
+import React, { useEffect, useState } from 'react';
+import { Dimensions, StyleSheet, View } from 'react-native';
+import MapView, { Marker } from 'react-native-maps';
 
 function MapScreen() {
-
     // Location State
     const [location, setLocation] = useState(null);
     const [locationReady, setLocationReady] = useState(false);
 
     useEffect(() => {
         (async () => {
-
             let { status } = await Location.requestForegroundPermissionsAsync();
             if (status !== 'granted') {
                 setErrorMsg('Permission to access location was denied');
@@ -29,9 +25,14 @@ function MapScreen() {
 
     return (
         <View style={styles.container}>
-            {locationReady ?
+            {locationReady ? (
                 <MapView
-                    initialRegion={{ latitude: location.coords.latitude, longitude: location.coords.longitude, latitudeDelta: 0.01, longitudeDelta: 0.01 }}
+                    initialRegion={{
+                        latitude: location.coords.latitude,
+                        longitude: location.coords.longitude,
+                        latitudeDelta: 0.01,
+                        longitudeDelta: 0.01,
+                    }}
                     style={styles.map}
                 >
                     <Marker
@@ -40,13 +41,11 @@ function MapScreen() {
                             latitude: location.coords.latitude,
                             longitude: location.coords.longitude,
                         }}
-                        title='Your position'
+                        title="Your position"
                         description="That's where you currently are!"
                     />
-                </MapView >
-                : null
-            }
-
+                </MapView>
+            ) : null}
         </View>
     );
 }

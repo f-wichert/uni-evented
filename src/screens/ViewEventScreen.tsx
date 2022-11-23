@@ -1,10 +1,8 @@
-import React, { useState, useContext, useEffect, useRef } from 'react';
-import { Alert, Button, Dimensions, StyleSheet, TextInput, View, Text, Platform, TouchableOpacity } from 'react-native';
-import { Context as AuthContext } from '../contexts/authContext';
-import { AutoFocus, Camera, CameraType } from 'expo-camera';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import React, { useContext, useState } from 'react';
+import { Button, StyleSheet, Text, View } from 'react-native';
 import VideoCamera from '../components/VideoCamera';
-
+import { Context as AuthContext } from '../contexts/authContext';
 
 function ViewEventScreen() {
     const { state, closeEvent } = useContext(AuthContext);
@@ -12,21 +10,29 @@ function ViewEventScreen() {
 
     return (
         <>
-            {cameraActive ?
-                <VideoCamera onFinish={setCameraActive} /> :
-                <View style={[styles.container,]}>
-                    < View style={[styles.flexEl, styles.camera,]} >
-                        <Ionicons name="camera" size={32} color="orange" onPress={() => setCameraActive(true)} />
-                    </View >
-                    <Text style={[styles.flexEl,]}>Sample Event Name</Text>
-                    <Button style={[styles.flexEl, styles.button,]} color="orange" title="Close Event" onPress={() => closeEvent()} />
-                </View >
-            }
-
+            {cameraActive ? (
+                <VideoCamera onFinish={setCameraActive} />
+            ) : (
+                <View style={[styles.container]}>
+                    <View style={[styles.flexEl, styles.camera]}>
+                        <Ionicons
+                            name="camera"
+                            size={32}
+                            color="orange"
+                            onPress={() => setCameraActive(true)}
+                        />
+                    </View>
+                    <Text style={[styles.flexEl]}>Sample Event Name</Text>
+                    <Button
+                        style={[styles.flexEl, styles.button]}
+                        color="orange"
+                        title="Close Event"
+                        onPress={() => closeEvent()}
+                    />
+                </View>
+            )}
         </>
-    )
-
-
+    );
 }
 
 const styles = StyleSheet.create({
@@ -43,23 +49,22 @@ const styles = StyleSheet.create({
         marginBottom: 10,
     },
     row: {
-        display: "flex",
-        flexDirection: "row",
-        justifyContent: "space-evenly",
+        display: 'flex',
+        flexDirection: 'row',
+        justifyContent: 'space-evenly',
     },
     flexEl: {
         flex: 0.5,
         padding: 20,
     },
-    button: {
-    },
+    button: {},
     camera: {
         display: 'flex',
         backgroundColor: 'grey',
         alignSelf: 'stretch',
         alignItems: 'center',
         justifyContent: 'center',
-    }
+    },
 });
 
 export default ViewEventScreen;
