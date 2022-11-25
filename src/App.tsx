@@ -3,6 +3,8 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import React, { useContext } from 'react';
+import { default as Toast, ToastProvider } from 'react-native-toast-notifications';
+
 import { Context as AuthContext, Provider as AuthProvider } from './contexts/authContext';
 import CreateEventScreen from './screens/CreateEventScreen';
 import DiscoverScreen from './screens/DiscoverScreen';
@@ -78,26 +80,40 @@ function TabScreen() {
 export default function App() {
     return (
         <AuthProvider>
-            <NavigationContainer>
-                <Stack.Navigator>
-                    <Stack.Screen
-                        name="LoginScreen"
-                        component={LoginScreen}
-                        options={{ headerShown: false }}
-                    />
-                    <Stack.Screen
-                        name="RegisterScreen"
-                        component={RegisterScreen}
-                        options={{ headerShown: false }}
-                    />
-                    <Stack.Screen
-                        name="TabScreen"
-                        component={TabScreen}
-                        options={{ headerShown: false }}
-                    />
-                    {/* <Stack.Screen name="EventScreen" component={ViewEventScreen} /> */}
-                </Stack.Navigator>
-            </NavigationContainer>
+            <ToastProvider>
+                <NavigationContainer>
+                    <Stack.Navigator>
+                        <Stack.Screen
+                            name="LoginScreen"
+                            component={LoginScreen}
+                            options={{ headerShown: false }}
+                        />
+                        <Stack.Screen
+                            name="RegisterScreen"
+                            component={RegisterScreen}
+                            options={{ headerShown: false }}
+                        />
+                        <Stack.Screen
+                            name="TabScreen"
+                            component={TabScreen}
+                            options={{ headerShown: false }}
+                        />
+                        {/* <Stack.Screen name="EventScreen" component={ViewEventScreen} /> */}
+                    </Stack.Navigator>
+                </NavigationContainer>
+                <Toast
+                    // make `toast.show` globally available
+                    ref={(ref) => ref && (globalThis['toast'] = ref)}
+                    placement="top"
+                    offset={20}
+                    successIcon={<Ionicons name="checkmark" color="#fff" size={18} />}
+                    // successColor=''
+                    warningIcon={<Ionicons name="warning" color="#fff" size={18} />}
+                    warningColor="gold"
+                    dangerIcon={<Ionicons name="close" color="#fff" size={18} />}
+                    // dangerColor=''
+                />
+            </ToastProvider>
         </AuthProvider>
     );
 }

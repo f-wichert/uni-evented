@@ -6,5 +6,6 @@
         "paths": {
             "~/*": ["*"] // resolve any `~/foo/bar` to `<baseUrl>/foo/bar`
         }
-    }
+    },
+    "typeRoots": ["src/index.d.ts"]
 }
