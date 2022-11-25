@@ -5,7 +5,10 @@ interface State {
     eventActive: boolean;
 }
 
-type Action = { type: 'createEvent' } | { type: 'closeEvent' };
+// prettier-ignore
+type Action =
+    | { type: 'createEvent' }
+    | { type: 'closeEvent' };
 
 const eventReducer = (state: State, action: Action): State => {
     switch (action.type) {
