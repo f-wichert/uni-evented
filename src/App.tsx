@@ -2,7 +2,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import React, { useContext } from 'react';
+import React, { ReactNode, useContext } from 'react';
 import { default as Toast, ToastProvider } from 'react-native-toast-notifications';
 
 import { Context as AuthContext, Provider as AuthProvider } from './contexts/authContext';
@@ -15,6 +15,7 @@ import ViewEventScreen from './screens/ViewEventScreen';
 import { IoniconsName } from './types';
 
 // https://reactnavigation.org/docs/typescript/
+// instead of `undefined`, props passed to these screens would be defined here if applicable
 
 export type RootNavigatorParams = {
     LoginScreen: undefined;
@@ -77,43 +78,51 @@ function TabScreen() {
     );
 }
 
-export default function App() {
+// wrapper for providers and similar root components,
+// to avoid constantly having to indent the app hierarchy below further
+function RootWrapper({ children }: { children: ReactNode }) {
     return (
         <AuthProvider>
-            <ToastProvider>
-                <NavigationContainer>
-                    <Stack.Navigator>
-                        <Stack.Screen
-                            name="LoginScreen"
-                            component={LoginScreen}
-                            options={{ headerShown: false }}
-                        />
-                        <Stack.Screen
-                            name="RegisterScreen"
-                            component={RegisterScreen}
-                            options={{ headerShown: false }}
-                        />
-                        <Stack.Screen
-                            name="TabScreen"
-                            component={TabScreen}
-                            options={{ headerShown: false }}
-                        />
-                        {/* <Stack.Screen name="EventScreen" component={ViewEventScreen} /> */}
-                    </Stack.Navigator>
-                </NavigationContainer>
-                <Toast
-                    // make `toast.show` globally available
-                    ref={(ref) => ref && (globalThis['toast'] = ref)}
-                    placement="top"
-                    offset={20}
-                    successIcon={<Ionicons name="checkmark" color="#fff" size={18} />}
-                    // successColor=''
-                    warningIcon={<Ionicons name="warning" color="#fff" size={18} />}
-                    warningColor="gold"
-                    dangerIcon={<Ionicons name="close" color="#fff" size={18} />}
-                    // dangerColor=''
-                />
-            </ToastProvider>
+            <ToastProvider>{children}</ToastProvider>
         </AuthProvider>
+    );
+}
+
+export default function App() {
+    return (
+        <RootWrapper>
+            <NavigationContainer>
+                <Stack.Navigator>
+                    <Stack.Screen
+                        name="LoginScreen"
+                        component={LoginScreen}
+                        options={{ headerShown: false }}
+                    />
+                    <Stack.Screen
+                        name="RegisterScreen"
+                        component={RegisterScreen}
+                        options={{ headerShown: false }}
+                    />
+                    <Stack.Screen
+                        name="TabScreen"
+                        component={TabScreen}
+                        options={{ headerShown: false }}
+                    />
+                    {/* <Stack.Screen name="EventScreen" component={ViewEventScreen} /> */}
+                </Stack.Navigator>
+            </NavigationContainer>
+            <Toast
+                // make `toast.show` globally available
+                ref={(ref) => ref && (globalThis['toast'] = ref)}
+                placement="top"
+                offset={20}
+                successIcon={<Ionicons name="checkmark" color="#fff" size={18} />}
+                // successColor=''
+                warningIcon={<Ionicons name="warning" color="#fff" size={18} />}
+                warningColor="gold"
+                dangerIcon={<Ionicons name="close" color="#fff" size={18} />}
+                // dangerColor=''
+            />
+        </RootWrapper>
     );
 }
