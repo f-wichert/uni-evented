@@ -53,7 +53,7 @@ const signup = (dispatch: Dispatch<Action>) => {
         password,
     }: {
         username: string;
-        // email: string;
+        email: string;
         password: string;
     }) => {
         const data = await request('POST', '/auth/register', null, {
