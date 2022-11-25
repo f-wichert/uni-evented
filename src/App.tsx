@@ -88,6 +88,23 @@ function RootWrapper({ children }: { children: ReactNode }) {
     );
 }
 
+function ToastRoot() {
+    return (
+        <Toast
+            // make `toast.show` globally available
+            ref={(ref) => ref && (globalThis['toast'] = ref)}
+            placement="top"
+            offset={20}
+            successIcon={<Ionicons name="checkmark" color="#fff" size={18} />}
+            // successColor=''
+            warningIcon={<Ionicons name="warning" color="#fff" size={18} />}
+            warningColor="gold"
+            dangerIcon={<Ionicons name="close" color="#fff" size={18} />}
+            // dangerColor=''
+        />
+    );
+}
+
 export default function App() {
     return (
         <RootWrapper>
@@ -111,18 +128,7 @@ export default function App() {
                     {/* <Stack.Screen name="EventScreen" component={ViewEventScreen} /> */}
                 </Stack.Navigator>
             </NavigationContainer>
-            <Toast
-                // make `toast.show` globally available
-                ref={(ref) => ref && (globalThis['toast'] = ref)}
-                placement="top"
-                offset={20}
-                successIcon={<Ionicons name="checkmark" color="#fff" size={18} />}
-                // successColor=''
-                warningIcon={<Ionicons name="warning" color="#fff" size={18} />}
-                warningColor="gold"
-                dangerIcon={<Ionicons name="close" color="#fff" size={18} />}
-                // dangerColor=''
-            />
+            <ToastRoot />
         </RootWrapper>
     );
 }
