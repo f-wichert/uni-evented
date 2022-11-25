@@ -1,11 +1,12 @@
-import React, { useContext, useState } from 'react';
-import { Button, Dimensions, StyleSheet, Text, TextInput, View } from 'react-native';
-import DropDownPicker from 'react-native-dropdown-picker';
-import { Context as AuthContext } from '../contexts/authContext';
-// import DateTimePicker from '@react-native-community/datetimepicker';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
 import * as Location from 'expo-location';
+import React, { useContext, useState } from 'react';
+import { Button, Dimensions, StyleSheet, Text, TextInput, View } from 'react-native';
+import DropDownPicker from 'react-native-dropdown-picker';
+// import DateTimePicker from '@react-native-community/datetimepicker';
+
+import { EventContext } from '../contexts/eventContext';
 
 const width = Dimensions.get('window').width;
 // const height = Dimensions.get('window').height;
@@ -44,7 +45,7 @@ function CreateEventScreen() {
     // Location icon
     const [iconName, setIconName] = useState('location-outline');
 
-    const { createEvent } = useContext(AuthContext);
+    const { createEvent } = useContext(EventContext);
 
     const onChange = (event, selectedDate) => {
         const currentDate = selectedDate;

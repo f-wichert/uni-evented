@@ -2,7 +2,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { Camera, CameraType } from 'expo-camera';
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
-import { Context as AuthContext } from '../contexts/authContext';
+import { AuthContext } from '../contexts/authContext';
 import { requestData } from '../util';
 
 function VideoCamera(props) {

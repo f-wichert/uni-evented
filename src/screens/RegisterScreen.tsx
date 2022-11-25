@@ -14,7 +14,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 
 import yellowSplash from '../../assets/yellow_splash.png';
 import { RootNavigatorParams } from '../App';
-import { Context as AuthContext } from '../contexts/authContext';
+import { AuthContext } from '../contexts/authContext';
 import { asyncHandler } from '../util';
 
 type ComponentProps = NativeStackScreenProps<RootNavigatorParams, 'RegisterScreen'>;

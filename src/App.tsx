@@ -4,7 +4,8 @@ import React, { ReactNode } from 'react';
 import { ToastProvider } from 'react-native-toast-notifications';
 
 import ToastRoot from './components/ToastRoot';
-import { Provider as AuthProvider } from './contexts/authContext';
+import { AuthProvider } from './contexts/authContext';
+import { EventProvider } from './contexts/eventContext';
 import TabNavigator from './nav/TabNavigator';
 import LoginScreen from './screens/LoginScreen';
 import RegisterScreen from './screens/RegisterScreen';
@@ -25,7 +26,9 @@ const Stack = createNativeStackNavigator<RootNavigatorParams>();
 function RootWrapper({ children }: { children: ReactNode }) {
     return (
         <AuthProvider>
-            <ToastProvider>{children}</ToastProvider>
+            <EventProvider>
+                <ToastProvider>{children}</ToastProvider>
+            </EventProvider>
         </AuthProvider>
     );
 }
