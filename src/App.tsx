@@ -1,10 +1,10 @@
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import React, { ReactNode } from 'react';
-import { ToastProvider } from 'react-native-toast-notifications';
+import React, { useContext } from 'react';
 
 import ToastRoot from './components/ToastRoot';
-import { Provider as AuthProvider } from './contexts/authContext';
+import { AuthContext, AuthProvider } from './contexts/authContext';
+import { EventProvider } from './contexts/eventContext';
 import TabNavigator from './nav/TabNavigator';
 import LoginScreen from './screens/LoginScreen';
 import RegisterScreen from './screens/RegisterScreen';
@@ -20,40 +20,52 @@ export type RootNavigatorParams = {
 
 const Stack = createNativeStackNavigator<RootNavigatorParams>();
 
-// wrapper for providers and similar root components,
-// to avoid constantly having to indent the app hierarchy below further
-function RootWrapper({ children }: { children: ReactNode }) {
-    return (
-        <AuthProvider>
-            <ToastProvider>{children}</ToastProvider>
-        </AuthProvider>
-    );
+function App() {
+    const { state: authState } = useContext(AuthContext);
+
+    // https://reactnavigation.org/docs/auth-flow
+    let screens;
+    if (authState.token) {
+        screens = (
+            <>
+                <Stack.Screen
+                    name="TabScreen"
+                    component={TabNavigator}
+                    options={{ headerShown: false, animation: 'fade' }}
+                />
+            </>
+        );
+    } else {
+        // TODO: fix signout animation using `animationTypeForReplace`
+        screens = (
+            <>
+                <Stack.Screen
+                    name="LoginScreen"
+                    component={LoginScreen}
+                    options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                    name="RegisterScreen"
+                    component={RegisterScreen}
+                    options={{ headerShown: false }}
+                />
+            </>
+        );
+    }
+
+    return <Stack.Navigator>{screens}</Stack.Navigator>;
 }
 
-export default function App() {
+export default function Root() {
     return (
-        <RootWrapper>
-            <NavigationContainer>
-                <Stack.Navigator>
-                    <Stack.Screen
-                        name="LoginScreen"
-                        component={LoginScreen}
-                        options={{ headerShown: false }}
-                    />
-                    <Stack.Screen
-                        name="RegisterScreen"
-                        component={RegisterScreen}
-                        options={{ headerShown: false }}
-                    />
-                    <Stack.Screen
-                        name="TabScreen"
-                        component={TabNavigator}
-                        options={{ headerShown: false }}
-                    />
-                </Stack.Navigator>
-            </NavigationContainer>
+        <AuthProvider>
+            <EventProvider>
+                <NavigationContainer>
+                    <App />
+                </NavigationContainer>
 
-            <ToastRoot />
-        </RootWrapper>
+                <ToastRoot />
+            </EventProvider>
+        </AuthProvider>
     );
 }

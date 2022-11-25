@@ -2,7 +2,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import React, { useContext } from 'react';
 
-import { Context as AuthContext } from '../contexts/authContext';
+import { EventContext } from '../contexts/eventContext';
 import CreateEventScreen from '../screens/CreateEventScreen';
 import DiscoverScreen from '../screens/DiscoverScreen';
 import MapScreen from '../screens/MapScreen';
@@ -21,7 +21,7 @@ export type TabNavigatorParams = {
 export const Tab = createBottomTabNavigator<TabNavigatorParams>();
 
 export default function TabNavigator() {
-    const { state } = useContext(AuthContext);
+    const { state } = useContext(EventContext);
 
     return (
         <Tab.Navigator
