@@ -22,9 +22,14 @@ type ComponentProps = NativeStackScreenProps<RootNavigatorParams, 'LoginScreen'>
 function LoginScreen({ navigation }: ComponentProps) {
     async function login() {
         console.log(`log: ${user}`);
-        // TODO: require these to be non-empty in the UI
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        await signin({ email: user!, password: password! });
+        try {
+            // TODO: require these to be non-empty in the UI
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            await signin({ email: user!, password: password! });
+        } catch (e) {
+            toast.show(`An error occurred:\n${e}`, { type: 'danger' });
+            throw e;
+        }
         navigation.navigate('TabScreen');
     }
 
