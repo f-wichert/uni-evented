@@ -23,14 +23,13 @@ function LoginScreen({ navigation }: ComponentProps) {
     async function login() {
         console.log(`log: ${user}`);
         try {
+            // this automatically navigates to the main screen when the token gets set
             // TODO: require these to be non-empty in the UI
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            await signin({ email: user!, password: password! });
+            await signin({ email: user || '', password: password || '' });
         } catch (e) {
             toast.show(`An error occurred:\n${e}`, { type: 'danger' });
             throw e;
         }
-        navigation.navigate('TabScreen');
     }
 
     const [user, setUser] = useState<string | undefined>();
