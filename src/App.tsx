@@ -19,8 +19,8 @@ import { IoniconsName } from './types';
 
 export type RootNavigatorParams = {
     LoginScreen: undefined;
+    RegisterScreen: undefined;
     TabScreen: undefined;
-    EventScreen: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootNavigatorParams>();
