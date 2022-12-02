@@ -12,7 +12,7 @@ function Discover(props) {
                 ref={video}
                 style={styles.video}
                 source={{
-                    uri: 'http://10.0.2.2:3001/api/hls/test_clip/output.m3u8',
+                    uri: props.discoverData.src,
                 }}
                 useNativeControls
                 resizeMode="contain"
@@ -36,8 +36,10 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: 'red',
-        margin: 5,
+        // backgroundColor: 'red',
+        borderWidth: 2,
+        borderRadius: 8,
+        margin: 5
     },
     backgroundVideo: {
         position: 'absolute',
@@ -47,8 +49,8 @@ const styles = StyleSheet.create({
         right: 0,
     },
     video: {
-        width: 300,
-        height: 300,
+        width: 350,
+        height: 450
         // flex: 1
     },
 });
