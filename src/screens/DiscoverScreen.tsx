@@ -16,7 +16,7 @@ const BASE_CLIP_NAME = 'output.m3u8'
 
 function DiscoverScreen(props) {
     async function updateClips() {
-        const data = await request('GET', '/info/all_clips', null);
+        const data = await request('GET', 'info/all_media', null);
         console.log(`Fetched data: ${JSON.stringify(data)}`);
 
 
