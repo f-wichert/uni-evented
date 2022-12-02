@@ -12,24 +12,35 @@ function VideoCamera(props) {
     const cameraRef = useRef(null);
     const { state } = useContext(AuthContext);
 
-    const createFormData = (uri) => {
+    const createFormData = (uri: string, type: string) => {
         // Here uri means the url of the video you captured
         const form = new FormData();
         form.append('File', {
-            name: 'SampleVideo',
+            name: 'Sample',
             uri: uri,
-            type: 'video/mp4',
+            type: type,
         });
         return form;
     };
 
     const uploadVideo = async (uri: String) => {
-        console.log('trying to upload');
         await requestData('POST', '/upload/clip', state.token, createFormData(uri))
             .then(() => {
                 console.log('video uploaded');
             })
-            .catch(() => {});
+            .catch(() => { });
+    };
+
+    const uploadPhoto = async (uri: String) => {
+        let filename = uri.split('/').pop();
+        let match = /\.(\w+)$/.exec(filename);
+        let type = match ? `image/${match[1]}` : `image`;
+
+        await requestData('POST', '/upload/image', state.token, createFormData(uri, type))
+            .then(() => {
+                console.log('photo uploaded');
+            })
+            .catch(() => { });
     };
 
     useEffect(() => {
@@ -66,7 +77,7 @@ function VideoCamera(props) {
                             onPress={async () => {
                                 if (cameraRef.current) {
                                     let photo = await cameraRef.current.takePictureAsync();
-                                    console.log('photo', photo);
+                                    uploadPhoto(photo.uri);
                                     props.onFinish(false);
                                 }
                             }}
