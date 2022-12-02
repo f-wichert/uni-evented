@@ -1,55 +1,65 @@
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, Dimensions, Text, View, Button } from 'react-native';
-
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import Carousel from 'react-native-reanimated-carousel';
-
-import { request } from '../util';
-
-import Discover from '../components/Discover';
-
-// const BASE_URL = 'http://10.0.2.2:3001/api'
-const BASE_URL = 'http://192.168.2.104:3001/api';
-const BASE_CLIP_NAME = 'output.m3u8'
-
-
+import { request, BASE_URL } from '../util';
+import VideoDiscover from '../components/VideoDiscover';
+import ImageDiscover from '../components/ImageDiscover';
+import Ionicons from '@expo/vector-icons/Ionicons';
 
 function DiscoverScreen(props) {
-    async function updateClips() {
+    const [images, setImages] = useState([]);
+    const [videos, setVideos] = useState([]);
+    const [media, setMedia] = useState([]);
+
+    async function updateMedia() {
         const data = await request('GET', 'info/all_media', null);
-        console.log(`Fetched data: ${JSON.stringify(data)}`);
-
-
-        var new_clips = []
-        for (const clip of data) {
-            new_clips.push({
-                id: clip.id,
-                src: `${BASE_URL}/hls/${clip.id}/index.m3u8`
-            })
-        }
-
-        setDiscoverData(new_clips)
-
-    }
-
-    function getDiscoverData() {
-        return [];
+        // console.log(data);
+        setVideos(
+            data
+                .filter(el => el.type === 'video')
+                .filter(el => el.fileAvailable)
+                .map(el => ({
+                    id: el.id,
+                    eventId: el.eventId,
+                    type: el.type,
+                    src: `${BASE_URL}/hls/${el.id}/index.m3u8`,
+                }))
+        );
+        setImages(
+            data
+                .filter(el => el.type === 'image')
+                .filter(el => el.fileAvailable)
+                .map(el => ({
+                    id: el.id,
+                    eventId: el.eventId,
+                    type: el.type,
+                    src: `${BASE_URL}/hls/${el.id}/high.jpg`,
+                }))
+        );
+        setMedia([...videos, ...images]);
     }
 
     const width = Dimensions.get('window').width;
-    // var discoverData = getDiscoverData();
 
-    const [discoverData, setDiscoverData] = React.useState(getDiscoverData);
 
-    React.useEffect(() => {
+
+    useEffect(() => {
+        updateMedia();
         // Use `setOptions` to update the button that we previously specified
         // Now the button includes an `onPress` handler to update the discoverData
         props.navigation.setOptions({
             headerRight: () => (
-                <Button
-                    // onPress={() => setDiscoverData([...discoverData, { id: 4 }])} 
-                    onPress={() => updateClips()}
-                    title="Reload" />
+                <Ionicons
+                    name="refresh-outline"
+                    size={32}
+                    color="black"
+                    onPress={() => updateMedia()}
+                    style={{
+                        marginRight: 10,
+                    }}
+                />
+
             ),
         });
     }, [props.navigation]);
@@ -63,17 +73,21 @@ function DiscoverScreen(props) {
                     height={580}
                     autoPlay={false}
                     loop={false}
-                    // data={[...new Array(6).keys()]}
-                    data={discoverData}
+                    data={media}
                     scrollAnimationDuration={450}
-                    onSnapToItem={(index) => console.log('current index:', discoverData[index].id)}
-                    // onScrollBegin={(e) => {console.log('Started to scroll!');}}
-                    // onScrollEnd={() => console.log('Stopped Scrolling')}
-                    renderItem={({ index }) => (
-                        <Discover
-                            discoverData={discoverData[index]}
-                            navigation={props.navigation}
-                        />
+                    renderItem={({ item, index }) => (
+                        <>
+                            {item.type === 'video' ?
+                                < VideoDiscover
+                                    discoverData={media[index]}
+                                    navigation={props.navigation}
+                                /> :
+                                <ImageDiscover
+                                    discoverData={media[index]}
+                                    navigation={props.navigation}
+                                />}
+                        </>
+
                     )}
                 />
             </GestureHandlerRootView>

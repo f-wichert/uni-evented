@@ -2,7 +2,8 @@ import { Video } from 'expo-av';
 import React from 'react';
 import { Button, StyleSheet, View } from 'react-native';
 
-function Discover(props) {
+
+function VideoDiscover(props) {
     const video = React.useRef(null);
     const [status, setStatus] = React.useState({});
 
@@ -19,14 +20,6 @@ function Discover(props) {
                 isLooping
                 onPlaybackStatusUpdate={(status) => setStatus(() => status)}
             />
-            <View style={styles.buttons}>
-                <Button
-                    title={status.isPlaying ? 'Pause' : 'Play'}
-                    onPress={() =>
-                        status.isPlaying ? video.current.pauseAsync() : video.current.playAsync()
-                    }
-                />
-            </View>
         </View>
     );
 }
@@ -36,23 +29,15 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        // backgroundColor: 'red',
         borderWidth: 2,
         borderRadius: 8,
         margin: 5
     },
-    backgroundVideo: {
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        bottom: 0,
-        right: 0,
-    },
     video: {
-        width: 350,
+        width: 300,
         height: 450
         // flex: 1
     },
 });
 
-export default Discover;
+export default VideoDiscover;
