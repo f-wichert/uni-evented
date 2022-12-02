@@ -14,8 +14,7 @@ function DiscoverScreen(props) {
 
     async function updateMedia() {
         const data = await request('GET', 'info/all_media', null);
-        // console.log(data);
-        setVideos(
+        const videos =
             data
                 .filter(el => el.type === 'video')
                 .filter(el => el.fileAvailable)
@@ -24,9 +23,8 @@ function DiscoverScreen(props) {
                     eventId: el.eventId,
                     type: el.type,
                     src: `${BASE_URL}/hls/${el.id}/index.m3u8`,
-                }))
-        );
-        setImages(
+                }));
+        const images =
             data
                 .filter(el => el.type === 'image')
                 .filter(el => el.fileAvailable)
@@ -35,8 +33,11 @@ function DiscoverScreen(props) {
                     eventId: el.eventId,
                     type: el.type,
                     src: `${BASE_URL}/hls/${el.id}/high.jpg`,
-                }))
-        );
+                }));
+
+        // doing it like this, because setting the state takes some time, media might otherwise be empty
+        setVideos(videos);
+        setImages(images);
         setMedia([...videos, ...images]);
     }
 

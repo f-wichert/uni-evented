@@ -24,7 +24,7 @@ function VideoCamera(props) {
     };
 
     const uploadVideo = async (uri: String) => {
-        await requestData('POST', '/upload/clip', state.token, createFormData(uri))
+        await requestData('POST', '/upload/clip', state.token, createFormData(uri, 'video/mp4'))
             .then(() => {
                 console.log('video uploaded');
             })
