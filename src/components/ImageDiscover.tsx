@@ -1,10 +1,16 @@
+import { NavigationProp, ParamListBase } from '@react-navigation/native';
 import React from 'react';
-import { StyleSheet, View, Image } from 'react-native';
+import { Image, StyleSheet, View } from 'react-native';
 
-function ImageDiscover(props) {
+declare type Props = {
+    discoverData: { src: string };
+    navigation: NavigationProp<ParamListBase>;
+};
+
+function ImageDiscover({ discoverData, navigation }: Props) {
     return (
         <View style={styles.container}>
-            <Image source={{ uri: props.discoverData.src, }} style={styles.image} />
+            <Image source={{ uri: discoverData.src }} style={styles.image} />
         </View>
     );
 }
@@ -16,11 +22,11 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         borderWidth: 2,
         borderRadius: 8,
-        margin: 5
+        margin: 5,
     },
     image: {
         width: 350,
-        height: 450
+        height: 450,
         // flex: 1
     },
 });

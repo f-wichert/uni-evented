@@ -1,12 +1,12 @@
 import * as Location from 'expo-location';
+import { LocationObject } from 'expo-location';
 import React, { useEffect, useState } from 'react';
 import { Dimensions, StyleSheet, View } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 
 function MapScreen() {
-    // Location State
-    const [location, setLocation] = useState(null);
-    const [locationReady, setLocationReady] = useState(false);
+    const [location, setLocation] = useState<LocationObject | null>(null);
+    const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
     useEffect(() => {
         (async () => {
@@ -19,13 +19,12 @@ function MapScreen() {
             let location = await Location.getCurrentPositionAsync({});
             console.log(location);
             setLocation(location);
-            setLocationReady(true);
         })();
     }, []);
 
     return (
         <View style={styles.container}>
-            {locationReady ? (
+            {location ? (
                 <MapView
                     initialRegion={{
                         latitude: location.coords.latitude,

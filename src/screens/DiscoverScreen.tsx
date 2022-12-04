@@ -1,69 +1,56 @@
+import Ionicons from '@expo/vector-icons/Ionicons';
+import { NavigationProp, ParamListBase } from '@react-navigation/native';
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, Dimensions, Text, View, Button } from 'react-native';
+import { Dimensions, StyleSheet, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import Carousel from 'react-native-reanimated-carousel';
-import { request, BASE_URL } from '../util';
-import VideoDiscover from '../components/VideoDiscover';
+import { ExtendedMedia, Media } from '~/types';
 import ImageDiscover from '../components/ImageDiscover';
-import Ionicons from '@expo/vector-icons/Ionicons';
+import VideoDiscover from '../components/VideoDiscover';
+import { BASE_URL, request } from '../util';
 
-function DiscoverScreen(props) {
-    const [images, setImages] = useState([]);
-    const [videos, setVideos] = useState([]);
-    const [media, setMedia] = useState([]);
+declare type Props = {
+    navigation: NavigationProp<ParamListBase>;
+};
+
+function DiscoverScreen({ navigation }: Props) {
+    const [media, setMedia] = useState<ExtendedMedia[]>([]);
 
     async function updateMedia() {
-        const data = await request('GET', 'info/all_media', null);
-        const videos =
-            data
-                .filter(el => el.type === 'video')
-                .filter(el => el.fileAvailable)
-                .map(el => ({
-                    id: el.id,
-                    eventId: el.eventId,
-                    type: el.type,
-                    src: `${BASE_URL}/hls/${el.id}/index.m3u8`,
-                }));
-        const images =
-            data
-                .filter(el => el.type === 'image')
-                .filter(el => el.fileAvailable)
-                .map(el => ({
-                    id: el.id,
-                    eventId: el.eventId,
-                    type: el.type,
-                    src: `${BASE_URL}/hls/${el.id}/high.jpg`,
-                }));
-
-        // doing it like this, because setting the state takes some time, media might otherwise be empty
-        setVideos(videos);
-        setImages(images);
-        setMedia([...videos, ...images]);
+        const responseData = await request('GET', 'info/all_media', null);
+        const data = responseData.media as Media[];
+        const media: ExtendedMedia[] = data
+            .filter((el) => el.fileAvailable)
+            .map((el) => {
+                const file = el.type == 'image' ? 'high.jpg' : 'index.m3u8';
+                return {
+                    ...el,
+                    src: `${BASE_URL}/media/${el.type}/${el.id}/${file}`,
+                };
+            });
+        setMedia(media);
     }
 
     const width = Dimensions.get('window').width;
-
-
 
     useEffect(() => {
         updateMedia();
         // Use `setOptions` to update the button that we previously specified
         // Now the button includes an `onPress` handler to update the discoverData
-        props.navigation.setOptions({
+        navigation.setOptions({
             headerRight: () => (
                 <Ionicons
                     name="refresh-outline"
                     size={32}
                     color="black"
-                    onPress={() => updateMedia()}
+                    onPress={async () => await updateMedia()}
                     style={{
                         marginRight: 10,
                     }}
                 />
-
             ),
         });
-    }, [props.navigation]);
+    }, [navigation]);
 
     return (
         <View style={styles.container}>
@@ -78,17 +65,18 @@ function DiscoverScreen(props) {
                     scrollAnimationDuration={450}
                     renderItem={({ item, index }) => (
                         <>
-                            {item.type === 'video' ?
-                                < VideoDiscover
+                            {item.type === 'video' ? (
+                                <VideoDiscover
                                     discoverData={media[index]}
-                                    navigation={props.navigation}
-                                /> :
+                                    navigation={navigation}
+                                />
+                            ) : (
                                 <ImageDiscover
                                     discoverData={media[index]}
-                                    navigation={props.navigation}
-                                />}
+                                    navigation={navigation}
+                                />
+                            )}
                         </>
-
                     )}
                 />
             </GestureHandlerRootView>

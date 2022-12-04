@@ -1,9 +1,11 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
+import { DateTimePickerAndroid, DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import * as Location from 'expo-location';
+import { LocationObject } from 'expo-location';
 import React, { useContext, useState } from 'react';
 import { Button, Dimensions, StyleSheet, Text, TextInput, View } from 'react-native';
 import DropDownPicker from 'react-native-dropdown-picker';
+import { IoniconsName } from '~/types';
 // import DateTimePicker from '@react-native-community/datetimepicker';
 
 import { EventContext } from '../contexts/eventContext';
@@ -39,20 +41,20 @@ function CreateEventScreen() {
     const [items, setItems] = useState([...tags]);
 
     // Location State
-    const [location, setLocation] = useState(null);
-    const [errorMsg, setErrorMsg] = useState(null);
+    const [location, setLocation] = useState<LocationObject | null>(null);
+    const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
     // Location icon
-    const [iconName, setIconName] = useState('location-outline');
+    const [iconName, setIconName] = useState<IoniconsName>('location-outline');
 
     const { createEvent } = useContext(EventContext);
 
-    const onChange = (event, selectedDate) => {
-        const currentDate = selectedDate;
+    const onChange = (event: DateTimePickerEvent, selectedDate?: Date) => {
+        const currentDate = selectedDate!;
         setStart(currentDate);
     };
 
-    const showModeStartPicker = (currentMode) => {
+    const showModeStartPicker = (currentMode: 'date' | 'time') => {
         DateTimePickerAndroid.open({
             value: start,
             onChange,
@@ -80,20 +82,20 @@ function CreateEventScreen() {
 
     async function grabLocation() {
         (async () => {
-            let { status } = await Location.requestForegroundPermissionsAsync();
+            const { status } = await Location.requestForegroundPermissionsAsync();
             if (status !== 'granted') {
                 setErrorMsg('Permission to access location was denied');
                 return;
             }
 
-            let location = await Location.getCurrentPositionAsync({});
+            const location = await Location.getCurrentPositionAsync({});
             setLocation(location);
         })()
             .then(() => {
                 setIconName('location');
             })
             .catch(() => {
-                setIconName('error');
+                setIconName('bug');
             });
     }
 

@@ -5,11 +5,15 @@ import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import { AuthContext } from '../contexts/authContext';
 import { requestData } from '../util';
 
-function VideoCamera(props) {
-    const [hasPermission, setHasPermission] = useState(null);
+declare type Props = {
+    onFinish(arg0: boolean): void;
+};
+
+function VideoCamera({ onFinish }: Props) {
+    const [hasPermission, setHasPermission] = useState(false);
     const [type, setType] = useState(CameraType.back);
     const [recording, setRecording] = useState(false);
-    const cameraRef = useRef(null);
+    const cameraRef = useRef<Camera>(null);
     const { state } = useContext(AuthContext);
 
     const createFormData = (uri: string, type: string) => {
@@ -28,19 +32,19 @@ function VideoCamera(props) {
             .then(() => {
                 console.log('video uploaded');
             })
-            .catch(() => { });
+            .catch(() => {});
     };
 
     const uploadPhoto = async (uri: String) => {
         let filename = uri.split('/').pop();
-        let match = /\.(\w+)$/.exec(filename);
+        let match = /\.(\w+)$/.exec(filename!);
         let type = match ? `image/${match[1]}` : `image`;
 
         await requestData('POST', '/upload/image', state.token, createFormData(uri, type))
             .then(() => {
                 console.log('photo uploaded');
             })
-            .catch(() => { });
+            .catch(() => {});
     };
 
     useEffect(() => {
@@ -78,7 +82,7 @@ function VideoCamera(props) {
                                 if (cameraRef.current) {
                                     let photo = await cameraRef.current.takePictureAsync();
                                     uploadPhoto(photo.uri);
-                                    props.onFinish(false);
+                                    onFinish(false);
                                 }
                             }}
                         >
@@ -89,11 +93,15 @@ function VideoCamera(props) {
                         <TouchableOpacity
                             style={[styles.flexEl]}
                             onPress={async () => {
+                                if (!cameraRef.current) {
+                                    return;
+                                }
+
                                 if (!recording) {
                                     setRecording(true);
                                     cameraRef.current.recordAsync().then((obj) => {
                                         uploadVideo(obj.uri);
-                                        props.onFinish(false);
+                                        onFinish(false);
                                     });
                                 } else {
                                     setRecording(false);

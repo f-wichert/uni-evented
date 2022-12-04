@@ -1,9 +1,14 @@
-import { Video } from 'expo-av';
+import { NavigationProp, ParamListBase } from '@react-navigation/native';
+import { ResizeMode, Video } from 'expo-av';
 import React from 'react';
-import { Button, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
+declare type Props = {
+    discoverData: { src: string };
+    navigation: NavigationProp<ParamListBase>;
+};
 
-function VideoDiscover(props) {
+function VideoDiscover({ discoverData, navigation }: Props) {
     const video = React.useRef(null);
     const [status, setStatus] = React.useState({});
 
@@ -13,10 +18,10 @@ function VideoDiscover(props) {
                 ref={video}
                 style={styles.video}
                 source={{
-                    uri: props.discoverData.src,
+                    uri: discoverData.src,
                 }}
                 useNativeControls
-                resizeMode="contain"
+                resizeMode={ResizeMode.CONTAIN}
                 isLooping
                 onPlaybackStatusUpdate={(status) => setStatus(() => status)}
             />
@@ -31,11 +36,11 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         borderWidth: 2,
         borderRadius: 8,
-        margin: 5
+        margin: 5,
     },
     video: {
         width: 300,
-        height: 450
+        height: 450,
         // flex: 1
     },
 });

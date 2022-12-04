@@ -25,7 +25,9 @@ function ViewEventScreen() {
                     </View>
                     <Text style={[styles.flexEl]}>Sample Event Name</Text>
                     <Button
-                        style={[styles.flexEl, styles.button]}
+                        // TODO: Button does not accept 'style'
+                        // https://docs.expo.dev/ui-programming/react-native-styling-buttons/
+                        // style={[styles.flexEl, styles.button]}
                         color="orange"
                         title="Close Event"
                         onPress={() => closeEvent()}
