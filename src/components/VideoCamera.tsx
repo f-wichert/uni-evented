@@ -27,38 +27,41 @@ function VideoCamera({ onFinish }: Props) {
         return form;
     };
 
-    const uploadVideo = async (uri: String) => {
-        await requestData('POST', '/upload/clip', state.token, createFormData(uri, 'video/mp4'))
-            .then(() => {
-                console.log('video uploaded');
-            })
-            .catch(() => {});
+    const uploadVideo = async (uri: string) => {
+        await requestData(
+            'POST',
+            '/upload/clip',
+            state.token,
+            createFormData(uri, 'video/mp4')
+        ).catch(() => {
+            console.error('video upload failed');
+        });
     };
 
-    const uploadPhoto = async (uri: String) => {
-        let filename = uri.split('/').pop();
-        let match = /\.(\w+)$/.exec(filename!);
-        let type = match ? `image/${match[1]}` : `image`;
+    const uploadPhoto = async (uri: string) => {
+        const filename = uri.split('/').pop();
 
-        await requestData('POST', '/upload/image', state.token, createFormData(uri, type))
-            .then(() => {
-                console.log('photo uploaded');
-            })
-            .catch(() => {});
+        if (!filename) {
+            console.error(`couldn't find filename in ${uri}`);
+            return;
+        }
+
+        const match = /\.(\w+)$/.exec(filename);
+        const type = match ? `image/${match[1]}` : `image`;
+
+        await requestData('POST', '/upload/image', state.token, createFormData(uri, type));
     };
 
     useEffect(() => {
-        (async () => {
-            const { status } = await Camera.requestCameraPermissionsAsync();
-            setHasPermission(status === 'granted');
-        })();
+        Camera.requestCameraPermissionsAsync()
+            .then(({ status }) => setHasPermission(status === 'granted'))
+            .catch((err) => console.error(`requestCameraPermissionAsync failed:`, err));
     }, []);
 
     useEffect(() => {
-        (async () => {
-            const { status } = await Camera.requestMicrophonePermissionsAsync();
-            setHasPermission(status === 'granted');
-        })();
+        Camera.requestMicrophonePermissionsAsync()
+            .then(({ status }) => setHasPermission(status === 'granted'))
+            .catch((err) => console.error(`requestMicrophonePermissionAsync failed:`, err));
     }, []);
 
     return (
@@ -78,11 +81,17 @@ function VideoCamera({ onFinish }: Props) {
                         </TouchableOpacity>
                         <TouchableOpacity
                             style={[styles.flexEl]}
-                            onPress={async () => {
+                            onPress={() => {
                                 if (cameraRef.current) {
-                                    let photo = await cameraRef.current.takePictureAsync();
-                                    uploadPhoto(photo.uri);
-                                    onFinish(false);
+                                    cameraRef.current
+                                        .takePictureAsync()
+                                        .then(async (photo) => {
+                                            await uploadPhoto(photo.uri);
+                                            onFinish(false);
+                                        })
+                                        .catch((err) =>
+                                            console.error(`takePictureAsync failed:`, err)
+                                        );
                                 }
                             }}
                         >
@@ -92,17 +101,22 @@ function VideoCamera({ onFinish }: Props) {
                         </TouchableOpacity>
                         <TouchableOpacity
                             style={[styles.flexEl]}
-                            onPress={async () => {
+                            onPress={() => {
                                 if (!cameraRef.current) {
                                     return;
                                 }
 
                                 if (!recording) {
                                     setRecording(true);
-                                    cameraRef.current.recordAsync().then((obj) => {
-                                        uploadVideo(obj.uri);
-                                        onFinish(false);
-                                    });
+                                    cameraRef.current
+                                        .recordAsync()
+                                        .then(async ({ uri }) => {
+                                            await uploadVideo(uri);
+                                            onFinish(false);
+                                        })
+                                        .catch((err) =>
+                                            console.error('camera recording failed', err)
+                                        );
                                 } else {
                                     setRecording(false);
                                     cameraRef.current.stopRecording();

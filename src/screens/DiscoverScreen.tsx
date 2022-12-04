@@ -16,7 +16,7 @@ declare type Props = {
 function DiscoverScreen({ navigation }: Props) {
     const [media, setMedia] = useState<ExtendedMedia[]>([]);
 
-    async function updateMedia() {
+    async function updateMediaAsync() {
         const responseData = await request('GET', 'info/all_media', null);
         const data = responseData.media as Media[];
         const media: ExtendedMedia[] = data
@@ -31,10 +31,13 @@ function DiscoverScreen({ navigation }: Props) {
         setMedia(media);
     }
 
+    const updateMedia = () => {
+        updateMediaAsync().catch((err) => console.error('media update failed', err));
+    };
+
     const width = Dimensions.get('window').width;
 
     useEffect(() => {
-        updateMedia();
         // Use `setOptions` to update the button that we previously specified
         // Now the button includes an `onPress` handler to update the discoverData
         navigation.setOptions({
@@ -43,7 +46,7 @@ function DiscoverScreen({ navigation }: Props) {
                     name="refresh-outline"
                     size={32}
                     color="black"
-                    onPress={async () => await updateMedia()}
+                    onPress={updateMedia}
                     style={{
                         marginRight: 10,
                     }}

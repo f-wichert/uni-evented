@@ -25,6 +25,6 @@ export interface Media extends JSONObject {
 /**
  * An interface for media objects with client side additions
  */
-export interface ExtendedMedia extends Media{
+export interface ExtendedMedia extends Media {
     src: string;
 }

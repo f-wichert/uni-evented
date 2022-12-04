@@ -8,18 +8,20 @@ function MapScreen() {
     const [location, setLocation] = useState<LocationObject | null>(null);
     const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-    useEffect(() => {
-        (async () => {
-            let { status } = await Location.requestForegroundPermissionsAsync();
-            if (status !== 'granted') {
-                setErrorMsg('Permission to access location was denied');
-                return;
-            }
+    const getCurrentPosition = async () => {
+        const { status } = await Location.requestForegroundPermissionsAsync();
+        if (status !== 'granted') {
+            setErrorMsg('Permission to access location was denied');
+            return;
+        }
 
-            let location = await Location.getCurrentPositionAsync({});
-            console.log(location);
-            setLocation(location);
-        })();
+        const location = await Location.getCurrentPositionAsync({});
+        console.log(location);
+        setLocation(location);
+    };
+
+    useEffect(() => {
+        getCurrentPosition().catch((err) => console.log('getCurrentPosition failed', err));
     }, []);
 
     return (

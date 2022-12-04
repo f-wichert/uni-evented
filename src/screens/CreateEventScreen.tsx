@@ -50,8 +50,10 @@ function CreateEventScreen() {
     const { createEvent } = useContext(EventContext);
 
     const onChange = (event: DateTimePickerEvent, selectedDate?: Date) => {
-        const currentDate = selectedDate!;
-        setStart(currentDate);
+        if (!selectedDate) {
+            return;
+        }
+        setStart(selectedDate);
     };
 
     const showModeStartPicker = (currentMode: 'date' | 'time') => {
@@ -80,7 +82,7 @@ function CreateEventScreen() {
         return `${day}.${month}.${year} - ${hours}:${minutes}`;
     };
 
-    async function grabLocation() {
+    function grabLocation() {
         (async () => {
             const { status } = await Location.requestForegroundPermissionsAsync();
             if (status !== 'granted') {
