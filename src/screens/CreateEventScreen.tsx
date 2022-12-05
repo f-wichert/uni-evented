@@ -5,10 +5,10 @@ import { LocationObject } from 'expo-location';
 import React, { useContext, useState } from 'react';
 import { Button, Dimensions, StyleSheet, Text, TextInput, View } from 'react-native';
 import DropDownPicker from 'react-native-dropdown-picker';
-import { IoniconsName } from '~/types';
 // import DateTimePicker from '@react-native-community/datetimepicker';
 
 import { EventContext } from '../contexts/eventContext';
+import { IoniconsName } from '../types';
 
 const width = Dimensions.get('window').width;
 // const height = Dimensions.get('window').height;

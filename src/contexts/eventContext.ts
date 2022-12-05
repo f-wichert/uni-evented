@@ -1,6 +1,7 @@
 import { LocationObject } from 'expo-location';
 import { Dispatch, useContext } from 'react';
-import { request } from '~/util';
+
+import { request } from '../util';
 import { AuthContext } from './authContext';
 import createDataContext from './createDataContext';
 
