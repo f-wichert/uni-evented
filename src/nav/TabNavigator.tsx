@@ -51,10 +51,10 @@ export default function TabNavigator() {
                 tabBarActiveTintColor: 'tomato',
                 tabBarInactiveTintColor: 'gray',
             })}
-            initialRouteName={state.eventActive ? 'Event' : 'Discover'}
+            initialRouteName={state.eventId ? 'Event' : 'Discover'}
         >
             <Tab.Screen name="Discover" component={DiscoverScreen} />
-            {state.eventActive ? (
+            {state.eventId ? (
                 <Tab.Screen name="Event" component={ViewEventScreen} />
             ) : (
                 <Tab.Screen name="Create" component={CreateEventScreen} />

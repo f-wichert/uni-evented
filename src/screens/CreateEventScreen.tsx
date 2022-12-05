@@ -7,6 +7,7 @@ import { Button, Dimensions, StyleSheet, Text, TextInput, View } from 'react-nat
 import DropDownPicker from 'react-native-dropdown-picker';
 // import DateTimePicker from '@react-native-community/datetimepicker';
 
+import { AuthContext } from '../contexts/authContext';
 import { EventContext } from '../contexts/eventContext';
 import { IoniconsName } from '../types';
 
@@ -48,6 +49,7 @@ function CreateEventScreen() {
     const [iconName, setIconName] = useState<IoniconsName>('location-outline');
 
     const { createEvent } = useContext(EventContext);
+    const { state: authState } = useContext(AuthContext);
 
     const onChange = (event: DateTimePickerEvent, selectedDate?: Date) => {
         if (!selectedDate) {
@@ -158,9 +160,10 @@ function CreateEventScreen() {
                     if (!location || !name) {
                         return;
                     }
-                    createEvent({ name: name, location: location, startDate: start }).catch((err) =>
-                        console.error('event creation failed', err)
-                    );
+                    createEvent(
+                        { name: name, location: location, startDate: start },
+                        authState.token
+                    ).catch((err) => console.error('event creation failed', err));
                 }}
             />
         </View>
