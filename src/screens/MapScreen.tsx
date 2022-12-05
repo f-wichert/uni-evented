@@ -4,25 +4,28 @@ import React, { useEffect, useState } from 'react';
 import { Dimensions, StyleSheet, View } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 
+import { asyncHandler } from '../util';
+
 function MapScreen() {
     const [location, setLocation] = useState<LocationObject | null>(null);
-    const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
     const getCurrentPosition = async () => {
         const { status } = await Location.requestForegroundPermissionsAsync();
         if (status !== 'granted') {
-            setErrorMsg('Permission to access location was denied');
-            return;
+            throw new Error('Location access not granted');
         }
 
-        const location = await Location.getCurrentPositionAsync({});
+        const location = await Location.getCurrentPositionAsync();
         console.log(location);
         setLocation(location);
     };
 
-    useEffect(() => {
-        getCurrentPosition().catch((err) => console.log('getCurrentPosition failed', err));
-    }, []);
+    useEffect(
+        asyncHandler(async () => {
+            await getCurrentPosition();
+        }),
+        []
+    );
 
     return (
         <View style={styles.container}>

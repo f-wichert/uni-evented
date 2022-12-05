@@ -9,7 +9,7 @@ import ImageDiscover from '../components/ImageDiscover';
 import VideoDiscover from '../components/VideoDiscover';
 import config from '../config';
 import { ExtendedMedia, Media } from '../types';
-import { request } from '../util';
+import { asyncHandler, request } from '../util';
 
 declare type Props = {
     navigation: NavigationProp<ParamListBase>;
@@ -18,7 +18,7 @@ declare type Props = {
 function DiscoverScreen({ navigation }: Props) {
     const [media, setMedia] = useState<ExtendedMedia[]>([]);
 
-    async function updateMediaAsync() {
+    async function updateMedia() {
         const responseData = await request('GET', 'info/all_media', null);
         const data = responseData.media as Media[];
         const media: ExtendedMedia[] = data
@@ -33,10 +33,6 @@ function DiscoverScreen({ navigation }: Props) {
         setMedia(media);
     }
 
-    const updateMedia = () => {
-        updateMediaAsync().catch((err) => console.error('media update failed', err));
-    };
-
     const width = Dimensions.get('window').width;
 
     useEffect(() => {
@@ -48,7 +44,7 @@ function DiscoverScreen({ navigation }: Props) {
                     name="refresh-outline"
                     size={32}
                     color="black"
-                    onPress={updateMedia}
+                    onPress={asyncHandler(updateMedia, { prefix: 'Failed to update media' })}
                     style={{
                         marginRight: 10,
                     }}

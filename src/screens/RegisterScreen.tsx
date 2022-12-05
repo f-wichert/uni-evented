@@ -10,15 +10,9 @@ type ComponentProps = NativeStackScreenProps<RootNavigatorParams, 'RegisterScree
 
 export default function RegisterScreen({ navigation }: ComponentProps) {
     async function submitRegister() {
-        console.log(`log: ${user}`);
-        try {
-            // this automatically navigates to the main screen when the token gets set
-            // TODO: require these to be non-empty in the UI
-            await signup({ username: user || '', email: email || '', password: password || '' });
-        } catch (e) {
-            toast.show(`An error occurred:\n${e}`, { type: 'danger' });
-            throw e;
-        }
+        // this automatically navigates to the main screen when the token gets set
+        // TODO: require these to be non-empty in the UI
+        await signup({ username: user || '', email: email || '', password: password || '' });
     }
 
     const { signup } = useContext(AuthContext);
@@ -44,7 +38,10 @@ export default function RegisterScreen({ navigation }: ComponentProps) {
                     textInputProps: { secureTextEntry: true },
                 },
             ]}
-            submitButton={{ text: 'Register', callback: asyncHandler(submitRegister) }}
+            submitButton={{
+                text: 'Register',
+                callback: asyncHandler(submitRegister, { prefix: 'Registration failed' }),
+            }}
             header={{ title: 'Register', subTitle: 'Please create an account to continue.' }}
             footer={{
                 text: 'Already have an account?',
