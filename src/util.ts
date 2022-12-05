@@ -1,8 +1,5 @@
+import config from './config';
 import { JSONObject } from './types';
-
-// TODO: make this configurable somehow?
-export const BASE_URL = 'http://192.168.2.119:8001/api';
-// const BASE_URL = 'http://10.0.2.2:3001/api'
 
 export async function request(
     method: string,
@@ -10,7 +7,7 @@ export async function request(
     token: string | null,
     data?: JSONObject
 ): Promise<JSONObject> {
-    const url = `${BASE_URL}/${route}`;
+    const url = `${config.BASE_URL}/${route}`;
 
     const headers: Record<string, string> = {
         'Content-Type': 'application/json',
@@ -38,7 +35,7 @@ export async function requestData(
     token: string | null,
     data?: JSONObject
 ): Promise<JSONObject> {
-    const url = `${BASE_URL}/${route}`;
+    const url = `${config.BASE_URL}/${route}`;
 
     const headers: Record<string, string> = {
         // 'Content-Type': 'application/json',

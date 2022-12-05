@@ -2,10 +2,7 @@
     "extends": "expo/tsconfig.base",
     "compilerOptions": {
         "strict": true,
-        "baseUrl": "./src", // all paths are relative to the baseUrl
-        "paths": {
-            "~/*": ["*"] // resolve any `~/foo/bar` to `<baseUrl>/foo/bar`
-        }
+        "baseUrl": "./src" // all paths are relative to the baseUrl
     },
     "typeRoots": ["src/index.d.ts"]
 }

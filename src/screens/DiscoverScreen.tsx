@@ -4,10 +4,12 @@ import React, { useEffect, useState } from 'react';
 import { Dimensions, StyleSheet, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import Carousel from 'react-native-reanimated-carousel';
-import { ExtendedMedia, Media } from '~/types';
+
 import ImageDiscover from '../components/ImageDiscover';
 import VideoDiscover from '../components/VideoDiscover';
-import { BASE_URL, request } from '../util';
+import config from '../config';
+import { ExtendedMedia, Media } from '../types';
+import { request } from '../util';
 
 declare type Props = {
     navigation: NavigationProp<ParamListBase>;
@@ -25,7 +27,7 @@ function DiscoverScreen({ navigation }: Props) {
                 const file = el.type == 'image' ? 'high.jpg' : 'index.m3u8';
                 return {
                     ...el,
-                    src: `${BASE_URL}/media/${el.type}/${el.id}/${file}`,
+                    src: `${config.BASE_URL}/media/${el.type}/${el.id}/${file}`,
                 };
             });
         setMedia(media);
