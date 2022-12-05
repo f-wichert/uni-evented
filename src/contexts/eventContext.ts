@@ -1,29 +1,56 @@
-import { Dispatch } from 'react';
+import { LocationObject } from 'expo-location';
+import { Dispatch, useContext } from 'react';
+import { request } from '~/util';
+import { AuthContext } from './authContext';
 import createDataContext from './createDataContext';
 
 interface State {
-    eventActive: boolean;
+    eventId: string | null;
 }
 
 // prettier-ignore
 type Action =
-    | { type: 'createEvent' }
+    | { type: 'createEvent' , payload: { eventId:string } }
     | { type: 'closeEvent' };
 
 const eventReducer = (state: State, action: Action): State => {
     switch (action.type) {
         case 'createEvent':
-            return { eventActive: true };
+            return { eventId: action.payload.eventId };
         case 'closeEvent':
-            return { eventActive: false };
+            return { eventId: null };
         default:
             return state;
     }
 };
 
 const createEvent = (dispatch: Dispatch<Action>) => {
-    return () => {
-        dispatch({ type: 'createEvent' });
+    return async ({
+        name,
+        location,
+        startDate,
+        endDate,
+    }: {
+        name: string;
+        location: LocationObject;
+        startDate?: Date;
+        endDate?: Date;
+    }) => {
+        const authToken = useContext(AuthContext).state.token;
+        if (!authToken) {
+            console.error('no token in authContext');
+            return;
+        }
+
+        const data = await request('POST', '/event/create', authToken, {
+            name: name,
+            lat: location.coords.latitude,
+            lon: location.coords.longitude,
+            startDateTime: startDate ? startDate.toJSON() : null,
+            endDateTime: endDate ? endDate.toJSON() : null,
+        });
+
+        dispatch({ type: 'createEvent', payload: { eventId: data.eventId as string } });
     };
 };
 
@@ -36,5 +63,5 @@ const closeEvent = (dispatch: Dispatch<Action>) => {
 export const { Context: EventContext, Provider: EventProvider } = createDataContext(
     eventReducer,
     { createEvent, closeEvent },
-    { eventActive: false }
+    { eventId: null }
 );

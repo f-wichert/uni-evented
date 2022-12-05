@@ -151,7 +151,18 @@ function CreateEventScreen() {
                     '#e9c46a',
                 ]}
             />
-            <Button color="orange" title="Create event!" onPress={() => createEvent()} />
+            <Button
+                color="orange"
+                title="Create event!"
+                onPress={() => {
+                    if (!location || !name) {
+                        return;
+                    }
+                    createEvent({ name: name, location: location, startDate: start }).catch((err) =>
+                        console.error('event creation failed', err)
+                    );
+                }}
+            />
         </View>
     );
 }
