@@ -1,14 +1,15 @@
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import React, { useContext } from 'react';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import ToastRoot from './components/ToastRoot';
 import { AuthContext, AuthProvider } from './contexts/authContext';
 import { EventProvider } from './contexts/eventContext';
 import TabNavigator from './nav/TabNavigator';
+import CreateEventScreen from './screens/CreateEventScreen';
 import LoginScreen from './screens/LoginScreen';
 import RegisterScreen from './screens/RegisterScreen';
-import CreateEventScreen from './screens/CreateEventScreen';
 
 // https://reactnavigation.org/docs/typescript/
 // instead of `undefined`, props passed to these screens would be defined here if applicable
@@ -67,11 +68,13 @@ export default function Root() {
     return (
         <AuthProvider>
             <EventProvider>
-                <NavigationContainer>
-                    <App />
-                </NavigationContainer>
+                <SafeAreaProvider>
+                    <NavigationContainer>
+                        <App />
+                    </NavigationContainer>
 
-                <ToastRoot />
+                    <ToastRoot />
+                </SafeAreaProvider>
             </EventProvider>
         </AuthProvider>
     );
