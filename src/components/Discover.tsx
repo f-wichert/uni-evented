@@ -12,11 +12,7 @@ function Discover(props) {
                 ref={video}
                 style={styles.video}
                 source={{
-<<<<<<< HEAD
                 uri: props.discoverData.src,
-=======
-                    uri: 'http://10.0.2.2:3001/api/hls/test_clip/output.m3u8',
->>>>>>> main
                 }}
                 useNativeControls
                 resizeMode="contain"

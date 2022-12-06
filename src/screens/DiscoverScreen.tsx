@@ -1,13 +1,8 @@
-<<<<<<< HEAD
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, Dimensions, Text, View, Button } from 'react-native';
 import { BackendMediaRequest, VideoIdentifyer } from '../types';
-=======
-import React from 'react';
-import { Dimensions, StyleSheet, View } from 'react-native';
 
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
->>>>>>> main
 import Carousel from 'react-native-reanimated-carousel';
 
 import { request } from '../util';
@@ -19,47 +14,6 @@ const BASE_URL = 'http:/192.168.0.10:3000/api';
 const BASE_CLIP_NAME = 'output.m3u8'
 
 function getDiscoverData() {
-<<<<<<< HEAD
-    return [];
-}
-
-function DiscoverScreen(props) {
-    async function updateClips() {
-        const data: {media:[BackendMediaRequest]} = await request('GET', 'info/all_media', null) as {media:[BackendMediaRequest]};
-        console.log(`Fetched data: ${JSON.stringify(data)}`);
-
-
-        var new_clips:VideoIdentifyer[] = []
-        for (const clip of data.media) {
-            new_clips.push({
-                id: clip.id,
-                src: `${BASE_URL}/hls/${clip.id}/index.m3u8`
-            })
-        }
-
-        setDiscoverData(new_clips)
-
-    }
-
-    const width = Dimensions.get('window').width;
-    // var discoverData = getDiscoverData();
-
-    const [discoverData, setDiscoverData] = React.useState(getDiscoverData);
-
-    React.useEffect(() => {
-        // Use `setOptions` to update the button that we previously specified
-        // Now the button includes an `onPress` handler to update the discoverData
-        props.navigation.setOptions({
-            headerRight: () => (
-                <Button
-                    // onPress={() => setDiscoverData([...discoverData, { id: 4 }])} 
-                    onPress={() => updateClips()}
-                    title="Reload" />
-            ),
-        });
-    }, [props.navigation]);
-
-=======
     return [
         {
             id: 1,
@@ -85,7 +39,6 @@ function DiscoverScreen(props) {
     const width = Dimensions.get('window').width;
     var discoverData = getDiscoverData();
 
->>>>>>> main
     return (
         <View style={styles.container}>
             <GestureHandlerRootView>

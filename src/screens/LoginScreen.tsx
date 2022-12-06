@@ -65,7 +65,6 @@ function LoginScreen({ navigation }: ComponentProps) {
                         style={styles.userInput}
                         onChangeText={setUser}
                         onFocus={() => console.log('focused')}
-<<<<<<< HEAD
                         // TODO! Remove bevore deployment! Only for ease of Login
                         defaultValue = 'Bob' 
                         />
@@ -79,17 +78,6 @@ function LoginScreen({ navigation }: ComponentProps) {
                         // TODO! Remove bevore deployment! Only for ease of Login
                         defaultValue='Verysecure' 
                         />
-=======
-                    />
-                </View>
-                <View style={{ ...styles.passwInputBox, ...styles.elevation }}>
-                    <Ionicons name={'lock-closed-outline'} size={20} color={'black'} />
-                    <TextInput
-                        style={styles.passwordInput}
-                        secureTextEntry={true}
-                        onChangeText={setPassword}
-                    />
->>>>>>> main
                 </View>
 
                 <TouchableHighlight
