@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, Dimensions, Text, View, Button } from 'react-native';
-
+import { BackendMediaRequest, VideoIdentifyer } from '../types';
 import Carousel from 'react-native-reanimated-carousel';
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 
@@ -18,12 +18,12 @@ function getDiscoverData() {
 
 function DiscoverScreen(props) {
     async function updateClips() {
-        const data = await request('GET', '/info/all_clips', null);
+        const data: {media:[BackendMediaRequest]} = await request('GET', 'info/all_media', null) as {media:[BackendMediaRequest]};
         console.log(`Fetched data: ${JSON.stringify(data)}`);
 
 
-        var new_clips = []
-        for (const clip of data) {
+        var new_clips:VideoIdentifyer[] = []
+        for (const clip of data.media) {
             new_clips.push({
                 id: clip.id,
                 src: `${BASE_URL}/hls/${clip.id}/index.m3u8`

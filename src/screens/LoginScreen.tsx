@@ -54,11 +54,20 @@ function LoginScreen({ navigation }: ComponentProps) {
                     <TextInput
                         style={styles.userInput}
                         onChangeText={setUser}
-                        onFocus={() => console.log('focused')} />
+                        onFocus={() => console.log('focused')}
+                        // TODO! Remove bevore deployment! Only for ease of Login
+                        defaultValue = 'Bob' 
+                        />
                 </View>
                 <View style={{ ...styles.passwInputBox, ...styles.elevation }}>
                     <Ionicons name={'lock-closed-outline'} size={20} color={'black'} />
-                    <TextInput style={styles.passwordInput} secureTextEntry={true} onChangeText={setPassword} />
+                    <TextInput 
+                        style={styles.passwordInput}
+                        secureTextEntry={true}
+                        onChangeText={setPassword}
+                        // TODO! Remove bevore deployment! Only for ease of Login
+                        defaultValue='Verysecure' 
+                        />
                 </View>
 
                 <TouchableHighlight
