@@ -1,5 +1,6 @@
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { StatusBar } from 'expo-status-bar';
 import React, { useContext } from 'react';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
@@ -74,6 +75,8 @@ export default function Root() {
                     </NavigationContainer>
 
                     <ToastRoot />
+
+                    <StatusBar style="dark" />
                 </SafeAreaProvider>
             </EventProvider>
         </AuthProvider>
