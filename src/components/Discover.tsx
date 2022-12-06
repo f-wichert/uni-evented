@@ -36,15 +36,10 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-<<<<<<< HEAD
         // backgroundColor: 'red',
         borderWidth: 2,
         borderRadius: 8,
         margin: 5
-=======
-        backgroundColor: 'red',
-        margin: 5,
->>>>>>> main
     },
     backgroundVideo: {
         position: 'absolute',
@@ -54,13 +49,8 @@ const styles = StyleSheet.create({
         right: 0,
     },
     video: {
-<<<<<<< HEAD
         width: 350,
         height: 450
-=======
-        width: 300,
-        height: 300,
->>>>>>> main
         // flex: 1
     },
 });
