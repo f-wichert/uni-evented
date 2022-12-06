@@ -8,6 +8,7 @@ import { EventProvider } from './contexts/eventContext';
 import TabNavigator from './nav/TabNavigator';
 import LoginScreen from './screens/LoginScreen';
 import RegisterScreen from './screens/RegisterScreen';
+import CreateEventScreen from './screens/CreateEventScreen';
 
 // https://reactnavigation.org/docs/typescript/
 // instead of `undefined`, props passed to these screens would be defined here if applicable
@@ -16,6 +17,7 @@ export type RootNavigatorParams = {
     LoginScreen: undefined;
     RegisterScreen: undefined;
     TabScreen: undefined;
+    CreateEventScreen: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootNavigatorParams>();
@@ -32,6 +34,11 @@ function App() {
                     name="TabScreen"
                     component={TabNavigator}
                     options={{ headerShown: false, animation: 'fade' }}
+                />
+                <Stack.Screen
+                    name="CreateEventScreen"
+                    component={CreateEventScreen}
+                    options={{ headerShown: false }}
                 />
             </>
         );
