@@ -1,11 +1,12 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import React, { useContext, useState } from 'react';
 import { Button, StyleSheet, Text, View } from 'react-native';
+
 import VideoCamera from '../components/VideoCamera';
-import { Context as AuthContext } from '../contexts/authContext';
+import { EventContext } from '../contexts/eventContext';
 
 function ViewEventScreen() {
-    const { state, closeEvent } = useContext(AuthContext);
+    const { closeEvent } = useContext(EventContext);
     const [cameraActive, setCameraActive] = useState(false);
 
     return (
@@ -24,7 +25,9 @@ function ViewEventScreen() {
                     </View>
                     <Text style={[styles.flexEl]}>Sample Event Name</Text>
                     <Button
-                        style={[styles.flexEl, styles.button]}
+                        // TODO: Button does not accept 'style'
+                        // https://docs.expo.dev/ui-programming/react-native-styling-buttons/
+                        // style={[styles.flexEl, styles.button]}
                         color="orange"
                         title="Close Event"
                         onPress={() => closeEvent()}

@@ -1,31 +1,35 @@
 import * as Location from 'expo-location';
+import { LocationObject } from 'expo-location';
 import React, { useEffect, useState } from 'react';
 import { Dimensions, StyleSheet, View } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 
+import { asyncHandler } from '../util';
+
 function MapScreen() {
-    // Location State
-    const [location, setLocation] = useState(null);
-    const [locationReady, setLocationReady] = useState(false);
+    const [location, setLocation] = useState<LocationObject | null>(null);
 
-    useEffect(() => {
-        (async () => {
-            let { status } = await Location.requestForegroundPermissionsAsync();
-            if (status !== 'granted') {
-                setErrorMsg('Permission to access location was denied');
-                return;
-            }
+    const getCurrentPosition = async () => {
+        const { status } = await Location.requestForegroundPermissionsAsync();
+        if (status !== 'granted') {
+            throw new Error('Location access not granted');
+        }
 
-            let location = await Location.getCurrentPositionAsync({});
-            console.log(location);
-            setLocation(location);
-            setLocationReady(true);
-        })();
-    }, []);
+        const location = await Location.getCurrentPositionAsync();
+        console.log(location);
+        setLocation(location);
+    };
+
+    useEffect(
+        asyncHandler(async () => {
+            await getCurrentPosition();
+        }),
+        []
+    );
 
     return (
         <View style={styles.container}>
-            {locationReady ? (
+            {location ? (
                 <MapView
                     initialRegion={{
                         latitude: location.coords.latitude,

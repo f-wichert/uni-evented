@@ -4,7 +4,6 @@ import createDataContext from './createDataContext';
 
 interface State {
     token: string | null;
-    eventActive: boolean;
 }
 
 // prettier-ignore
@@ -12,27 +11,19 @@ type Action =
     | { type: 'signin', payload: { token: string } }
     | { type: 'signout' }
     | { type: 'signup', payload: { token: string } }
-    | { type: 'createEvent' }
-    | { type: 'closeEvent' };
 
 const authReducer = (state: State, action: Action): State => {
     switch (action.type) {
         case 'signout':
-            return { token: null, eventActive: state.eventActive };
+            return { token: null };
         case 'signin':
             return {
                 token: action.payload.token,
-                eventActive: state.eventActive,
             };
         case 'signup':
             return {
                 token: action.payload.token,
-                eventActive: state.eventActive,
             };
-        case 'createEvent':
-            return { token: state.token, eventActive: true };
-        case 'closeEvent':
-            return { token: state.token, eventActive: false };
         default:
             return state;
     }
@@ -58,7 +49,7 @@ const signin = (dispatch: Dispatch<Action>) => {
 const signup = (dispatch: Dispatch<Action>) => {
     return async ({
         username,
-        email,
+        // email,
         password,
     }: {
         username: string;
@@ -85,20 +76,8 @@ const signout = (dispatch: Dispatch<Action>) => {
     };
 };
 
-const createEvent = (dispatch: Dispatch<Action>) => {
-    return async () => {
-        dispatch({ type: 'createEvent' });
-    };
-};
-
-const closeEvent = (dispatch: Dispatch<Action>) => {
-    return () => {
-        dispatch({ type: 'closeEvent' });
-    };
-};
-
-export const { Context, Provider } = createDataContext(
+export const { Context: AuthContext, Provider: AuthProvider } = createDataContext(
     authReducer,
-    { signin, signup, signout, createEvent, closeEvent },
-    { token: null, eventActive: false }
+    { signin, signup, signout },
+    { token: null }
 );

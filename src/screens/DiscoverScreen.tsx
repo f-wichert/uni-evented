@@ -1,43 +1,57 @@
+import Ionicons from '@expo/vector-icons/Ionicons';
+import { NavigationProp, ParamListBase } from '@react-navigation/native';
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, Dimensions, Text, View, Button } from 'react-native';
-import { BackendMediaRequest, VideoIdentifyer } from '../types';
-
+import { Dimensions, StyleSheet, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import Carousel from 'react-native-reanimated-carousel';
 
-import { request } from '../util';
+import ImageDiscover from '../components/ImageDiscover';
+import VideoDiscover from '../components/VideoDiscover';
+import config from '../config';
+import { ExtendedMedia, Media } from '../types';
+import { asyncHandler, request } from '../util';
 
-import Discover from '../components/Discover';
+declare type Props = {
+    navigation: NavigationProp<ParamListBase>;
+};
 
-// const BASE_URL = 'http://10.0.2.2:3001/api'
-const BASE_URL = 'http:/192.168.0.10:3000/api';
-const BASE_CLIP_NAME = 'output.m3u8'
+function DiscoverScreen({ navigation }: Props) {
+    const [media, setMedia] = useState<ExtendedMedia[]>([]);
 
-function getDiscoverData() {
-    return [
-        {
-            id: 1,
-            name: 'Hulahoop',
-            score: 7,
-            src: 'https://media1.giphy.com/media/26tPghhb310muUkEw/giphy.gif?cid=790b761196948897dfeab8f83d9f6f966f882d3aa2f52cad&rid=giphy.gif&ct=g',
-            src_t: 'https://images.pexels.com/photos/799443/pexels-photo-799443.jpeg?auto=compress&cs=tinysrgb&w=1600',
-        },
-        {
-            id: 2,
-            score: 2,
-            src: 'https://media0.giphy.com/media/mOZ7nolkGapzpDnvgW/giphy.gif?cid=ecf05e4712jtgto9d53xxd976gle9kjw0t0odr46blolq6bk&rid=giphy.gif&ct=g',
-        },
-        {
-            id: 3,
-            score: 14,
-            src: 'https://images.pexels.com/photos/2486168/pexels-photo-2486168.jpeg?auto=compress&cs=tinysrgb&w=1600',
-        },
-    ];
-}
+    async function updateMedia() {
+        const responseData = await request('GET', 'info/all_media', null);
+        const data = responseData.media as Media[];
+        const media: ExtendedMedia[] = data
+            .filter((el) => el.fileAvailable)
+            .map((el) => {
+                const file = el.type == 'image' ? 'high.jpg' : 'index.m3u8';
+                return {
+                    ...el,
+                    src: `${config.BASE_URL}/media/${el.type}/${el.id}/${file}`,
+                };
+            });
+        setMedia(media);
+    }
 
-function DiscoverScreen(props) {
     const width = Dimensions.get('window').width;
-    var discoverData = getDiscoverData();
+
+    useEffect(() => {
+        // Use `setOptions` to update the button that we previously specified
+        // Now the button includes an `onPress` handler to update the discoverData
+        navigation.setOptions({
+            headerRight: () => (
+                <Ionicons
+                    name="refresh-outline"
+                    size={32}
+                    color="black"
+                    onPress={asyncHandler(updateMedia, { prefix: 'Failed to update media' })}
+                    style={{
+                        marginRight: 10,
+                    }}
+                />
+            ),
+        });
+    }, [navigation]);
 
     return (
         <View style={styles.container}>
@@ -48,17 +62,22 @@ function DiscoverScreen(props) {
                     height={580}
                     autoPlay={false}
                     loop={false}
-                    // data={[...new Array(6).keys()]}
-                    data={discoverData}
+                    data={media}
                     scrollAnimationDuration={450}
-                    onSnapToItem={(index) => console.log('current index:', discoverData[index].id)}
-                    // onScrollBegin={(e) => {console.log('Started to scroll!');}}
-                    // onScrollEnd={() => console.log('Stopped Scrolling')}
-                    renderItem={({ index }) => (
-                        <Discover
-                            discoverData={discoverData[index]}
-                            navigation={props.navigation}
-                        />
+                    renderItem={({ item, index }) => (
+                        <>
+                            {item.type === 'video' ? (
+                                <VideoDiscover
+                                    discoverData={media[index]}
+                                    navigation={navigation}
+                                />
+                            ) : (
+                                <ImageDiscover
+                                    discoverData={media[index]}
+                                    navigation={navigation}
+                                />
+                            )}
+                        </>
                     )}
                 />
             </GestureHandlerRootView>

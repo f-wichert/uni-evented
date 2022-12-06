@@ -2,49 +2,86 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { Camera, CameraType } from 'expo-camera';
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
-import { Context as AuthContext } from '../contexts/authContext';
-import { requestData } from '../util';
 
-function VideoCamera(props) {
-    const [hasPermission, setHasPermission] = useState(null);
+import { AuthContext } from '../contexts/authContext';
+import { asyncHandler, request } from '../util';
+
+declare type Props = {
+    // TODO: this is always called with `false`?
+    onFinish(arg0: boolean): void;
+};
+
+function VideoCamera({ onFinish }: Props) {
+    const [hasPermission, setHasPermission] = useState(false);
     const [type, setType] = useState(CameraType.back);
     const [recording, setRecording] = useState(false);
-    const cameraRef = useRef(null);
+    const cameraRef = useRef<Camera>(null);
     const { state } = useContext(AuthContext);
 
-    const createFormData = (uri) => {
-        // Here uri means the url of the video you captured
+    const createFormData = (uri: string, type: string) => {
         const form = new FormData();
         form.append('File', {
-            name: 'SampleVideo',
+            name: uri.split('/').pop() || 'sample.dat',
             uri: uri,
-            type: 'video/mp4',
+            type: type,
         });
         return form;
     };
 
-    const uploadVideo = async (uri: String) => {
-        console.log('trying to upload');
-        await requestData('POST', '/upload/clip', state.token, createFormData(uri))
-            .then(() => {
-                console.log('video uploaded');
-            })
-            .catch(() => {});
+    const onPhotoButton = async () => {
+        if (!cameraRef.current) return;
+
+        // capture image
+        const { uri } = await cameraRef.current.takePictureAsync();
+
+        // infer mime type based on extension
+        const extensionMatch = /\.(\w+)$/.exec(uri);
+        const type = extensionMatch ? `image/${extensionMatch[1]}` : `image`;
+
+        // upload media
+        await request('POST', '/upload/image', state.token, createFormData(uri, type));
     };
 
-    useEffect(() => {
-        (async () => {
-            const { status } = await Camera.requestCameraPermissionsAsync();
-            setHasPermission(status === 'granted');
-        })();
-    }, []);
+    const onVideoButton = async () => {
+        if (!cameraRef.current) return;
 
-    useEffect(() => {
-        (async () => {
-            const { status } = await Camera.requestMicrophonePermissionsAsync();
-            setHasPermission(status === 'granted');
-        })();
-    }, []);
+        if (recording) {
+            setRecording(false);
+            cameraRef.current.stopRecording();
+            return;
+        }
+
+        // start recording
+        setRecording(true);
+        const { uri } = await cameraRef.current.recordAsync();
+
+        // upload media
+        await request('POST', '/upload/clip', state.token, createFormData(uri, 'video/mp4'));
+
+        onFinish(false);
+    };
+
+    useEffect(
+        asyncHandler(
+            async () => {
+                const { status } = await Camera.requestCameraPermissionsAsync();
+                setHasPermission(status === 'granted');
+            },
+            { prefix: 'requestCameraPermissionsAsync failed' }
+        ),
+        []
+    );
+
+    useEffect(
+        asyncHandler(
+            async () => {
+                const { status } = await Camera.requestMicrophonePermissionsAsync();
+                setHasPermission(status === 'granted');
+            },
+            { prefix: 'requestMicrophonePermissionsAsync failed' }
+        ),
+        []
+    );
 
     return (
         <View style={[styles.container]}>
@@ -63,13 +100,9 @@ function VideoCamera(props) {
                         </TouchableOpacity>
                         <TouchableOpacity
                             style={[styles.flexEl]}
-                            onPress={async () => {
-                                if (cameraRef.current) {
-                                    let photo = await cameraRef.current.takePictureAsync();
-                                    console.log('photo', photo);
-                                    props.onFinish(false);
-                                }
-                            }}
+                            onPress={asyncHandler(onPhotoButton, {
+                                prefix: 'Failed to take picture',
+                            })}
                         >
                             <View style={[styles.outerCirclePhoto]}>
                                 <View style={[styles.innerCirclePhoto]}></View>
@@ -77,18 +110,9 @@ function VideoCamera(props) {
                         </TouchableOpacity>
                         <TouchableOpacity
                             style={[styles.flexEl]}
-                            onPress={async () => {
-                                if (!recording) {
-                                    setRecording(true);
-                                    cameraRef.current.recordAsync().then((obj) => {
-                                        uploadVideo(obj.uri);
-                                        props.onFinish(false);
-                                    });
-                                } else {
-                                    setRecording(false);
-                                    cameraRef.current.stopRecording();
-                                }
-                            }}
+                            onPress={asyncHandler(onVideoButton, {
+                                prefix: 'Failed to record video',
+                            })}
                         >
                             <View style={[styles.outerCircleVideo]}>
                                 <View style={[styles.innerCircleVideo]}></View>
