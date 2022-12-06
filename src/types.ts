@@ -8,5 +8,5 @@ export type VideoIdentifyer = {id:string,src:string};
 export type JSONValue = string | number | boolean | JSONObject | JSONValue[];
 export type BackendMediaRequest = {id:string}
 export interface JSONObject {
-  [x: string]: JSONValue;
+    [x: string]: JSONValue;
 }

@@ -28,7 +28,7 @@ const authReducer = (state: State, action: Action): State => {
             return {
                 token: action.payload.token,
                 eventActive: state.eventActive,
-            }
+            };
         case 'createEvent':
             return { token: state.token, eventActive: true };
         case 'closeEvent':
@@ -56,16 +56,24 @@ const signin = (dispatch: Dispatch<Action>) => {
 };
 
 const signup = (dispatch: Dispatch<Action>) => {
-    return async ({ username, email, password }: { username: string; email: string; password: string }) => {
+    return async ({
+        username,
+        email,
+        password,
+    }: {
+        username: string;
+        email: string;
+        password: string;
+    }) => {
         const data = await request('POST', '/auth/register', null, {
             username: username,
-            password: password
+            password: password,
         });
 
         dispatch({
             type: 'signup',
             payload: {
-                token: data.token as string
+                token: data.token as string,
             },
         });
     };
@@ -89,9 +97,8 @@ const closeEvent = (dispatch: Dispatch<Action>) => {
     };
 };
 
-
 export const { Context, Provider } = createDataContext(
     authReducer,
-    { signin, signup, signout, createEvent, closeEvent, },
+    { signin, signup, signout, createEvent, closeEvent },
     { token: null, eventActive: false }
 );

@@ -1,30 +1,34 @@
+import { Video } from 'expo-av';
 import React from 'react';
-import { StyleSheet, View, Text, Button } from 'react-native';
-import { Video, AVPlaybackStatus } from 'expo-av';
+import { Button, StyleSheet, View } from 'react-native';
 
 function Discover(props) {
     const video = React.useRef(null);
     const [status, setStatus] = React.useState({});
-    
+
     return (
         <View style={styles.container}>
             <Video
                 ref={video}
                 style={styles.video}
                 source={{
+<<<<<<< HEAD
                 uri: props.discoverData.src,
+=======
+                    uri: 'http://10.0.2.2:3001/api/hls/test_clip/output.m3u8',
+>>>>>>> main
                 }}
                 useNativeControls
                 resizeMode="contain"
                 isLooping
-                onPlaybackStatusUpdate={status => setStatus(() => status)}
+                onPlaybackStatusUpdate={(status) => setStatus(() => status)}
             />
             <View style={styles.buttons}>
                 <Button
-                title={status.isPlaying ? 'Pause' : 'Play'}
-                onPress={() =>
-                    status.isPlaying ? video.current.pauseAsync() : video.current.playAsync()
-                }
+                    title={status.isPlaying ? 'Pause' : 'Play'}
+                    onPress={() =>
+                        status.isPlaying ? video.current.pauseAsync() : video.current.playAsync()
+                    }
                 />
             </View>
         </View>
@@ -36,10 +40,15 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
+<<<<<<< HEAD
         // backgroundColor: 'red',
         borderWidth: 2,
         borderRadius: 8,
         margin: 5
+=======
+        backgroundColor: 'red',
+        margin: 5,
+>>>>>>> main
     },
     backgroundVideo: {
         position: 'absolute',
@@ -49,10 +58,15 @@ const styles = StyleSheet.create({
         right: 0,
     },
     video: {
+<<<<<<< HEAD
         width: 350,
         height: 450
+=======
+        width: 300,
+        height: 300,
+>>>>>>> main
         // flex: 1
-    }
+    },
 });
 
 export default Discover;

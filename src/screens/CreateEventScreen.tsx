@@ -1,10 +1,10 @@
-import React, { useState, useContext } from 'react';
-import { Alert, Button, Dimensions, StyleSheet, TextInput, View, Text, Platform } from 'react-native';
-import { Context as AuthContext } from '../contexts/authContext';
+import React, { useContext, useState } from 'react';
+import { Button, Dimensions, StyleSheet, Text, TextInput, View } from 'react-native';
 import DropDownPicker from 'react-native-dropdown-picker';
+import { Context as AuthContext } from '../contexts/authContext';
 // import DateTimePicker from '@react-native-community/datetimepicker';
-import { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
 import * as Location from 'expo-location';
 
 const width = Dimensions.get('window').width;
@@ -42,10 +42,9 @@ function CreateEventScreen() {
     const [errorMsg, setErrorMsg] = useState(null);
 
     // Location icon
-    const [iconName, setIconName] = useState('location-outline')
+    const [iconName, setIconName] = useState('location-outline');
 
     const { createEvent } = useContext(AuthContext);
-
 
     const onChange = (event, selectedDate) => {
         const currentDate = selectedDate;
@@ -94,21 +93,33 @@ function CreateEventScreen() {
             })
             .catch(() => {
                 setIconName('error');
-            })
-
-
-    };
+            });
+    }
 
     return (
         <View style={[styles.container]}>
-            <View style={[styles.row,]}>
-                <TextInput style={[styles.textInput]} placeholder="Event Name" onChangeText={setName} />
+            <View style={[styles.row]}>
+                <TextInput
+                    style={[styles.textInput]}
+                    placeholder="Event Name"
+                    onChangeText={setName}
+                />
                 <Ionicons onPress={grabLocation} name={iconName} size={32} color={'orange'} />
             </View>
-            <View style={[styles.row,]}>
+            <View style={[styles.row]}>
                 <Text style={[styles.text]}>Start: {formatDate(start)}</Text>
-                <Ionicons onPress={showDatepickerStartPicker} name={'calendar-outline'} size={32} color={'orange'} />
-                <Ionicons onPress={showTimepickerStartPicker} name={'time-outline'} size={32} color={'orange'} />
+                <Ionicons
+                    onPress={showDatepickerStartPicker}
+                    name={'calendar-outline'}
+                    size={32}
+                    color={'orange'}
+                />
+                <Ionicons
+                    onPress={showTimepickerStartPicker}
+                    name={'time-outline'}
+                    size={32}
+                    color={'orange'}
+                />
             </View>
             <DropDownPicker
                 style={[styles.dropdown]}
@@ -176,7 +187,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-around',
         alignContent: 'center',
-    }
+    },
 });
 
 export default CreateEventScreen;

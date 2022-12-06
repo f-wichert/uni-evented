@@ -7,37 +7,37 @@ import { createContext, Dispatch, ReactNode, Reducer, useReducer } from 'react';
 // Do not question the typescript magic, it just works™
 
 interface ActionData {
-  type: string;
-  payload?: any;
+    type: string;
+    payload?: any;
 }
 
 type ActionCreator<TActionData> = (d: Dispatch<TActionData>) => (...args: any[]) => void;
 
 type BoundActions<T, TActionData> = {
-  [K in keyof T]: T[K] extends (d: Dispatch<TActionData>) => infer R ? R : never;
+    [K in keyof T]: T[K] extends (d: Dispatch<TActionData>) => infer R ? R : never;
 };
 
 type ContextValue<TState, TActions, TActionData> = {
-  state: TState;
+    state: TState;
 } & BoundActions<TActions, TActionData>;
 
 // creates a context+provider with a state and action methods
 export default function createDataContext<
-  TState,
-  TActions extends Record<string, ActionCreator<TActionData>>,
-  TActionData extends ActionData
+    TState,
+    TActions extends Record<string, ActionCreator<TActionData>>,
+    TActionData extends ActionData
 >(reducer: Reducer<TState, TActionData>, actions: TActions, defaultValue: TState) {
-  const Context = createContext({} as ContextValue<TState, TActions, TActionData>);
+    const Context = createContext({} as ContextValue<TState, TActions, TActionData>);
 
-  const Provider = ({ children }: { children: ReactNode }) => {
-    const [state, dispatch] = useReducer(reducer, defaultValue);
+    const Provider = ({ children }: { children: ReactNode }) => {
+        const [state, dispatch] = useReducer(reducer, defaultValue);
 
-    const boundActions = Object.fromEntries(
-      Object.entries(actions).map(([name, action]) => [name, action(dispatch)])
-    ) as BoundActions<TActions, TActionData>;
+        const boundActions = Object.fromEntries(
+            Object.entries(actions).map(([name, action]) => [name, action(dispatch)])
+        ) as BoundActions<TActions, TActionData>;
 
-    return <Context.Provider value={{ state, ...boundActions }}>{children}</Context.Provider>;
-  };
+        return <Context.Provider value={{ state, ...boundActions }}>{children}</Context.Provider>;
+    };
 
-  return { Context: Context, Provider: Provider };
+    return { Context: Context, Provider: Provider };
 }

@@ -1,6 +1,14 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useContext, useState } from 'react';
-import { Image, ImageBackground, StyleSheet, Text, TextInput, TouchableHighlight, View } from 'react-native';
+import {
+    Image,
+    ImageBackground,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableHighlight,
+    View,
+} from 'react-native';
 
 import Ionicons from '@expo/vector-icons/Ionicons';
 
@@ -38,11 +46,13 @@ function LoginScreen({ navigation }: ComponentProps) {
                     >
                         Login
                     </Text>
-                    <Text style={{
-                        fontSize: 15,
-                        fontWeight: 'bold',
-                        color: '#bdbdbd'
-                    }}>
+                    <Text
+                        style={{
+                            fontSize: 15,
+                            fontWeight: 'bold',
+                            color: '#bdbdbd',
+                        }}
+                    >
                         Please sign in to continue.
                     </Text>
                 </View>
@@ -55,6 +65,7 @@ function LoginScreen({ navigation }: ComponentProps) {
                         style={styles.userInput}
                         onChangeText={setUser}
                         onFocus={() => console.log('focused')}
+<<<<<<< HEAD
                         // TODO! Remove bevore deployment! Only for ease of Login
                         defaultValue = 'Bob' 
                         />
@@ -68,6 +79,17 @@ function LoginScreen({ navigation }: ComponentProps) {
                         // TODO! Remove bevore deployment! Only for ease of Login
                         defaultValue='Verysecure' 
                         />
+=======
+                    />
+                </View>
+                <View style={{ ...styles.passwInputBox, ...styles.elevation }}>
+                    <Ionicons name={'lock-closed-outline'} size={20} color={'black'} />
+                    <TextInput
+                        style={styles.passwordInput}
+                        secureTextEntry={true}
+                        onChangeText={setPassword}
+                    />
+>>>>>>> main
                 </View>
 
                 <TouchableHighlight
@@ -75,7 +97,11 @@ function LoginScreen({ navigation }: ComponentProps) {
                     // activeOpacity={0.6}
                     onPress={asyncHandler(login)}
                 >
-                    <ImageBackground source={yellowSplash} resizeMode="contain" style={styles.image} >
+                    <ImageBackground
+                        source={yellowSplash}
+                        resizeMode="contain"
+                        style={styles.image}
+                    >
                         <Text
                             style={{
                                 fontSize: 18,
@@ -86,33 +112,31 @@ function LoginScreen({ navigation }: ComponentProps) {
                         </Text>
                     </ImageBackground>
                 </TouchableHighlight>
-
             </View>
-
 
             <View style={styles.infoBlock}>
                 <View style={styles.footerText}>
-                    <Text style={{
-                        fontSize: 15,
-                        fontWeight: 'bold',
-                        color: '#bdbdbd'
-                    }}
+                    <Text
+                        style={{
+                            fontSize: 15,
+                            fontWeight: 'bold',
+                            color: '#bdbdbd',
+                        }}
                     >
                         Don't have an account?
                     </Text>
-                    <Text style={{
-                        fontSize: 15,
-                        fontWeight: 'bold',
-                        color: '#D9B611'
-                    }}
+                    <Text
+                        style={{
+                            fontSize: 15,
+                            fontWeight: 'bold',
+                            color: '#D9B611',
+                        }}
                         onPress={() => navigation.navigate('RegisterScreen')}
                     >
                         Sign up
                     </Text>
                 </View>
             </View>
-
-
         </View>
     );
 }
@@ -126,7 +150,7 @@ const styles = StyleSheet.create({
         flex: 25,
         // backgroundColor: 'blue',
         flexDirection: 'column-reverse',
-        marginBottom: 50
+        marginBottom: 50,
     },
     dataBlock: {
         flex: 30,
@@ -135,7 +159,7 @@ const styles = StyleSheet.create({
     infoBlock: {
         flex: 10,
         // backgroundColor: 'yellow',
-        flexDirection: 'column-reverse'
+        flexDirection: 'column-reverse',
     },
     userInputBox: {
         height: 40,
@@ -147,7 +171,7 @@ const styles = StyleSheet.create({
         marginBottom: 20,
         // borderWidth: 1,
         borderRadius: 8,
-        backgroundColor: '#efefef'
+        backgroundColor: '#efefef',
     },
     passwInputBox: {
         height: 40,
@@ -159,7 +183,7 @@ const styles = StyleSheet.create({
         marginBottom: 20,
         // borderWidth: 1,
         borderRadius: 8,
-        backgroundColor: '#efefef'
+        backgroundColor: '#efefef',
     },
     userInput: {
         height: 40,
@@ -210,14 +234,14 @@ const styles = StyleSheet.create({
     footerText: {
         justifyContent: 'center',
         flexDirection: 'row',
-        // bottom: 
+        // bottom:
     },
     image: {
         flex: 1,
         justifyContent: 'center',
         // height: 20,
         // width: 20
-    }
+    },
 });
 
 export default LoginScreen;
