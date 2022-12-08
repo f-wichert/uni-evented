@@ -1,4 +1,6 @@
+import { useContext } from 'react';
 import config from './config';
+import { AuthContext } from './contexts/authContext';
 import { JSONObject } from './types';
 
 export async function request(
@@ -52,4 +54,14 @@ export function asyncHandler<Args extends unknown[]>(
             console.error(e, e instanceof Error ? e.stack : undefined);
         });
     };
+}
+
+export function getUserToken() {
+    const token = useContext(AuthContext).state.token;
+    if (!token) {
+        toast.show('User not signed in', { type: 'danger' });
+        console.error('User not signed in');
+        return undefined;
+    }
+    return token;
 }
