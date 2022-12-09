@@ -1,7 +1,14 @@
+import Constants from 'expo-constants';
 import { useContext } from 'react';
+
 import config from './config';
 import { AuthContext } from './contexts/authContext';
 import { JSONObject } from './types';
+
+export const baseHeaders = Object.freeze({
+    // Currently required to access main API
+    'Client-ID': `evented/${Constants.expoConfig?.version}`,
+});
 
 export async function request(
     method: string,
@@ -11,7 +18,7 @@ export async function request(
 ): Promise<JSONObject> {
     const url = `${config.BASE_URL}/${route}`;
 
-    const headers: Record<string, string> = {};
+    const headers: Record<string, string> = { ...baseHeaders };
     if (token) {
         headers['Authorization'] = `Bearer ${token}`;
     }

@@ -3,6 +3,8 @@ import { ResizeMode, Video } from 'expo-av';
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 
+import { baseHeaders } from '../util';
+
 declare type Props = {
     discoverData: { src: string };
     navigation: NavigationProp<ParamListBase>;
@@ -19,6 +21,9 @@ function VideoDiscover({ discoverData, navigation }: Props) {
                 style={styles.video}
                 source={{
                     uri: discoverData.src,
+                    headers: {
+                        ...baseHeaders,
+                    },
                 }}
                 useNativeControls
                 resizeMode={ResizeMode.CONTAIN}
