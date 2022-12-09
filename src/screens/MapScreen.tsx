@@ -1,13 +1,19 @@
 import * as Location from 'expo-location';
 import { LocationObject } from 'expo-location';
-import React, { useEffect, useState } from 'react';
-import { Dimensions, StyleSheet, View } from 'react-native';
+import React, { useEffect, useState, useContext } from 'react';
+import { AuthContext } from '../contexts/authContext';
+import { Button, Dimensions, StyleSheet, View, TouchableOpacity, Text } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
+import { asyncHandler, request } from '../util';
+import Ionicons from '@expo/vector-icons/Ionicons';
+import { BottomTabBarHeightCallbackContext } from '@react-navigation/bottom-tabs';
+import CreateEventScreen from './CreateEventScreen';
 
-import { asyncHandler } from '../util';
-
-function MapScreen() {
+function MapScreen({ navigation }) {
     const [location, setLocation] = useState<LocationObject | null>(null);
+    const { state: authState } = useContext(AuthContext);
+    // todo: fix types
+    const [events, setEvents] = useState<any>([]);
 
     const getCurrentPosition = async () => {
         const { status } = await Location.requestForegroundPermissionsAsync();
@@ -16,12 +22,13 @@ function MapScreen() {
         }
 
         const location = await Location.getCurrentPositionAsync();
-        console.log(location);
         setLocation(location);
     };
 
     useEffect(
         asyncHandler(async () => {
+            const eventList = await request('get', 'event/find', authState.token);
+            setEvents(eventList.events);
             await getCurrentPosition();
         }),
         []
@@ -39,18 +46,38 @@ function MapScreen() {
                     }}
                     style={styles.map}
                 >
-                    <Marker
-                        key={1}
-                        coordinate={{
-                            latitude: location.coords.latitude,
-                            longitude: location.coords.longitude,
-                        }}
-                        title="Your position"
-                        description="That's where you currently are!"
-                    />
+                    <>
+                        <Marker
+                            key={1}
+                            coordinate={{
+                                latitude: location.coords.latitude,
+                                longitude: location.coords.longitude,
+                            }}
+                            title="Your position"
+                            pinColor="orange"
+                        />
+                        {events.map((el: any) =>
+                            <Marker
+                                key={el.id}
+                                coordinate={{
+                                    latitude: el.lat,
+                                    longitude: el.lon,
+                                }}
+                                title={el.name}
+                                pinColor="teal"
+                            />
+                        )}
+                    </>
                 </MapView>
-            ) : null}
-        </View>
+            ) : null
+            }
+            <TouchableOpacity
+                style={[styles.create,]}
+                onPress={() => navigation.navigate('CreateEventScreen')}
+            >
+                <Ionicons name='add-circle-outline' size={64} color='black' />
+            </TouchableOpacity>
+        </View >
     );
 }
 
@@ -65,6 +92,17 @@ const styles = StyleSheet.create({
         width: Dimensions.get('window').width,
         height: Dimensions.get('window').height,
     },
+    create: {
+        position: 'absolute',
+        bottom: 5,
+        opacity: 0.75,
+    },
+    createEvent: {
+        position: 'absolute',
+        width: Dimensions.get('window').width,
+        height: Dimensions.get('window').height,
+        zIndex: 99,
+    }
 });
 
 export default MapScreen;

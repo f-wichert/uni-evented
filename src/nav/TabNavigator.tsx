@@ -5,6 +5,8 @@ import React, { useContext } from 'react';
 import { EventContext } from '../contexts/eventContext';
 import CreateEventScreen from '../screens/CreateEventScreen';
 import DiscoverScreen from '../screens/DiscoverScreen';
+import EventsScreen from '../screens/EventsScreen';
+import ProfileScreen from '../screens/ProfileScreen';
 import MapScreen from '../screens/MapScreen';
 import ViewEventScreen from '../screens/ViewEventScreen';
 import { IoniconsName } from '../types';
@@ -13,9 +15,11 @@ import { IoniconsName } from '../types';
 
 export type TabNavigatorParams = {
     Discover: undefined;
-    Create: undefined;
     Map: undefined;
+    Events: undefined;
+    Profile: undefined;
     Event: undefined;
+    Create: undefined;
 };
 
 export const Tab = createBottomTabNavigator<TabNavigatorParams>();
@@ -31,14 +35,14 @@ export default function TabNavigator() {
 
                     if (route.name === 'Discover') {
                         iconName = focused ? 'play' : 'play-outline';
-                        // } else if (route.name === 'Settings') {
-                        //   iconName = focused ? 'settings' : 'settings-outline';
                     } else if (route.name === 'Map') {
                         iconName = focused ? 'map' : 'map-outline';
-                        // } else if (route.name === 'Profile') {
-                        //   iconName = focused ? 'person' : 'person-outline';
+                    } else if (route.name === 'Profile') {
+                        iconName = focused ? 'person' : 'person-outline';
                     } else if (route.name === 'Create') {
                         iconName = focused ? 'add' : 'add-outline';
+                    } else if (route.name === 'Events') {
+                        iconName = focused ? 'rocket' : 'rocket-outline';
                     } else if (route.name === 'Event') {
                         iconName = focused ? 'rocket' : 'rocket-outline';
                     } else {
@@ -51,15 +55,19 @@ export default function TabNavigator() {
                 tabBarActiveTintColor: 'tomato',
                 tabBarInactiveTintColor: 'gray',
             })}
-            initialRouteName={state.eventId ? 'Event' : 'Discover'}
+            initialRouteName={state.eventId ? 'Events' : 'Discover'}
         >
             <Tab.Screen name="Discover" component={DiscoverScreen} />
+            <Tab.Screen name="Map" component={MapScreen} />
+            <Tab.Screen name="Events" component={EventsScreen} />
+            <Tab.Screen name="Profile" component={ProfileScreen} />
+
             {state.eventId ? (
                 <Tab.Screen name="Event" component={ViewEventScreen} />
             ) : (
                 <Tab.Screen name="Create" component={CreateEventScreen} />
             )}
-            <Tab.Screen name="Map" component={MapScreen} />
+
         </Tab.Navigator>
     );
 }

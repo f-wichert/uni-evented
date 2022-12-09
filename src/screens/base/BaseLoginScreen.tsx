@@ -40,7 +40,12 @@ export default function BaseLoginScreen({ fields, submitButton, header, footer }
                         // n.b. using `index` as the key here should be fine,
                         // as long as the list of input fields isn't rearranged
                         <View key={index} style={{ ...styles.inputBox, ...styles.elevation }}>
-                            <Ionicons name={icon} size={20} color={'black'} />
+                            <Ionicons
+                                name={icon}
+                                size={20}
+                                color={'black'}
+                                style={styles.inputIcon}
+                            />
                             <TextInput
                                 style={styles.input}
                                 onChangeText={onChange}
@@ -71,6 +76,7 @@ export default function BaseLoginScreen({ fields, submitButton, header, footer }
                             fontSize: 15,
                             fontWeight: 'bold',
                             color: '#D9B611',
+                            marginHorizontal: 8,
                         }}
                         onPress={footer.callback}
                     >
@@ -127,9 +133,12 @@ const styles = StyleSheet.create({
         borderRadius: 8,
         backgroundColor: '#efefef',
     },
+    inputIcon: {
+        marginRight: 4,
+    },
     input: {
-        height: 40,
-        width: 200,
+        height: '100%',
+        width: '100%',
     },
     submitButton: {
         width: 110,
