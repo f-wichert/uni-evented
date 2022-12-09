@@ -59,7 +59,7 @@ function DiscoverScreen({ navigation }: Props) {
                 <Carousel
                     vertical={true}
                     width={width}
-                    height={580}
+                    height={400}
                     autoPlay={false}
                     loop={false}
                     data={media}

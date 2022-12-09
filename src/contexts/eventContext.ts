@@ -39,7 +39,7 @@ const createEvent = (dispatch: Dispatch<Action>) => {
         },
         token: string | null
     ) => {
-        const data = await request('POST', '/event/create', token, {
+        const data = await request('POST', 'event/create', token, {
             name: name,
             lat: location.coords.latitude,
             lon: location.coords.longitude,

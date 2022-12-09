@@ -1,13 +1,6 @@
 import config from './config';
 import { JSONObject } from './types';
 
-<<<<<<< HEAD
-// TODO: make this configurable somehow?
-const BASE_URL = 'http://192.168.0.10:3000/api';
-// const BASE_URL = 'http://10.0.2.2:3001/api'
-
-=======
->>>>>>> main
 export async function request(
     method: string,
     route: string,

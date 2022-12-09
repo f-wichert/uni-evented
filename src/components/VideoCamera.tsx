@@ -39,7 +39,7 @@ function VideoCamera({ onFinish }: Props) {
         const type = extensionMatch ? `image/${extensionMatch[1]}` : `image`;
 
         // upload media
-        await request('POST', '/upload/image', state.token, createFormData(uri, type));
+        await request('POST', 'upload/image', state.token, createFormData(uri, type));
     };
 
     const onVideoButton = async () => {
@@ -56,7 +56,7 @@ function VideoCamera({ onFinish }: Props) {
         const { uri } = await cameraRef.current.recordAsync();
 
         // upload media
-        await request('POST', '/upload/clip', state.token, createFormData(uri, 'video/mp4'));
+        await request('POST', 'upload/clip', state.token, createFormData(uri, 'video/mp4'));
 
         onFinish(false);
     };

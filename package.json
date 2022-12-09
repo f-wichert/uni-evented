@@ -15,7 +15,7 @@
         "@expo/vector-icons": "^13.0.0",
         "@react-native-community/datetimepicker": "6.5.2",
         "@react-navigation/bottom-tabs": "^6.4.1",
-        "@react-navigation/native": "^6.0.14",
+        "@react-navigation/native": "^6.0.16",
         "@react-navigation/native-stack": "^6.9.2",
         "@videojs/http-streaming": "^2.15.1",
         "envsafe": "^2.0.3",
