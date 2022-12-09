@@ -1,13 +1,12 @@
+import Ionicons from '@expo/vector-icons/Ionicons';
 import * as Location from 'expo-location';
 import { LocationObject } from 'expo-location';
-import React, { useEffect, useState, useContext } from 'react';
-import { AuthContext } from '../contexts/authContext';
-import { Button, Dimensions, StyleSheet, View, TouchableOpacity, Text } from 'react-native';
+import React, { useContext, useEffect, useState } from 'react';
+import { Dimensions, StyleSheet, TouchableOpacity, View } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
+
+import { AuthContext } from '../contexts/authContext';
 import { asyncHandler, request } from '../util';
-import Ionicons from '@expo/vector-icons/Ionicons';
-import { BottomTabBarHeightCallbackContext } from '@react-navigation/bottom-tabs';
-import CreateEventScreen from './CreateEventScreen';
 
 function MapScreen({ navigation }) {
     const [location, setLocation] = useState<LocationObject | null>(null);
@@ -56,7 +55,7 @@ function MapScreen({ navigation }) {
                             title="Your position"
                             pinColor="orange"
                         />
-                        {events.map((el: any) =>
+                        {events.map((el: any) => (
                             <Marker
                                 key={el.id}
                                 coordinate={{
@@ -66,18 +65,17 @@ function MapScreen({ navigation }) {
                                 title={el.name}
                                 pinColor="teal"
                             />
-                        )}
+                        ))}
                     </>
                 </MapView>
-            ) : null
-            }
+            ) : null}
             <TouchableOpacity
-                style={[styles.create,]}
+                style={[styles.create]}
                 onPress={() => navigation.navigate('CreateEventScreen')}
             >
-                <Ionicons name='add-circle-outline' size={64} color='black' />
+                <Ionicons name="add-circle-outline" size={64} color="black" />
             </TouchableOpacity>
-        </View >
+        </View>
     );
 }
 
@@ -102,7 +100,7 @@ const styles = StyleSheet.create({
         width: Dimensions.get('window').width,
         height: Dimensions.get('window').height,
         zIndex: 99,
-    }
+    },
 });
 
 export default MapScreen;

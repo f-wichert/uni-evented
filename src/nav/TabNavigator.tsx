@@ -6,8 +6,8 @@ import { EventContext } from '../contexts/eventContext';
 import CreateEventScreen from '../screens/CreateEventScreen';
 import DiscoverScreen from '../screens/DiscoverScreen';
 import EventsScreen from '../screens/EventsScreen';
-import ProfileScreen from '../screens/ProfileScreen';
 import MapScreen from '../screens/MapScreen';
+import ProfileScreen from '../screens/ProfileScreen';
 import ViewEventScreen from '../screens/ViewEventScreen';
 import { IoniconsName } from '../types';
 
@@ -67,7 +67,6 @@ export default function TabNavigator() {
             ) : (
                 <Tab.Screen name="Create" component={CreateEventScreen} />
             )}
-
         </Tab.Navigator>
     );
 }

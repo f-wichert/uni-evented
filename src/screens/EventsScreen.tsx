@@ -1,17 +1,10 @@
-import Ionicons from '@expo/vector-icons/Ionicons';
-import React, { useContext, useState } from 'react';
-import { Button, StyleSheet, Text, View } from 'react-native';
+import React from 'react';
+import { StyleSheet } from 'react-native';
 
 function EventsScreen() {
-
-    return (
-        <>
-
-        </>
-    );
+    return <></>;
 }
 
-const styles = StyleSheet.create({
-});
+const styles = StyleSheet.create({});
 
 export default EventsScreen;
