@@ -30,7 +30,7 @@ const tags = [
 ] as const;
 type TagValue = typeof tags[number]['value'];
 
-function CreateEventScreen() {
+function CreateEventScreen(props) {
     const [name, setName] = useState('');
 
     // DatePickerState
@@ -102,6 +102,8 @@ function CreateEventScreen() {
             });
     }
 
+
+
     return (
         <View style={styles.container}>
             <View style={styles.section}>
@@ -171,6 +173,9 @@ function CreateEventScreen() {
                 color="orange"
                 title="Create event!"
                 onPress={() => {
+                    console.log('Nav');
+                    props.navigation.navigate('MapPicker')
+                    return;
                     if (!location || !name) {
                         return;
                     }

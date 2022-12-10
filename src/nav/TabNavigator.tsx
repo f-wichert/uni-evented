@@ -3,11 +3,14 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import React, { useContext } from 'react';
 
 import { EventContext } from '../contexts/eventContext';
+import { IoniconsName } from '../types';
+
 import CreateEventScreen from '../screens/CreateEventScreen';
 import DiscoverScreen from '../screens/DiscoverScreen';
 import MapScreen from '../screens/MapScreen';
 import ViewEventScreen from '../screens/ViewEventScreen';
-import { IoniconsName } from '../types';
+import CreateEventStackScreen from './CreateEventStackScreen';
+
 
 // https://reactnavigation.org/docs/typescript/
 
@@ -57,7 +60,7 @@ export default function TabNavigator() {
             {state.eventActive ? (
                 <Tab.Screen name="Event" component={ViewEventScreen} />
             ) : (
-                <Tab.Screen name="Create" component={CreateEventScreen} />
+                <Tab.Screen name="Create" component={CreateEventStackScreen} />
             )}
             <Tab.Screen name="Map" component={MapScreen} />
         </Tab.Navigator>
