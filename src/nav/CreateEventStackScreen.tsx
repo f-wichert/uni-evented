@@ -19,7 +19,7 @@ export default function CreateEventStackScreen() {
             <Stack.Screen
                 name="CreateEvent"
                 component={CreateEventScreen}
-                options={{ headerShown: true }}
+                options={{ headerShown: false }}
             />
             <Stack.Screen
                 name="MapPicker"

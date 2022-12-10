@@ -108,7 +108,6 @@ function CreateEventScreen(props) {
 
 
     return (
-<<<<<<< HEAD
         <View style={styles.container}>
             <View style={styles.section}>
                 <Text style={styles.sectionTitle}>Name</Text>
@@ -122,21 +121,6 @@ function CreateEventScreen(props) {
                         />  
                     </View>               
                 </View>
-=======
-        <View style={[styles.container]}>
-            <View style={[styles.row]}>
-                <TextInput
-                    style={[styles.textInput]}
-                    placeholder="Event Name"
-                    onChangeText={setName}
-                />
-                <Ionicons
-                    onPress={asyncHandler(grabLocation)}
-                    name={iconName}
-                    size={32}
-                    color={'orange'}
-                />
->>>>>>> fb3744783657e0116ff52fa3df30d656cc8a8963
             </View>
                 
             <View style={styles.section}>
@@ -191,21 +175,6 @@ function CreateEventScreen(props) {
             <Button
                 color="orange"
                 title="Create event!"
-<<<<<<< HEAD
-                onPress={() => {
-                    console.log('Nav');
-                    props.navigation.navigate('MapPicker')
-                    return;
-                    if (!location || !name) {
-                        return;
-                    }
-                    createEvent({ name: name, location: location, startDate: start }).catch((err) =>
-                        console.error('event creation failed', err)
-                    );
-                }}
-=======
-                onPress={asyncHandler(onCreateButton, { prefix: 'Failed to create event' })}
->>>>>>> fb3744783657e0116ff52fa3df30d656cc8a8963
             />
         </View>
     );
@@ -216,10 +185,7 @@ const styles = StyleSheet.create({
         // flex: 1,
         // height
         width: width,
-        padding: 20,
-        backgroundColor: BACKGR_COLOR,
-        justifyContent: 'space-around',
-        alignItems: 'center',
+        padding: 0,
     },
     section: {
         width: width,

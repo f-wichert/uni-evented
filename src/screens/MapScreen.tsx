@@ -9,7 +9,12 @@ import { AuthContext } from '../contexts/authContext';
 import { asyncHandler, request } from '../util';
 
 function MapScreen({ navigation }) {
-    const [location, setLocation] = useState<LocationObject | null>(null);
+    const [location, setLocation] = useState<LocationObject | null>({
+        coords: {
+            latitude: 49.871611,
+            longitude: 8.648212
+        }
+    });
     const { state: authState } = useContext(AuthContext);
     // todo: fix types
     const [events, setEvents] = useState<any>([]);
