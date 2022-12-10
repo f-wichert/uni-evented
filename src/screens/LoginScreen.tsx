@@ -10,15 +10,9 @@ type ComponentProps = NativeStackScreenProps<RootNavigatorParams, 'LoginScreen'>
 
 export default function LoginScreen({ navigation }: ComponentProps) {
     async function submitLogin() {
-        console.log(`log: ${user}`);
-        try {
-            // this automatically navigates to the main screen when the token gets set
-            // TODO: require these to be non-empty in the UI
-            await signin({ email: user || '', password: password || '' });
-        } catch (e) {
-            toast.show(`An error occurred:\n${e}`, { type: 'danger' });
-            throw e;
-        }
+        // this automatically navigates to the main screen when the token gets set
+        // TODO: require these to be non-empty in the UI
+        await signin({ email: user || '', password: password || '' });
     }
 
     const { signin } = useContext(AuthContext);
@@ -35,7 +29,10 @@ export default function LoginScreen({ navigation }: ComponentProps) {
                     textInputProps: { secureTextEntry: true },
                 },
             ]}
-            submitButton={{ text: 'Login', callback: asyncHandler(submitLogin) }}
+            submitButton={{
+                text: 'Login',
+                callback: asyncHandler(submitLogin, { prefix: 'Login failed' }),
+            }}
             header={{ title: 'Login', subTitle: 'Please sign in to continue.' }}
             footer={{
                 text: "Don't have an account?",

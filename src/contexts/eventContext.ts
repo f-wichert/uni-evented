@@ -1,8 +1,7 @@
 import { LocationObject } from 'expo-location';
-import { Dispatch, useContext } from 'react';
+import { Dispatch } from 'react';
 
 import { request } from '../util';
-import { AuthContext } from './authContext';
 import createDataContext from './createDataContext';
 
 interface State {
@@ -26,24 +25,21 @@ const eventReducer = (state: State, action: Action): State => {
 };
 
 const createEvent = (dispatch: Dispatch<Action>) => {
-    return async ({
-        name,
-        location,
-        startDate,
-        endDate,
-    }: {
-        name: string;
-        location: LocationObject;
-        startDate?: Date;
-        endDate?: Date;
-    }) => {
-        const authToken = useContext(AuthContext).state.token;
-        if (!authToken) {
-            console.error('no token in authContext');
-            return;
-        }
-
-        const data = await request('POST', '/event/create', authToken, {
+    return async (
+        {
+            name,
+            location,
+            startDate,
+            endDate,
+        }: {
+            name: string;
+            location: LocationObject;
+            startDate?: Date;
+            endDate?: Date;
+        },
+        token: string | null
+    ) => {
+        const data = await request('POST', '/event/create', token, {
             name: name,
             lat: location.coords.latitude,
             lon: location.coords.longitude,

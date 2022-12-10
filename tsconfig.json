@@ -1,8 +1,7 @@
 {
     "extends": "expo/tsconfig.base",
     "compilerOptions": {
-        "strict": true,
-        "baseUrl": "./src" // all paths are relative to the baseUrl
+        "strict": true
     },
     "typeRoots": ["src/index.d.ts"]
 }

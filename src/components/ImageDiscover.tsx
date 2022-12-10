@@ -2,6 +2,8 @@ import { NavigationProp, ParamListBase } from '@react-navigation/native';
 import React from 'react';
 import { Image, StyleSheet, View } from 'react-native';
 
+import { baseHeaders } from '../util';
+
 declare type Props = {
     discoverData: { src: string };
     navigation: NavigationProp<ParamListBase>;
@@ -10,7 +12,15 @@ declare type Props = {
 function ImageDiscover({ discoverData, navigation }: Props) {
     return (
         <View style={styles.container}>
-            <Image source={{ uri: discoverData.src }} style={styles.image} />
+            <Image
+                source={{
+                    uri: discoverData.src,
+                    headers: {
+                        ...baseHeaders,
+                    },
+                }}
+                style={styles.image}
+            />
         </View>
     );
 }

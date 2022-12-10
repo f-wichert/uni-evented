@@ -7,9 +7,14 @@ import { Button, Dimensions, StyleSheet, Text, TextInput, View } from 'react-nat
 import DropDownPicker from 'react-native-dropdown-picker';
 // import DateTimePicker from '@react-native-community/datetimepicker';
 
+import { AuthContext } from '../contexts/authContext';
 import { EventContext } from '../contexts/eventContext';
 import { IoniconsName } from '../types';
+<<<<<<< HEAD
 import { INPUT_BACKGR_COLOR, BACKGR_COLOR } from '../const'; 
+=======
+import { asyncHandler } from '../util';
+>>>>>>> fb3744783657e0116ff52fa3df30d656cc8a8963
 
 const width = Dimensions.get('window').width;
 // const height = Dimensions.get('window').height;
@@ -43,12 +48,12 @@ function CreateEventScreen(props) {
 
     // Location State
     const [location, setLocation] = useState<LocationObject | null>(null);
-    const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
     // Location icon
     const [iconName, setIconName] = useState<IoniconsName>('location-outline');
 
     const { createEvent } = useContext(EventContext);
+    const { state: authState } = useContext(AuthContext);
 
     const onChange = (event: DateTimePickerEvent, selectedDate?: Date) => {
         if (!selectedDate) {
@@ -58,6 +63,7 @@ function CreateEventScreen(props) {
     };
 
     const showModeStartPicker = (currentMode: 'date' | 'time') => {
+        // TODO: not supported on ios, which technically isn't a requirement but would be nice
         DateTimePickerAndroid.open({
             value: start,
             onChange,
@@ -83,28 +89,29 @@ function CreateEventScreen(props) {
         return `${day}.${month}.${year} - ${hours}:${minutes}`;
     };
 
-    function grabLocation() {
-        (async () => {
-            const { status } = await Location.requestForegroundPermissionsAsync();
-            if (status !== 'granted') {
-                setErrorMsg('Permission to access location was denied');
-                return;
-            }
+    const grabLocation = async () => {
+        const { status } = await Location.requestForegroundPermissionsAsync();
+        if (status !== 'granted') {
+            setIconName('bug');
+            throw new Error('Location access not granted');
+        }
 
-            const location = await Location.getCurrentPositionAsync({});
-            setLocation(location);
-        })()
-            .then(() => {
-                setIconName('location');
-            })
-            .catch(() => {
-                setIconName('bug');
-            });
-    }
+        setLocation(await Location.getCurrentPositionAsync());
+        setIconName('location');
+    };
+
+    const onCreateButton = async () => {
+        // TODO: require these to be non-empty in the UI
+        if (!location || !name) {
+            throw new Error('Invalid name or location');
+        }
+        await createEvent({ name: name, location: location, startDate: start }, authState.token);
+    };
 
 
 
     return (
+<<<<<<< HEAD
         <View style={styles.container}>
             <View style={styles.section}>
                 <Text style={styles.sectionTitle}>Name</Text>
@@ -118,6 +125,21 @@ function CreateEventScreen(props) {
                         />  
                     </View>               
                 </View>
+=======
+        <View style={[styles.container]}>
+            <View style={[styles.row]}>
+                <TextInput
+                    style={[styles.textInput]}
+                    placeholder="Event Name"
+                    onChangeText={setName}
+                />
+                <Ionicons
+                    onPress={asyncHandler(grabLocation)}
+                    name={iconName}
+                    size={32}
+                    color={'orange'}
+                />
+>>>>>>> fb3744783657e0116ff52fa3df30d656cc8a8963
             </View>
                 
             <View style={styles.section}>
@@ -172,6 +194,7 @@ function CreateEventScreen(props) {
             <Button
                 color="orange"
                 title="Create event!"
+<<<<<<< HEAD
                 onPress={() => {
                     console.log('Nav');
                     props.navigation.navigate('MapPicker')
@@ -183,6 +206,9 @@ function CreateEventScreen(props) {
                         console.error('event creation failed', err)
                     );
                 }}
+=======
+                onPress={asyncHandler(onCreateButton, { prefix: 'Failed to create event' })}
+>>>>>>> fb3744783657e0116ff52fa3df30d656cc8a8963
             />
         </View>
     );
