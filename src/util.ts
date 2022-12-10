@@ -16,7 +16,8 @@ export async function request(
     token: string | null,
     data?: JSONObject | FormData
 ): Promise<JSONObject> {
-    const url = `${config.BASE_URL}/${route}`;
+    // TODO: join url parts properly and fix double slashes
+    const url = `${config.BASE_URL}/api/${route}`;
 
     const headers: Record<string, string> = { ...baseHeaders };
     if (token) {
