@@ -10,11 +10,8 @@ import DropDownPicker from 'react-native-dropdown-picker';
 import { AuthContext } from '../contexts/authContext';
 import { EventContext } from '../contexts/eventContext';
 import { IoniconsName } from '../types';
-<<<<<<< HEAD
 import { INPUT_BACKGR_COLOR, BACKGR_COLOR } from '../const'; 
-=======
 import { asyncHandler } from '../util';
->>>>>>> fb3744783657e0116ff52fa3df30d656cc8a8963
 
 const width = Dimensions.get('window').width;
 // const height = Dimensions.get('window').height;
