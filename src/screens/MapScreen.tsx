@@ -6,9 +6,12 @@ import { Dimensions, StyleSheet, TouchableOpacity, View } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 
 import { useToken } from '../contexts/authContext';
+import { TabPropsFor } from '../nav/TabNavigator';
 import { asyncHandler, request } from '../util';
 
-function MapScreen({ navigation }) {
+type ComponentProps = TabPropsFor<'Map'>;
+
+function MapScreen({ navigation }: ComponentProps) {
     const [location, setLocation] = useState<LocationObject | null>(null);
     const token = useToken();
     // todo: fix types

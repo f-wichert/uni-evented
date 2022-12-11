@@ -15,14 +15,19 @@ import RegisterScreen from './screens/RegisterScreen';
 // https://reactnavigation.org/docs/typescript/
 // instead of `undefined`, props passed to these screens would be defined here if applicable
 
+// screens in stack, with token
 export type RootNavigatorParams = {
-    LoginScreen: undefined;
-    RegisterScreen: undefined;
     TabScreen: undefined;
     CreateEventScreen: undefined;
 };
 
-const Stack = createNativeStackNavigator<RootNavigatorParams>();
+// screens in stack, without token
+export type UnauthRootNavigatorParams = {
+    LoginScreen: undefined;
+    RegisterScreen: undefined;
+};
+
+const Stack = createNativeStackNavigator<RootNavigatorParams & UnauthRootNavigatorParams>();
 
 function App() {
     const { state: authState } = useContext(AuthContext);
