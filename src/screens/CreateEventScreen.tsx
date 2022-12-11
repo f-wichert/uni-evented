@@ -10,6 +10,7 @@ import DropDownPicker from 'react-native-dropdown-picker';
 import { useToken } from '../contexts/authContext';
 import { EventContext } from '../contexts/eventContext';
 import { IoniconsName } from '../types';
+import { INPUT_BACKGR_COLOR, BACKGR_COLOR } from '../const'; 
 import { asyncHandler } from '../util';
 
 const width = Dimensions.get('window').width;
@@ -31,7 +32,7 @@ const tags = [
 ] as const;
 type TagValue = typeof tags[number]['value'];
 
-function CreateEventScreen() {
+function CreateEventScreen(props) {
     const [name, setName] = useState('');
 
     // DatePickerState
@@ -104,23 +105,34 @@ function CreateEventScreen() {
         await createEvent({ name: name, location: location, startDate: start }, token);
     };
 
+
+
     return (
-        <View style={[styles.container]}>
-            <View style={[styles.row]}>
-                <TextInput
-                    style={[styles.textInput]}
-                    placeholder="Event Name"
-                    onChangeText={setName}
-                />
-                <Ionicons
-                    onPress={asyncHandler(grabLocation)}
-                    name={iconName}
-                    size={32}
-                    color={'orange'}
-                />
+        <View style={styles.container}>
+            <View style={styles.section}>
+                <Text style={styles.sectionTitle}>Name</Text>
+
+                <View style={styles.sectionBody}>
+                    <View style={styles.textInputWrapper}>
+                        <TextInput
+                            style={styles.textInput}
+                            placeholder="Type out your event name..."
+                            onChangeText={setName}
+                        />  
+                    </View>               
+                </View>
             </View>
-            <View style={[styles.row]}>
-                <Text style={[styles.text]}>Start: {formatDate(start)}</Text>
+                
+            <View style={styles.section}>
+                <Text style={styles.sectionTitle}>Location</Text>
+                
+                <View style={styles.sectionBody}>
+                    <Ionicons onPress={grabLocation} name={iconName} size={32} color={'orange'} />
+                </View>
+            </View>
+
+            <View style={styles.row}>
+                <Text style={styles.text}>Start: {formatDate(start)}</Text>
                 <Ionicons
                     onPress={showDatepickerStartPicker}
                     name={'calendar-outline'}
@@ -134,6 +146,7 @@ function CreateEventScreen() {
                     color={'orange'}
                 />
             </View>
+
             <DropDownPicker
                 style={[styles.dropdown]}
                 multiple={true}
@@ -162,7 +175,6 @@ function CreateEventScreen() {
             <Button
                 color="orange"
                 title="Create event!"
-                onPress={asyncHandler(onCreateButton, { prefix: 'Failed to create event' })}
             />
         </View>
     );
@@ -170,20 +182,41 @@ function CreateEventScreen() {
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
-        padding: 20,
-        backgroundColor: '#fff',
-        justifyContent: 'space-around',
+        // flex: 1,
+        // height
         width: width,
-        alignItems: 'center',
+        padding: 0,
+    },
+    section: {
+        width: width,
+        // backgroundColor: 'orange',
+        padding: 10,
+        // margin: 20
+    },
+    sectionTitle: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        
+    },
+    sectionBody: {
+        marginTop: 8,
+        marginRight: 10
+    },
+    textInputWrapper: {
+        backgroundColor: INPUT_BACKGR_COLOR,
+        borderRadius: 5
     },
     textInput: {
-        borderBottomColor: 'black',
-        borderBottomWidth: 0.25,
-        fontSize: 25,
-        margin: 10,
-        paddingBottom: 5,
-        width: 0.75 * width,
+        // borderBottomColor: 'black',
+        // borderBottomWidth: 0.25,
+        // fontSize: 25,
+        // margin: 10,
+        // paddingBottom: 5,
+        // width: 0.75 * width,
+        // backgroundColor: '#d6d6d6',
+        // borderRadius: 5
+        marginLeft: 5,
+        minHeight: 10
     },
     dropdown: {
         marginTop: 10,

@@ -6,13 +6,16 @@ import React, { useContext } from 'react';
 import { RootNavigatorParams } from '../App';
 
 import { EventContext } from '../contexts/eventContext';
+import { IoniconsName } from '../types';
+
 import CreateEventScreen from '../screens/CreateEventScreen';
 import DiscoverScreen from '../screens/DiscoverScreen';
 import EventsScreen from '../screens/EventsScreen';
 import MapScreen from '../screens/MapScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import ViewEventScreen from '../screens/ViewEventScreen';
-import { IoniconsName } from '../types';
+import CreateEventStackScreen from './CreateEventStackScreen';
+
 
 // https://reactnavigation.org/docs/typescript/
 export type TabNavigatorParams = {
@@ -73,7 +76,7 @@ export default function TabNavigator() {
             {state.eventId ? (
                 <Tab.Screen name="Event" component={ViewEventScreen} />
             ) : (
-                <Tab.Screen name="Create" component={CreateEventScreen} />
+                <Tab.Screen name="Create" component={CreateEventStackScreen} />
             )}
         </Tab.Navigator>
     );
