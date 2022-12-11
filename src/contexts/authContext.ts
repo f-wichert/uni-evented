@@ -49,7 +49,7 @@ const signin = (dispatch: Dispatch<Action>) => {
 const signup = (dispatch: Dispatch<Action>) => {
     return async ({
         username,
-        // email,
+        email,
         password,
     }: {
         username: string;
@@ -58,6 +58,7 @@ const signup = (dispatch: Dispatch<Action>) => {
     }) => {
         const data = await request('POST', '/auth/register', null, {
             username: username,
+            email: email,
             password: password,
         });
 
