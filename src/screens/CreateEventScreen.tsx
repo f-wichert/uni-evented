@@ -87,6 +87,8 @@ function CreateEventScreen() {
     };
 
     const grabLocation = async () => {
+        console.log('Location grabbed');
+        
         const { status } = await Location.requestForegroundPermissionsAsync();
         if (status !== 'granted') {
             setIconName('bug');
