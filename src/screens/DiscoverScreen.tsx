@@ -8,7 +8,7 @@ import Carousel from 'react-native-reanimated-carousel';
 import ImageDiscover from '../components/ImageDiscover';
 import VideoDiscover from '../components/VideoDiscover';
 import config from '../config';
-import { useToken } from '../contexts/authContext';
+import { getToken } from '../state/auth';
 import { ExtendedMedia, Media } from '../types';
 import { asyncHandler, request } from '../util';
 
@@ -18,10 +18,9 @@ declare type Props = {
 
 function DiscoverScreen({ navigation }: Props) {
     const [media, setMedia] = useState<ExtendedMedia[]>([]);
-    const token = useToken();
 
     async function updateMedia() {
-        const responseData = await request('GET', 'info/all_media', token);
+        const responseData = await request('GET', 'info/all_media', getToken());
         const data = responseData.media as Media[];
         const media: ExtendedMedia[] = data
             .filter((el) => el.fileAvailable)
