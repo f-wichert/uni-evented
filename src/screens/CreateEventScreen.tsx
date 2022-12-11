@@ -3,7 +3,7 @@ import { DateTimePickerAndroid, DateTimePickerEvent } from '@react-native-commun
 import * as Location from 'expo-location';
 import { LocationObject } from 'expo-location';
 import React, { useContext, useState } from 'react';
-import { Button, Dimensions, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Button, Dimensions, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import DropDownPicker from 'react-native-dropdown-picker';
 // import DateTimePicker from '@react-native-community/datetimepicker';
 
@@ -12,6 +12,7 @@ import { EventContext } from '../contexts/eventContext';
 import { IoniconsName } from '../types';
 import { INPUT_BACKGR_COLOR, BACKGR_COLOR } from '../const'; 
 import { asyncHandler } from '../util';
+import MapView, { LatLng, Marker } from 'react-native-maps';
 
 const width = Dimensions.get('window').width;
 // const height = Dimensions.get('window').height;
@@ -32,7 +33,7 @@ const tags = [
 ] as const;
 type TagValue = typeof tags[number]['value'];
 
-function CreateEventScreen() {
+function CreateEventScreen(props) {
     const [name, setName] = useState('');
 
     // DatePickerState
@@ -44,13 +45,20 @@ function CreateEventScreen() {
     const [items, setItems] = useState([...tags]);
 
     // Location State
-    const [location, setLocation] = useState<LocationObject | null>(null);
+    const [location, setLocation] = useState<LatLng | null>(null);
 
     // Location icon
     const [iconName, setIconName] = useState<IoniconsName>('location-outline');
 
     const { createEvent } = useContext(EventContext);
     const { state: authState } = useContext(AuthContext);
+
+    const recieveLocation = (loc) => {
+        // console.log(`location recieved: ${JSON.stringify(loc)}`);
+        setLocation(loc);
+        // console.log(`Assigend location: ${location}`);
+        
+    };
 
     const onChange = (event: DateTimePickerEvent, selectedDate?: Date) => {
         if (!selectedDate) {
@@ -86,8 +94,26 @@ function CreateEventScreen() {
         return `${day}.${month}.${year} - ${hours}:${minutes}`;
     };
 
+    const formatStartTime = (date: Date) => {
+        const hours = date.getHours().toString().padStart(2, '0');
+        const minutes = date.getMinutes().toString().padStart(2, '0');
+        return `${hours}:${minutes}`
+    };
+
+    const formatStartDate = (date: Date) => {
+        const day = date.getDate().toString().padStart(2, '0');
+        const month = (date.getMonth() + 1).toString().padStart(2, '0');
+        const year = date.getFullYear();
+        return `${day}.${month}.${year}`;
+    };
+
     const grabLocation = async () => {
         console.log('Location grabbed');
+
+        props.navigation.navigate('MapPicker', {
+            returnLocation: recieveLocation
+        })
+        return
         
         const { status } = await Location.requestForegroundPermissionsAsync();
         if (status !== 'granted') {
@@ -101,6 +127,9 @@ function CreateEventScreen() {
 
     const onCreateButton = async () => {
         // TODO: require these to be non-empty in the UI
+        console.log(`name: ${name}`);
+        console.log(`loc: ${JSON.stringify(location)}`);
+        
         if (!location || !name) {
             throw new Error('Invalid name or location');
         }
@@ -124,15 +153,61 @@ function CreateEventScreen() {
             </View>
                 
             <View style={styles.section}>
-                <Text style={styles.sectionTitle}>Location</Text>
+                <View style={{ flexDirection: 'row' }}>
+                    <Text style={styles.sectionTitle}>Location</Text>
+                    <Ionicons onPress={grabLocation} name={iconName} size={26} color={'orange'} />
+                </View>
                 
                 <View style={styles.sectionBody}>
-                    <Ionicons onPress={grabLocation} name={iconName} size={32} color={'orange'} />
+                { location ? (
+                    <TouchableOpacity
+                        onPressIn={console.log('hi')}
+                    >
+                        <MapView 
+                            style={styles.locationPreviewMap}
+                            onPress={(e) => console.log('E')}
+                            zoomEnabled={false}
+                            scrollEnabled={false}
+                            initialRegion={{
+                                latitude: location.latitude,
+                                longitude: location.longitude,
+                                latitudeDelta: 0.001,
+                                longitudeDelta: 0.001,
+                            }}
+                        >
+                            <Marker
+                                key={1}
+                                coordinate={{
+                                    latitude: location.latitude,
+                                    longitude: location.longitude,
+                                }}
+                                title="Your party location"
+                            />
+                        </MapView>
+                    </TouchableOpacity>
+                ) : null
+                }
                 </View>
             </View>
 
-            <View style={styles.row}>
-                <Text style={styles.text}>Start: {formatDate(start)}</Text>
+            <View style={styles.section}>
+                <Text style={styles.sectionTitle}>Date & Time</Text>
+                
+                <Text style={styles.sectionSubtitle}>Start</Text>
+                <View style={styles.sectionBody}>
+                    <View style={styles.dateTimeWrapper}>
+                        <TouchableOpacity style={styles.timeInput} onPress={showTimepickerStartPicker}>
+                            <Text>{formatStartTime(start)}</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity style={styles.dateInput}>
+                            <Text>{formatStartDate(start)}</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+
+                <Text style={{...styles.sectionSubtitle, marginTop: 10}}>End...</Text>
+
+                {/* <Text style={styles.text}>Start: {formatDate(start)}</Text>
                 <Ionicons
                     onPress={showDatepickerStartPicker}
                     name={'calendar-outline'}
@@ -144,34 +219,42 @@ function CreateEventScreen() {
                     name={'time-outline'}
                     size={32}
                     color={'orange'}
-                />
+                /> */}
             </View>
 
-            <DropDownPicker
-                style={[styles.dropdown]}
-                multiple={true}
-                min={1}
-                max={3}
-                open={open}
-                value={value}
-                items={items}
-                setOpen={setOpen}
-                setValue={setValue}
-                setItems={setItems}
-                placeholder="Select up to three tags"
-                maxHeight={300}
-                categorySelectable={false}
-                mode="BADGE"
-                badgeDotColors={[
-                    '#e76f51',
-                    '#00b4d8',
-                    '#e9c46a',
-                    '#e76f51',
-                    '#8ac926',
-                    '#00b4d8',
-                    '#e9c46a',
-                ]}
-            />
+            <View style={styles.section}>
+                <Text style={styles.sectionTitle}>Tags</Text>
+
+                <View style={styles.sectionBody}>
+                    <DropDownPicker
+                        style={[styles.dropdown]}
+                        multiple={true}
+                        min={1}
+                        max={3}
+                        open={open}
+                        value={value}
+                        items={items}
+                        setOpen={setOpen}
+                        setValue={setValue}
+                        setItems={setItems}
+                        placeholder="Select up to three tags"
+                        maxHeight={300}
+                        categorySelectable={false}
+                        mode="BADGE"
+                        badgeDotColors={[
+                            '#e76f51',
+                            '#00b4d8',
+                            '#e9c46a',
+                            '#e76f51',
+                            '#8ac926',
+                            '#00b4d8',
+                            '#e9c46a',
+                        ]}
+                    />
+                </View>
+            </View>
+
+
             <Button
                 color="orange"
                 title="Create event!"
@@ -184,7 +267,7 @@ function CreateEventScreen() {
 const styles = StyleSheet.create({
     container: {
         // flex: 1,
-        // height
+        minHeight: '100%',
         width: width,
         padding: 20,
         backgroundColor: BACKGR_COLOR,
@@ -201,6 +284,9 @@ const styles = StyleSheet.create({
         fontSize: 20,
         fontWeight: 'bold',
         
+    },
+    sectionSubtitle: {
+        fontSize: 16,
     },
     sectionBody: {
         marginTop: 8,
@@ -222,6 +308,26 @@ const styles = StyleSheet.create({
         marginLeft: 5,
         minHeight: 10
     },
+    dateTimeWrapper: {
+        flexDirection: 'row'
+    },
+    timeInput: {
+        justifyContent: 'center',
+        alignItems: 'center',
+        width: 80,
+        height: 30,
+        borderRadius: 5,
+        backgroundColor: INPUT_BACKGR_COLOR
+    },
+    dateInput: {
+        justifyContent: 'center',
+        alignItems: 'center',
+        width: 250,
+        height: 30,
+        marginLeft: 20,
+        borderRadius: 5,
+        backgroundColor: INPUT_BACKGR_COLOR
+    },
     dropdown: {
         marginTop: 10,
         marginBottom: 10,
@@ -242,6 +348,11 @@ const styles = StyleSheet.create({
         justifyContent: 'space-around',
         alignContent: 'center',
     },
+    locationPreviewMap: {
+        width: '100%',
+        height: 90,
+        borderRadius: 5
+    }
 });
 
 export default CreateEventScreen;

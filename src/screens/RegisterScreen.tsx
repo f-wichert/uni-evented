@@ -33,6 +33,7 @@ export default function RegisterScreen({ navigation }: ComponentProps) {
             return false;
         } else if (!(password === passwordCtrl)) {
             toast.show('The passwords do not match!', { type: 'normal' });
+            return false;
         }
 
         return true

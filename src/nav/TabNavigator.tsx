@@ -9,6 +9,7 @@ import EventsScreen from '../screens/EventsScreen';
 import MapScreen from '../screens/MapScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import ViewEventScreen from '../screens/ViewEventScreen';
+import CreateEventScreenStack from './CreateEventScreenStack';
 import { IoniconsName } from '../types';
 
 // https://reactnavigation.org/docs/typescript/
@@ -65,7 +66,7 @@ export default function TabNavigator() {
             {state.eventId ? (
                 <Tab.Screen name="Event" component={ViewEventScreen} />
             ) : (
-                <Tab.Screen name="Create" component={CreateEventScreen} />
+                <Tab.Screen name="Create" component={CreateEventScreenStack} />
             )}
         </Tab.Navigator>
     );

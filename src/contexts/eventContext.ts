@@ -1,5 +1,6 @@
 import { LocationObject } from 'expo-location';
 import { Dispatch } from 'react';
+import { LatLng } from 'react-native-maps';
 
 import { request } from '../util';
 import createDataContext from './createDataContext';
@@ -33,7 +34,7 @@ const createEvent = (dispatch: Dispatch<Action>) => {
             endDate,
         }: {
             name: string;
-            location: LocationObject;
+            location: LatLng;
             startDate?: Date;
             endDate?: Date;
         },
@@ -41,8 +42,8 @@ const createEvent = (dispatch: Dispatch<Action>) => {
     ) => {
         const data = await request('POST', '/event/create', token, {
             name: name,
-            lat: location.coords.latitude,
-            lon: location.coords.longitude,
+            lat: location.latitude,
+            lon: location.longitude,
             startDateTime: startDate ? startDate.toJSON() : null,
             endDateTime: endDate ? endDate.toJSON() : null,
         });
