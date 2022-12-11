@@ -1,16 +1,16 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import * as Location from 'expo-location';
 import { LocationObject } from 'expo-location';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Dimensions, StyleSheet, TouchableOpacity, View } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 
-import { AuthContext } from '../contexts/authContext';
+import { useToken } from '../contexts/authContext';
 import { asyncHandler, request } from '../util';
 
 function MapScreen({ navigation }) {
     const [location, setLocation] = useState<LocationObject | null>(null);
-    const { state: authState } = useContext(AuthContext);
+    const token = useToken();
     // todo: fix types
     const [events, setEvents] = useState<any>([]);
 
@@ -26,7 +26,7 @@ function MapScreen({ navigation }) {
 
     useEffect(
         asyncHandler(async () => {
-            const eventList = await request('get', 'event/find', authState.token);
+            const eventList = await request('get', 'event/find', token);
             setEvents(eventList.events);
             await getCurrentPosition();
         }),

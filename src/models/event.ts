@@ -1,5 +1,6 @@
+import { useToken } from '../contexts/authContext';
 import { JSONObject } from '../types';
-import { getUserToken, request } from '../util';
+import { request } from '../util';
 import Media, { MediaResponse } from './media';
 import User, { UserResponse } from './user';
 
@@ -80,7 +81,7 @@ export default class Event {
     }
 
     async join(lat: number, lon: number) {
-        const token = getUserToken()!;
+        const token = useToken();
 
         // TODO: client side validation
 
@@ -88,7 +89,7 @@ export default class Event {
     }
 
     async close() {
-        const token = getUserToken()!;
+        const token = useToken();
 
         // TODO: client side validation
 
@@ -134,7 +135,7 @@ export default class Event {
     }
 
     static async fromId(id: string) {
-        const token = getUserToken()!;
+        const token = useToken();
         const data = await request('GET', '/event/info', token, { eventId: id });
         return Event.fromEventResponse(data as EventResponse);
     }
@@ -154,7 +155,7 @@ export default class Event {
         startDate: Date | null;
         endDate: Date | null;
     }) {
-        const token = getUserToken()!;
+        const token = useToken();
         const { eventId } = await request('POST', '/event/create', token, {
             name: name,
             tags: tags,
@@ -175,7 +176,7 @@ export default class Event {
         maxResults?: number;
         maxRadius?: number;
     }) {
-        const token = getUserToken()!;
+        const token = useToken();
         const data = await request('GET', '/event/find', token, options);
         const eventResponses = data.events as EventResponse[];
         return eventResponses.map((res) => Event.fromEventResponse(res));

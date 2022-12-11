@@ -13,12 +13,12 @@ export default function RegisterScreen({ navigation }: ComponentProps) {
         // this automatically navigates to the main screen when the token gets set
         // TODO: require these to be non-empty in the UI
         if (!validatdeInputs()) {
-            return
+            return;
         }
         await signup({ username: user || '', email: email || '', password: password || '' });
     }
 
-    function validatdeInputs():boolean {
+    function validatdeInputs(): boolean {
         if (user === '') {
             toast.show('Please enter a user name.', { type: 'normal' });
             return false;
@@ -35,7 +35,7 @@ export default function RegisterScreen({ navigation }: ComponentProps) {
             toast.show('The passwords do not match!', { type: 'normal' });
         }
 
-        return true
+        return true;
     }
 
     const { signup } = useContext(AuthContext);
