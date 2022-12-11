@@ -7,9 +7,11 @@ import { Button, Dimensions, StyleSheet, Text, TextInput, View } from 'react-nat
 import DropDownPicker from 'react-native-dropdown-picker';
 // import DateTimePicker from '@react-native-community/datetimepicker';
 
+import { AuthContext } from '../contexts/authContext';
 import { EventContext } from '../contexts/eventContext';
 import { IoniconsName } from '../types';
 import { INPUT_BACKGR_COLOR, BACKGR_COLOR } from '../const'; 
+import { asyncHandler } from '../util';
 
 const width = Dimensions.get('window').width;
 // const height = Dimensions.get('window').height;
@@ -43,12 +45,12 @@ function CreateEventScreen() {
 
     // Location State
     const [location, setLocation] = useState<LocationObject | null>(null);
-    const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
     // Location icon
     const [iconName, setIconName] = useState<IoniconsName>('location-outline');
 
     const { createEvent } = useContext(EventContext);
+    const { state: authState } = useContext(AuthContext);
 
     const onChange = (event: DateTimePickerEvent, selectedDate?: Date) => {
         if (!selectedDate) {
@@ -58,6 +60,7 @@ function CreateEventScreen() {
     };
 
     const showModeStartPicker = (currentMode: 'date' | 'time') => {
+        // TODO: not supported on ios, which technically isn't a requirement but would be nice
         DateTimePickerAndroid.open({
             value: start,
             onChange,
@@ -83,24 +86,24 @@ function CreateEventScreen() {
         return `${day}.${month}.${year} - ${hours}:${minutes}`;
     };
 
-    function grabLocation() {
-        (async () => {
-            const { status } = await Location.requestForegroundPermissionsAsync();
-            if (status !== 'granted') {
-                setErrorMsg('Permission to access location was denied');
-                return;
-            }
+    const grabLocation = async () => {
+        const { status } = await Location.requestForegroundPermissionsAsync();
+        if (status !== 'granted') {
+            setIconName('bug');
+            throw new Error('Location access not granted');
+        }
 
-            const location = await Location.getCurrentPositionAsync({});
-            setLocation(location);
-        })()
-            .then(() => {
-                setIconName('location');
-            })
-            .catch(() => {
-                setIconName('bug');
-            });
-    }
+        setLocation(await Location.getCurrentPositionAsync());
+        setIconName('location');
+    };
+
+    const onCreateButton = async () => {
+        // TODO: require these to be non-empty in the UI
+        if (!location || !name) {
+            throw new Error('Invalid name or location');
+        }
+        await createEvent({ name: name, location: location, startDate: start }, authState.token);
+    };
 
     return (
         <View style={styles.container}>
@@ -170,14 +173,7 @@ function CreateEventScreen() {
             <Button
                 color="orange"
                 title="Create event!"
-                onPress={() => {
-                    if (!location || !name) {
-                        return;
-                    }
-                    createEvent({ name: name, location: location, startDate: start }).catch((err) =>
-                        console.error('event creation failed', err)
-                    );
-                }}
+                onPress={asyncHandler(onCreateButton, { prefix: 'Failed to create event' })}
             />
         </View>
     );

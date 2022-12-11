@@ -1,6 +1,6 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { NavigationProp, ParamListBase } from '@react-navigation/native';
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Dimensions, StyleSheet, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import Carousel from 'react-native-reanimated-carousel';
@@ -8,8 +8,9 @@ import Carousel from 'react-native-reanimated-carousel';
 import ImageDiscover from '../components/ImageDiscover';
 import VideoDiscover from '../components/VideoDiscover';
 import config from '../config';
+import { AuthContext } from '../contexts/authContext';
 import { ExtendedMedia, Media } from '../types';
-import { request } from '../util';
+import { asyncHandler, request } from '../util';
 
 declare type Props = {
     navigation: NavigationProp<ParamListBase>;
@@ -17,9 +18,10 @@ declare type Props = {
 
 function DiscoverScreen({ navigation }: Props) {
     const [media, setMedia] = useState<ExtendedMedia[]>([]);
+    const { state: authState } = useContext(AuthContext);
 
-    async function updateMediaAsync() {
-        const responseData = await request('GET', 'info/all_media', null);
+    async function updateMedia() {
+        const responseData = await request('GET', 'info/all_media', authState.token);
         const data = responseData.media as Media[];
         const media: ExtendedMedia[] = data
             .filter((el) => el.fileAvailable)
@@ -33,10 +35,6 @@ function DiscoverScreen({ navigation }: Props) {
         setMedia(media);
     }
 
-    const updateMedia = () => {
-        updateMediaAsync().catch((err) => console.error('media update failed', err));
-    };
-
     const width = Dimensions.get('window').width;
 
     useEffect(() => {
@@ -48,7 +46,7 @@ function DiscoverScreen({ navigation }: Props) {
                     name="refresh-outline"
                     size={32}
                     color="black"
-                    onPress={updateMedia}
+                    onPress={asyncHandler(updateMedia, { prefix: 'Failed to update media' })}
                     style={{
                         marginRight: 10,
                     }}

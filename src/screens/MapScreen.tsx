@@ -1,28 +1,37 @@
+import Ionicons from '@expo/vector-icons/Ionicons';
 import * as Location from 'expo-location';
 import { LocationObject } from 'expo-location';
-import React, { useEffect, useState } from 'react';
-import { Dimensions, StyleSheet, View } from 'react-native';
+import React, { useContext, useEffect, useState } from 'react';
+import { Dimensions, StyleSheet, TouchableOpacity, View } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 
-function MapScreen() {
+import { AuthContext } from '../contexts/authContext';
+import { asyncHandler, request } from '../util';
+
+function MapScreen({ navigation }) {
     const [location, setLocation] = useState<LocationObject | null>(null);
-    const [errorMsg, setErrorMsg] = useState<string | null>(null);
+    const { state: authState } = useContext(AuthContext);
+    // todo: fix types
+    const [events, setEvents] = useState<any>([]);
 
     const getCurrentPosition = async () => {
         const { status } = await Location.requestForegroundPermissionsAsync();
         if (status !== 'granted') {
-            setErrorMsg('Permission to access location was denied');
-            return;
+            throw new Error('Location access not granted');
         }
 
-        const location = await Location.getCurrentPositionAsync({});
-        console.log(location);
+        const location = await Location.getCurrentPositionAsync();
         setLocation(location);
     };
 
-    useEffect(() => {
-        getCurrentPosition().catch((err) => console.log('getCurrentPosition failed', err));
-    }, []);
+    useEffect(
+        asyncHandler(async () => {
+            const eventList = await request('get', 'event/find', authState.token);
+            setEvents(eventList.events);
+            await getCurrentPosition();
+        }),
+        []
+    );
 
     return (
         <View style={styles.container}>
@@ -36,17 +45,36 @@ function MapScreen() {
                     }}
                     style={styles.map}
                 >
-                    <Marker
-                        key={1}
-                        coordinate={{
-                            latitude: location.coords.latitude,
-                            longitude: location.coords.longitude,
-                        }}
-                        title="Your position"
-                        description="That's where you currently are!"
-                    />
+                    <>
+                        <Marker
+                            key={1}
+                            coordinate={{
+                                latitude: location.coords.latitude,
+                                longitude: location.coords.longitude,
+                            }}
+                            title="Your position"
+                            pinColor="orange"
+                        />
+                        {events.map((el: any) => (
+                            <Marker
+                                key={el.id}
+                                coordinate={{
+                                    latitude: el.lat,
+                                    longitude: el.lon,
+                                }}
+                                title={el.name}
+                                pinColor="teal"
+                            />
+                        ))}
+                    </>
                 </MapView>
             ) : null}
+            <TouchableOpacity
+                style={[styles.create]}
+                onPress={() => navigation.navigate('CreateEventScreen')}
+            >
+                <Ionicons name="add-circle-outline" size={64} color="black" />
+            </TouchableOpacity>
         </View>
     );
 }
@@ -61,6 +89,17 @@ const styles = StyleSheet.create({
     map: {
         width: Dimensions.get('window').width,
         height: Dimensions.get('window').height,
+    },
+    create: {
+        position: 'absolute',
+        bottom: 5,
+        opacity: 0.75,
+    },
+    createEvent: {
+        position: 'absolute',
+        width: Dimensions.get('window').width,
+        height: Dimensions.get('window').height,
+        zIndex: 99,
     },
 });
 
