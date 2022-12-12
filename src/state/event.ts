@@ -1,9 +1,8 @@
 import { LatLng } from 'react-native-maps';
-import create from 'zustand';
-import { immer } from 'zustand/middleware/immer';
 
 import { request } from '../util';
 import { getToken } from './auth';
+import { createStore } from './utils/createStore';
 
 interface State {
     eventId: string | null;
@@ -16,28 +15,26 @@ interface State {
     closeEvent: () => void;
 }
 
-export const useEventStore = create<State>()(
-    immer((set) => ({
-        eventId: null,
+export const useEventStore = createStore<State>('event')((set) => ({
+    eventId: null,
 
-        createEvent: async (params) => {
-            const data = await request('POST', '/event/create', getToken(), {
-                name: params.name,
-                lat: params.location.latitude,
-                lon: params.location.longitude,
-                startDateTime: params.startDate?.toJSON() ?? null,
-                endDateTime: params.endDate?.toJSON() ?? null,
-            });
-            console.debug('createEvent response:', data);
+    createEvent: async (params) => {
+        const data = await request('POST', '/event/create', getToken(), {
+            name: params.name,
+            lat: params.location.latitude,
+            lon: params.location.longitude,
+            startDateTime: params.startDate?.toJSON() ?? null,
+            endDateTime: params.endDate?.toJSON() ?? null,
+        });
+        console.debug('createEvent response:', data);
 
-            set((state) => {
-                state.eventId = data.eventId as string;
-            });
-        },
-        closeEvent: () => {
-            set((state) => {
-                state.eventId = null;
-            });
-        },
-    }))
-);
+        set((state) => {
+            state.eventId = data.eventId as string;
+        });
+    },
+    closeEvent: () => {
+        set((state) => {
+            state.eventId = null;
+        });
+    },
+}));

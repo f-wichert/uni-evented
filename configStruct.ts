@@ -13,6 +13,10 @@ export default (env: e.Environment, isBuild = false) => {
             desc: 'The base API url',
             example: 'http://10.0.2.2:3001/api (Android Emulator)',
         }),
+        ENABLE_STATE_DEBUG: e.bool({
+            default: false,
+            desc: 'Logs all state updates to console',
+        }),
     };
 
     // At runtime, we expect these to be provided and don't want to set defaults
