@@ -1,4 +1,5 @@
 import * as SecureStore from 'expo-secure-store';
+import { LatLng } from 'react-native-maps';
 import { persist, StateStorage } from 'zustand/middleware';
 
 import { CurrentUser } from '../models';
@@ -12,7 +13,16 @@ interface State {
     signup: (params: { username: string; email: string; password: string }) => Promise<void>;
     signout: () => void;
     reset: (params: { email: string }) => Promise<void>;
+
     fetchUser: () => Promise<void>;
+
+    createEvent: (params: {
+        name: string;
+        location: LatLng;
+        startDate?: Date;
+        endDate?: Date;
+    }) => Promise<void>;
+    closeEvent: () => void;
 }
 
 // TODO: show loading state while waiting for hydration: https://github.com/pmndrs/zustand/blob/main/docs/integrations/persisting-store-data.md#hydration-and-asynchronous-storages
@@ -69,6 +79,33 @@ export const useAuthStore = createStore<State>('auth')(
 
                 set((state) => {
                     state.user = user as unknown as CurrentUser;
+                });
+            },
+
+            createEvent: async (params) => {
+                const data = await request('POST', '/event/create', getToken(), {
+                    name: params.name,
+                    lat: params.location.latitude,
+                    lon: params.location.longitude,
+                    startDateTime: params.startDate?.toJSON() ?? null,
+                    endDateTime: params.endDate?.toJSON() ?? null,
+                });
+                console.debug('createEvent response:', data);
+
+                set((state) => {
+                    if (!state.user) {
+                        console.warn('No current user stored, cannot set event ID');
+                        return;
+                    }
+                    state.user.currentEventId = data.eventId as string;
+                });
+            },
+            closeEvent: () => {
+                set((state) => {
+                    if (!state.user) {
+                        console.warn('No current user stored, cannot clear event ID');
+                    }
+                    state.user.currentEventId = null;
                 });
             },
         }),
