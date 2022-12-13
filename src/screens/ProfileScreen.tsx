@@ -1,3 +1,4 @@
+import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -8,10 +9,13 @@ import ProfileHeader from '../components/ProfileHeader';
 import Separator from '../components/Separator';
 
 import { useAuthStore, useCurrentUser } from '../state/auth';
+import { IoniconsName } from '../types';
 
 export default function ProfileScreen() {
     const user = useCurrentUser();
     const signout = useAuthStore((state) => state.signout);
+
+    const getCellIcon = (name: IoniconsName) => <Ionicons name={name} size={29} />;
 
     return (
         <SafeAreaView>
@@ -23,15 +27,27 @@ export default function ProfileScreen() {
                 />
             </View>
 
-            <Separator color="black" />
-            <ScrollView style={styles.tableContainer}>
+            <Separator color="black" width="90%" />
+            <ScrollView style={styles.tableContainer} alwaysBounceVertical={false}>
                 <TableView style={styles.table}>
                     <Section>
-                        <Cell title="Option 1" />
-                        <Cell title="Option 2" />
-                        <Cell title="Option 3" />
-                        <Cell title="Option 4" />
-                        <Cell title="Option 5" />
+                        <Cell
+                            image={getCellIcon('create-outline')}
+                            title="Profile"
+                            accessory="DisclosureIndicator"
+                        />
+                        <Cell
+                            image={getCellIcon('time-outline')}
+                            title="My Events"
+                            accessory="DisclosureIndicator"
+                        />
+                    </Section>
+                    <Section sectionPaddingTop={0}>
+                        <Cell
+                            image={getCellIcon('cog-outline')}
+                            title="Manage Account"
+                            accessory="DisclosureIndicator"
+                        />
                     </Section>
                 </TableView>
 
