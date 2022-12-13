@@ -1,4 +1,4 @@
-import { useToken } from '../contexts/authContext';
+import { getToken } from '../state/auth';
 import { JSONObject } from '../types';
 import { request } from '../util';
 import { Media, MediaManager, MediaResponse } from './media';
@@ -42,7 +42,7 @@ export class EventManager {
     }
 
     static async join(event: Event, lat: number, lon: number) {
-        const token = useToken();
+        const token = getToken();
 
         // TODO: client side validation
 
@@ -50,7 +50,7 @@ export class EventManager {
     }
 
     static async close(event: Event) {
-        const token = useToken();
+        const token = getToken();
 
         // TODO: client side validation
 
@@ -99,7 +99,7 @@ export class EventManager {
     }
 
     static async fromId(id: string) {
-        const token = useToken();
+        const token = getToken();
         const data = await request('GET', '/event/info', token, { eventId: id });
         return this.fromEventResponse(data as EventResponse);
     }
@@ -119,7 +119,7 @@ export class EventManager {
         startDate?: Date | null;
         endDate?: Date | null;
     }) {
-        const token = useToken();
+        const token = getToken();
         const { eventId } = await request('POST', '/event/create', token, {
             name: name,
             tags: tags,
@@ -140,7 +140,7 @@ export class EventManager {
         maxResults?: number;
         maxRadius?: number;
     }) {
-        const token = useToken();
+        const token = getToken();
         const data = await request('GET', '/event/find', token, options);
         const eventResponses = data.events as EventResponse[];
         return eventResponses.map((res) => this.fromEventResponse(res));

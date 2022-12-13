@@ -1,16 +1,15 @@
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { StatusBar } from 'expo-status-bar';
-import React, { useContext } from 'react';
+import React from 'react';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import ToastRoot from './components/ToastRoot';
-import { AuthContext, AuthProvider } from './contexts/authContext';
-import { EventProvider } from './contexts/eventContext';
 import TabNavigator from './nav/TabNavigator';
 import CreateEventScreen from './screens/CreateEventScreen';
 import LoginScreen from './screens/LoginScreen';
 import RegisterScreen from './screens/RegisterScreen';
+import { useAuthStore } from './state/auth';
 
 // https://reactnavigation.org/docs/typescript/
 // instead of `undefined`, props passed to these screens would be defined here if applicable
@@ -30,11 +29,11 @@ export type UnauthRootNavigatorParams = {
 const Stack = createNativeStackNavigator<RootNavigatorParams & UnauthRootNavigatorParams>();
 
 function App() {
-    const { state: authState } = useContext(AuthContext);
+    const token = useAuthStore((state) => state.token);
 
     // https://reactnavigation.org/docs/auth-flow
     let screens;
-    if (authState.token) {
+    if (token) {
         screens = (
             <>
                 <Stack.Screen
@@ -72,18 +71,14 @@ function App() {
 
 export default function Root() {
     return (
-        <AuthProvider>
-            <EventProvider>
-                <SafeAreaProvider>
-                    <NavigationContainer>
-                        <App />
-                    </NavigationContainer>
+        <SafeAreaProvider>
+            <NavigationContainer>
+                <App />
+            </NavigationContainer>
 
-                    <ToastRoot />
+            <ToastRoot />
 
-                    <StatusBar style="dark" />
-                </SafeAreaProvider>
-            </EventProvider>
-        </AuthProvider>
+            <StatusBar style="dark" />
+        </SafeAreaProvider>
     );
 }

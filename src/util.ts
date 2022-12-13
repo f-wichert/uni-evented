@@ -11,7 +11,7 @@ export const baseHeaders = Object.freeze({
 export async function request(
     method: string,
     route: string,
-    token: string | null,
+    token: string | null | undefined,
     data?: JSONObject | FormData
 ): Promise<JSONObject> {
     // TODO: join url parts properly and fix double slashes

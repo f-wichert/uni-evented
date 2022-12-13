@@ -1,12 +1,12 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
-import React, { useContext, useState } from 'react';
+import React, { useState } from 'react';
 import { Button, StyleSheet, Text, View } from 'react-native';
 
 import VideoCamera from '../components/VideoCamera';
-import { EventContext } from '../contexts/eventContext';
+import { useEventStore } from '../state/event';
 
 function ViewEventScreen() {
-    const { closeEvent } = useContext(EventContext);
+    const closeEvent = useEventStore((state) => state.closeEvent);
     const [cameraActive, setCameraActive] = useState(false);
 
     return (

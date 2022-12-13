@@ -1,7 +1,7 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { DateTimePickerAndroid, DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import * as Location from 'expo-location';
-import React, { useContext, useState } from 'react';
+import React, { useState } from 'react';
 import {
     Button,
     Dimensions,
@@ -16,8 +16,7 @@ import DropDownPicker from 'react-native-dropdown-picker';
 
 import MapView, { LatLng, Marker } from 'react-native-maps';
 import { INPUT_BACKGR_COLOR } from '../const';
-import { useToken } from '../contexts/authContext';
-import { EventContext } from '../contexts/eventContext';
+import { useEventStore } from '../state/event';
 import { IoniconsName } from '../types';
 
 const width = Dimensions.get('window').width;
@@ -56,8 +55,7 @@ function CreateEventScreen(props) {
     // Location icon
     const [iconName, setIconName] = useState<IoniconsName>('location-outline');
 
-    const { createEvent } = useContext(EventContext);
-    const token = useToken();
+    const createEvent = useEventStore((state) => state.createEvent);
 
     const recieveLocation = (loc) => {
         // console.log(`location recieved: ${JSON.stringify(loc)}`);
@@ -138,7 +136,7 @@ function CreateEventScreen(props) {
         if (!location || !name) {
             throw new Error('Invalid name or location');
         }
-        await createEvent({ name: name, location: location, startDate: start }, token);
+        await createEvent({ name: name, location: location, startDate: start });
     };
 
     return (

@@ -3,7 +3,7 @@ import { Camera, CameraType } from 'expo-camera';
 import React, { useEffect, useRef, useState } from 'react';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
 
-import { useToken } from '../contexts/authContext';
+import { getToken } from '../state/auth';
 import { asyncHandler, request } from '../util';
 
 declare type Props = {
@@ -16,7 +16,6 @@ function VideoCamera({ onFinish }: Props) {
     const [type, setType] = useState(CameraType.back);
     const [recording, setRecording] = useState(false);
     const cameraRef = useRef<Camera>(null);
-    const token = useToken();
 
     const createFormData = (uri: string, type: string) => {
         const form = new FormData();
@@ -39,7 +38,7 @@ function VideoCamera({ onFinish }: Props) {
         const type = extensionMatch ? `image/${extensionMatch[1]}` : `image`;
 
         // upload media
-        await request('POST', '/upload/image', token, createFormData(uri, type));
+        await request('POST', '/upload/image', getToken(), createFormData(uri, type));
     };
 
     const onVideoButton = async () => {
@@ -56,7 +55,7 @@ function VideoCamera({ onFinish }: Props) {
         const { uri } = await cameraRef.current.recordAsync();
 
         // upload media
-        await request('POST', '/upload/clip', token, createFormData(uri, 'video/mp4'));
+        await request('POST', '/upload/clip', getToken(), createFormData(uri, 'video/mp4'));
 
         onFinish(false);
     };

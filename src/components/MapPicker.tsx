@@ -1,9 +1,8 @@
 import * as Location from 'expo-location';
 import { LocationObject } from 'expo-location';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import MapView, { LatLng, Marker } from 'react-native-maps';
-import { AuthContext } from '../contexts/authContext';
 import { asyncHandler } from '../util';
 
 MapPicker.propTypes = {};
@@ -11,7 +10,6 @@ MapPicker.propTypes = {};
 export default function MapPicker({ route, navigation }) {
     const { returnLocation } = route.params;
     const mapRef = React.useRef<MapView>(null);
-    const { state: authState } = useContext(AuthContext);
     const [location, setLocation] = useState<LocationObject | null>({
         coords: {
             latitude: 48.877616,

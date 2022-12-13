@@ -1,18 +1,18 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { BottomTabScreenProps, createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { BottomTabScreenProps, createBottomTabNavigator, BottomTabBar } from '@react-navigation/bottom-tabs';
 import { CompositeScreenProps } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import React, { useContext } from 'react';
-import { RootNavigatorParams } from '../App';
+import React from 'react';
 
-import { EventContext } from '../contexts/eventContext';
-import { IoniconsName } from '../types';
+import { RootNavigatorParams } from '../App';
 
 import DiscoverScreen from '../screens/DiscoverScreen';
 import EventsScreen from '../screens/EventsScreen';
 import MapScreen from '../screens/MapScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import ViewEventScreen from '../screens/ViewEventScreen';
+import { useEventStore } from '../state/event';
+import { IoniconsName } from '../types';
 import CreateEventScreenStack from './CreateEventScreenStack';
 
 // https://reactnavigation.org/docs/typescript/
@@ -34,10 +34,11 @@ export type TabPropsFor<T extends keyof TabNavigatorParams> = CompositeScreenPro
 export const Tab = createBottomTabNavigator<TabNavigatorParams>();
 
 export default function TabNavigator() {
-    const { state } = useContext(EventContext);
+    const eventId = useEventStore((state) => state.eventId);
 
     return (
         <Tab.Navigator
+            // tabBar={props => <BottomTabBar {...props} state={{...props.state, routes: props.state.routes.slice(0,4)}}></BottomTabBar>}
             screenOptions={({ route }) => ({
                 tabBarIcon: ({ focused, color, size }) => {
                     let iconName: IoniconsName;
@@ -64,14 +65,14 @@ export default function TabNavigator() {
                 tabBarActiveTintColor: 'tomato',
                 tabBarInactiveTintColor: 'gray',
             })}
-            initialRouteName={state.eventId ? 'Events' : 'Discover'}
+            initialRouteName={eventId ? 'Events' : 'Discover'}
         >
             <Tab.Screen name="Discover" component={DiscoverScreen} />
             <Tab.Screen name="Map" component={MapScreen} />
             <Tab.Screen name="Events" component={EventsScreen} />
-            <Tab.Screen name="Profile" component={ProfileScreen} />
+            <Tab.Screen name="Profile" component={ProfileScreen} options={{ headerShown: false }}/>
 
-            {state.eventId ? (
+            {eventId ? (
                 <Tab.Screen name="Event" component={ViewEventScreen} />
             ) : (
                 <Tab.Screen name="Create" component={CreateEventScreenStack} />
