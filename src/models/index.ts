@@ -1,9 +1,15 @@
-import Event, { EventResponse, EventStatus, EventStatuses } from './event';
-import Media, { MediaResponse, MediaType, MediaTypes } from './media';
-import User, { UserResponse } from './user';
+import { Event, EventManager, EventResponse, EventStatus, EventStatuses } from './event';
+import { Media, MediaManager, MediaResponse, MediaType, MediaTypes } from './media';
+import { CurrentUser, User, UserManager, UserResponse } from './user';
 
-export default { User, Media, Event };
 export {
+    Event,
+    Media,
+    User,
+    CurrentUser,
+    EventManager,
+    MediaManager,
+    UserManager,
     EventResponse,
     EventStatus,
     EventStatuses,
