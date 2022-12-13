@@ -36,7 +36,7 @@ function DiscoverScreen({ navigation }: Props) {
 
     const width = Dimensions.get('window').width;
     // var height = Dimensions.get('window').height;
-    var height = 500
+    var height = 700
 
     useEffect(() => {
         // Use `setOptions` to update the button that we previously specified
@@ -76,7 +76,7 @@ function DiscoverScreen({ navigation }: Props) {
                 <Carousel
                     vertical={true}
                     width={width}
-                    height={500}
+                    height={700}
                     autoPlay={false}
                     loop={false}
                     data={media}
