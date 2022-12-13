@@ -6,9 +6,9 @@ import { AuthContext } from '../contexts/authContext';
 import { asyncHandler } from '../util';
 import BaseLoginScreen from './base/BaseLoginScreen';
 
-type ComponentProps = NativeStackScreenProps<UnauthRootNavigatorParams, 'LoginScreen'>;
+type ComponentProps = NativeStackScreenProps<UnauthRootNavigatorParams, 'ResetPasswordScreen'>;
 
-export default function LoginScreen({ navigation }: ComponentProps) {
+export default function ResetPasswordScreen({ navigation }: ComponentProps) {
     async function submitLogin() {
         // this automatically navigates to the main screen when the token gets set
         // TODO: require these to be non-empty in the UI
@@ -31,36 +31,23 @@ export default function LoginScreen({ navigation }: ComponentProps) {
     }
 
     const { signin } = useContext(AuthContext);
-    const [user, setUser] = useState<string | undefined>('');
-    const [password, setPassword] = useState<string | undefined>('');
+    const [email, setEmail] = useState<string | undefined>('');
 
     return (
         <BaseLoginScreen
             fields={[
-                { icon: 'person-outline', onChange: setUser },
-                {
-                    icon: 'lock-closed-outline',
-                    onChange: setPassword,
-                    textInputProps: { secureTextEntry: true },
-                },
+                { icon: 'mail-outline', onChange: setEmail },
             ]}
             submitButton={{
-                text: 'Login',
+                text: 'Reset',
                 callback: asyncHandler(submitLogin, { prefix: 'Login failed' }),
             }}
-            header={{ title: 'Login', subTitle: 'Please sign in to continue.' }}
-            footer={[
-                {
-                    text: "Don't have an account?",
-                    buttonText: 'Sign up',
-                    callback: () => navigation.navigate('RegisterScreen'),
-                },
-                {
-                    text: "Forgot password?",
-                    buttonText: 'Reset',
-                    callback: () => navigation.navigate('ResetPasswordScreen'),
-                },
-            ]}
+            header={{ title: 'Reset Password', subTitle: 'Please enter your email address. You will recieve a futher instructions.' }}
+            footer={[{
+                text: "Don't have an account?",
+                buttonText: 'Sign up',
+                callback: () => navigation.navigate('RegisterScreen'),
+            }]}
         />
     );
 }

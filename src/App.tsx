@@ -11,6 +11,7 @@ import TabNavigator from './nav/TabNavigator';
 import CreateEventScreen from './screens/CreateEventScreen';
 import LoginScreen from './screens/LoginScreen';
 import RegisterScreen from './screens/RegisterScreen';
+import ResetPasswordScreen from './screens/ResetPasswordScreen';
 
 // https://reactnavigation.org/docs/typescript/
 // instead of `undefined`, props passed to these screens would be defined here if applicable
@@ -25,6 +26,7 @@ export type RootNavigatorParams = {
 export type UnauthRootNavigatorParams = {
     LoginScreen: undefined;
     RegisterScreen: undefined;
+    ResetPasswordScreen: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootNavigatorParams & UnauthRootNavigatorParams>();
@@ -61,6 +63,11 @@ function App() {
                 <Stack.Screen
                     name="RegisterScreen"
                     component={RegisterScreen}
+                    options={{ headerShown: false }}
+                />
+                <Stack.Screen 
+                    name="ResetPasswordScreen"
+                    component={ResetPasswordScreen}
                     options={{ headerShown: false }}
                 />
             </>
