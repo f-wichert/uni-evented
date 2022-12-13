@@ -1,12 +1,12 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useContext, useState } from 'react';
 
-import { RootNavigatorParams } from '../App';
+import { UnauthRootNavigatorParams } from '../App';
 import { AuthContext } from '../contexts/authContext';
 import { asyncHandler } from '../util';
 import BaseLoginScreen from './base/BaseLoginScreen';
 
-type ComponentProps = NativeStackScreenProps<RootNavigatorParams, 'LoginScreen'>;
+type ComponentProps = NativeStackScreenProps<UnauthRootNavigatorParams, 'LoginScreen'>;
 
 export default function LoginScreen({ navigation }: ComponentProps) {
     async function submitLogin() {

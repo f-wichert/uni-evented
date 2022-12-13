@@ -7,7 +7,7 @@ import { Button, Dimensions, StyleSheet, Text, TextInput, TouchableOpacity, View
 import DropDownPicker from 'react-native-dropdown-picker';
 // import DateTimePicker from '@react-native-community/datetimepicker';
 
-import { AuthContext } from '../contexts/authContext';
+import { useToken } from '../contexts/authContext';
 import { EventContext } from '../contexts/eventContext';
 import { IoniconsName } from '../types';
 import { INPUT_BACKGR_COLOR, BACKGR_COLOR } from '../const'; 
@@ -51,7 +51,7 @@ function CreateEventScreen(props) {
     const [iconName, setIconName] = useState<IoniconsName>('location-outline');
 
     const { createEvent } = useContext(EventContext);
-    const { state: authState } = useContext(AuthContext);
+    const token = useToken();
 
     const recieveLocation = (loc) => {
         // console.log(`location recieved: ${JSON.stringify(loc)}`);
@@ -133,8 +133,10 @@ function CreateEventScreen(props) {
         if (!location || !name) {
             throw new Error('Invalid name or location');
         }
-        await createEvent({ name: name, location: location, startDate: start }, authState.token);
+        await createEvent({ name: name, location: location, startDate: start }, token);
     };
+
+
 
     return (
         <View style={styles.container}>
@@ -258,7 +260,6 @@ function CreateEventScreen(props) {
             <Button
                 color="orange"
                 title="Create event!"
-                onPress={asyncHandler(onCreateButton, { prefix: 'Failed to create event' })}
             />
         </View>
     );
@@ -269,10 +270,7 @@ const styles = StyleSheet.create({
         // flex: 1,
         minHeight: '100%',
         width: width,
-        padding: 20,
-        backgroundColor: BACKGR_COLOR,
-        justifyContent: 'space-around',
-        alignItems: 'center',
+        padding: 0,
     },
     section: {
         width: width,

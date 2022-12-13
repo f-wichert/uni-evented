@@ -1,24 +1,24 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useContext, useState } from 'react';
 
-import { RootNavigatorParams } from '../App';
+import { UnauthRootNavigatorParams } from '../App';
 import { AuthContext } from '../contexts/authContext';
 import { asyncHandler } from '../util';
 import BaseLoginScreen from './base/BaseLoginScreen';
 
-type ComponentProps = NativeStackScreenProps<RootNavigatorParams, 'RegisterScreen'>;
+type ComponentProps = NativeStackScreenProps<UnauthRootNavigatorParams, 'RegisterScreen'>;
 
 export default function RegisterScreen({ navigation }: ComponentProps) {
     async function submitRegister() {
         // this automatically navigates to the main screen when the token gets set
         // TODO: require these to be non-empty in the UI
         if (!validatdeInputs()) {
-            return
+            return;
         }
         await signup({ username: user || '', email: email || '', password: password || '' });
     }
 
-    function validatdeInputs():boolean {
+    function validatdeInputs(): boolean {
         if (user === '') {
             toast.show('Please enter a user name.', { type: 'normal' });
             return false;
@@ -36,7 +36,7 @@ export default function RegisterScreen({ navigation }: ComponentProps) {
             return false;
         }
 
-        return true
+        return true;
     }
 
     const { signup } = useContext(AuthContext);

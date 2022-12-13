@@ -1,4 +1,4 @@
-import { Dispatch } from 'react';
+import { Dispatch, useContext } from 'react';
 import { request } from '../util';
 import createDataContext from './createDataContext';
 
@@ -82,3 +82,9 @@ export const { Context: AuthContext, Provider: AuthProvider } = createDataContex
     { signin, signup, signout },
     { token: null }
 );
+
+export const useToken = () => {
+    const token = useContext(AuthContext).state.token;
+    if (!token) throw new Error('Not signed in.');
+    return token;
+};
