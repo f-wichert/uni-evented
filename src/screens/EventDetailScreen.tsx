@@ -1,6 +1,6 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import React, { useContext, useState } from 'react';
-import { Image, StyleSheet, Text, View, Pressable } from 'react-native';
+import { Image, StyleSheet, Text, View, Pressable, SafeAreaView, ScrollView } from 'react-native';
 import { max } from 'react-native-reanimated';
 import VideoCamera from '../components/VideoCamera';
 import {Props} from '../types'
@@ -30,63 +30,67 @@ function EventDetailScreen() {
         numberOfAttendants: 5,
         startingTime: '19:00',
         endingTime: '23:30',
-        address: 'Herrengarten and der Uni',
+        address: 'Schloßgartenstraße, 64289 Darmstadt',
         musicStyle: 'Techno',
         rating: 4,
-        description: 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum.'
+        description: 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum.'
     }
     
     return (
-        <View style={[styles.container]}>
-            <View style={styles.camera}>
-                <Ionicons
-                    name="camera"
-                    size={64}
-                    color="orange"
-                    onPress={() => setCameraActive(true)}
-                />
-                <Text>Load Picture/Video of event here</Text>
-            </View>
-            <View style={styles.TagArea}>
-                {
-                    event.tags.map((tag) => <Tag style={{backgroundColor:tag.color}} key={tag.name}>{tag.name}</Tag>)
-                }
-            </View>
-            <View style={styles.RatingArea}>
-                <Rating/>
-            </View>
-            <View style={styles.InformationArea}>
-                    <View style={styles.TitleLine}>
-                        <Text style={{fontSize:25, fontWeight:'bold'}}>{event.title}</Text>
-                        <View style={{display:'flex',flexDirection:'row', alignItems:'center'}}>
-                            <Ionicons name='people' size={28}/>
-                            <Text style={{fontSize:25, fontWeight:'bold', marginLeft:2}}>{event.numberOfAttendants}</Text>
+        <SafeAreaView>
+            <ScrollView>
+                <View style={[styles.container]}>
+                    <View style={styles.camera}>
+                        <Ionicons
+                            name="camera"
+                            size={64}
+                            color="orange"
+                            onPress={() => setCameraActive(true)}
+                        />
+                        <Text>Load Picture/Video of event here</Text>
+                    </View>
+                    <View style={styles.TagArea}>
+                        {
+                            event.tags.map((tag) => <Tag style={{backgroundColor:tag.color}} key={tag.name}>{tag.name}</Tag>)
+                        }
+                    </View>
+                    <View style={styles.RatingArea}>
+                        <Rating/>
+                    </View>
+                    <View style={styles.InformationArea}>
+                            <View style={styles.TitleLine}>
+                                <Text style={{fontSize:25, fontWeight:'bold', maxWidth:'70%'}}>{event.title}</Text>
+                                <View style={{display:'flex',flexDirection:'row', alignItems:'center'}}>
+                                    <Ionicons name='people' size={28}/>
+                                    <Text style={{fontSize:25, fontWeight:'bold', marginLeft:2}}>{event.numberOfAttendants}</Text>
+                                </View>
+                                <Image style={styles.ProfilePicture} source={{ uri: getProfilePicture().profilePicture }}/>
+                            </View>
+                        <View style={styles.GeneralInformationArea}>
+                            <View style={{maxWidth:'60%'}}>
+                                <Text style={{color:'grey', fontSize:16}}>{event.startingTime}-{event.endingTime}</Text>
+                                <Text style={{fontSize:18, fontWeight:'bold'}}>{event.address}</Text>
+                            </View>
+                            <View style={{display:'flex',flexDirection:'row', alignItems:'center', marginRight:13}}>
+                                <Ionicons name='musical-notes-sharp' size={25}></Ionicons>
+                                <Text style={{fontSize:23, fontWeight:'900'}}>{event.musicStyle}</Text>
+                            </View>
                         </View>
-                        <Image style={styles.ProfilePicture} source={{ uri: getProfilePicture().profilePicture }}/>
+                        <View style={styles.DescriptionArea}>
+                            <Text>{event.description}</Text>
+                        </View>
                     </View>
-                <View style={styles.GeneralInformationArea}>
-                    <View >
-                        <Text style={{color:'grey', fontSize:16}}>{event.startingTime}-{event.endingTime}</Text>
-                        <Text style={{fontSize:18, fontWeight:'bold'}}>{event.address}</Text>
-                    </View>
-                    <View style={{display:'flex',flexDirection:'row', alignItems:'center', marginRight:10}}>
-                        <Ionicons name='musical-notes-sharp' size={25}></Ionicons>
-                        <Text style={{fontSize:23, fontWeight:'900'}}>{event.musicStyle}</Text>
-                    </View>
-                </View>
-                <View style={styles.DescriptionArea}>
-                    <Text>{event.description}</Text>
-                </View>
-            </View>
-            <View style={styles.ChatArea}>
+                    <View style={styles.ChatArea}>
 
-            </View>
-            <View style={styles.IMHereButtonContainer}>
-                <Pressable style={styles.IMHereButtonArea} onPress={registerUserArrivalAtEvent}>
-                    <Text style={styles.IMHereButton}> I'm Here!</Text>
-                </Pressable>
-            </View>
-        </View>
+                    </View>
+                    <View style={styles.IMHereButtonContainer}>
+                        <Pressable style={styles.IMHereButtonArea} onPress={registerUserArrivalAtEvent}>
+                            <Text style={styles.IMHereButton}> I'm Here!</Text>
+                        </Pressable>
+                    </View>
+                </View>
+            </ScrollView>
+        </SafeAreaView>
     );
 }
 
@@ -151,6 +155,7 @@ function EventDetailScreen() {
             alignSelf:'stretch',  // Float elements to the left
             justifyContent: 'space-between',
             alignItems:'center',
+            marginLeft:7,
         },
         ProfilePicture:{
             width:35,
@@ -162,7 +167,8 @@ function EventDetailScreen() {
             display:'flex',
             flexDirection: 'row', 
             alignSelf:'stretch',
-            justifyContent:'space-between'
+            justifyContent:'space-between',
+            marginLeft:7,
         },
         DescriptionArea:{
             padding:10,
