@@ -7,6 +7,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import ToastRoot from './components/ToastRoot';
 import TabNavigator from './nav/TabNavigator';
 import CreateEventScreen from './screens/CreateEventScreen';
+import LoadingScreen from './screens/LoadingScreen';
 import LoginScreen from './screens/LoginScreen';
 import RegisterScreen from './screens/RegisterScreen';
 import ResetPasswordScreen from './screens/ResetPasswordScreen';
@@ -21,6 +22,10 @@ export type RootNavigatorParams = {
     CreateEventScreen: undefined;
 };
 
+export type LoadingRootNavigatorParams = {
+    LoadingScreen: undefined;
+};
+
 // screens in stack, without token
 export type UnauthRootNavigatorParams = {
     LoginScreen: undefined;
@@ -28,29 +33,18 @@ export type UnauthRootNavigatorParams = {
     ResetPasswordScreen: undefined;
 };
 
-const Stack = createNativeStackNavigator<RootNavigatorParams & UnauthRootNavigatorParams>();
+const Stack = createNativeStackNavigator<
+    RootNavigatorParams & LoadingRootNavigatorParams & UnauthRootNavigatorParams
+>();
 
 function App() {
     const token = useAuthStore((state) => state.token);
+    const user = useAuthStore((state) => state.user);
 
     // https://reactnavigation.org/docs/auth-flow
     let screens;
-    if (token) {
-        screens = (
-            <>
-                <Stack.Screen
-                    name="TabScreen"
-                    component={TabNavigator}
-                    options={{ headerShown: false, animation: 'fade' }}
-                />
-                <Stack.Screen
-                    name="CreateEventScreen"
-                    component={CreateEventScreen}
-                    options={{ headerShown: false }}
-                />
-            </>
-        );
-    } else {
+    if (!token) {
+        // not signed in
         // TODO: fix signout animation using `animationTypeForReplace`
         screens = (
             <>
@@ -67,6 +61,33 @@ function App() {
                 <Stack.Screen
                     name="ResetPasswordScreen"
                     component={ResetPasswordScreen}
+                    options={{ headerShown: false }}
+                />
+            </>
+        );
+    } else if (!user) {
+        // we have a token, wait for user to load
+        screens = (
+            <>
+                <Stack.Screen
+                    name="LoadingScreen"
+                    component={LoadingScreen}
+                    options={{ headerShown: false, animation: 'fade' }}
+                />
+            </>
+        );
+    } else {
+        // got token and user, show main content
+        screens = (
+            <>
+                <Stack.Screen
+                    name="TabScreen"
+                    component={TabNavigator}
+                    options={{ headerShown: false, animation: 'fade' }}
+                />
+                <Stack.Screen
+                    name="CreateEventScreen"
+                    component={CreateEventScreen}
                     options={{ headerShown: false }}
                 />
             </>
