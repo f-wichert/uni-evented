@@ -1,47 +1,40 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import React, { useContext, useState } from 'react';
-import { Button, StyleSheet, Text, View } from 'react-native';
+import { Image, StyleSheet, Text, View, Pressable } from 'react-native';
 import { max } from 'react-native-reanimated';
 import VideoCamera from '../components/VideoCamera';
 import {Props} from '../types'
 import { Tag } from '../components/Tag';
+import { useAuthStore } from '../state/auth';
+import { Rating, AirbnbRating } from 'react-native-ratings';
 
 import { asyncHandler } from '../util';
 
 function EventDetailScreen() {
-    // return (
-    //     <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-    //       <Text>Details Screen</Text>
-    //     </View>
-    //   );
     const [cameraActive, setCameraActive] = useState(false);
 
-    const eventID = 0 // TODO: Mock Value. Replace with real value once this part gets connected
+    const eventID = useAuthStore((state) => state.user?.currentEventId) // Get event ID of current event of currently logged in user
+    console.log(eventID)
+
+    function getProfilePicture() {
+        return {
+            profilePicture:
+                'https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=745&q=80',
+        };
+    }
 
     // Developement Values TODO: replace with request to real ones
     let event = {
         title:'Herrengarten Rave',
-        tags: ['Beer', 'Rave', 'Techno'],
+        tags: [{name:'Beer', color:'orange'}, {name:'Rave', color:'green'}, {name:'Techno',color:'red'}],
         numberOfAttendants: 5,
         startingTime: '19:00',
         endingTime: '23:30',
         address: 'Herrengarten and der Uni',
-        musicStyle: 'Funk',
+        musicStyle: 'Techno',
         rating: 4,
         description: 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum.'
     }
-
-    // TODO: But back in when event creatin is smooth
-    // if (state.eventId == null) {  // If no event has been created, gibe error
-
-    //     console.log('ERROR! - Opened Event Detail Screen, but Event-ID was null')
-    //     return (
-    //         <View>
-    //             <Text style={{justifyContent: 'center', alignItems:'center'}}> No event ID given, please create an event</Text>
-    //         </View>
-    //     )
-    // }
-
     
     return (
         <View style={[styles.container]}>
@@ -55,27 +48,42 @@ function EventDetailScreen() {
                 <Text>Load Picture/Video of event here</Text>
             </View>
             <View style={styles.TagArea}>
-                
-                <Tag style={{}}>Helllol</Tag>
+                {
+                    event.tags.map((tag) => <Tag style={{backgroundColor:tag.color}} key={tag.name}>{tag.name}</Tag>)
+                }
             </View>
             <View style={styles.RatingArea}>
-
+                <Rating/>
             </View>
-            <View style={styles.GeneralInformationArea}>
-
+            <View style={styles.InformationArea}>
+                    <View style={styles.TitleLine}>
+                        <Text style={{fontSize:25, fontWeight:'bold'}}>{event.title}</Text>
+                        <View style={{display:'flex',flexDirection:'row', alignItems:'center'}}>
+                            <Ionicons name='people' size={28}/>
+                            <Text style={{fontSize:25, fontWeight:'bold', marginLeft:2}}>{event.numberOfAttendants}</Text>
+                        </View>
+                        <Image style={styles.ProfilePicture} source={{ uri: getProfilePicture().profilePicture }}/>
+                    </View>
+                <View style={styles.GeneralInformationArea}>
+                    <View >
+                        <Text style={{color:'grey', fontSize:16}}>{event.startingTime}-{event.endingTime}</Text>
+                        <Text style={{fontSize:18, fontWeight:'bold'}}>{event.address}</Text>
+                    </View>
+                    <View style={{display:'flex',flexDirection:'row', alignItems:'center', marginRight:10}}>
+                        <Ionicons name='musical-notes-sharp' size={25}></Ionicons>
+                        <Text style={{fontSize:23}}>{event.musicStyle}</Text>
+                    </View>
+                </View>
+                <View style={styles.DescriptionArea}>
+                    <Text>{event.description}</Text>
+                </View>
             </View>
             <View style={styles.ChatArea}>
 
             </View>
-            <View style={styles.IMHereButtonArea}>
-            <Button
-                // TODO: Button does not accept 'style'
-                // https://docs.expo.dev/ui-programming/react-native-styling-buttons/
-                // style={[styles.flexEl, styles.button]}
-                color="black"
-                title="I'm here!"
-                onPress={() => registerUserArrivalAtEvent()} />
-            </View>
+            <Pressable style={styles.IMHereButtonArea} onPress={registerUserArrivalAtEvent}>
+                <Text style={styles.IMHereButton}> I'm Here!</Text>
+            </Pressable>
         </View>
     );
 }
@@ -111,23 +119,70 @@ function EventDetailScreen() {
             alignItems: 'center',
             justifyContent: 'center',
             minHeight:200,
+            borderRadius: 10,
         },
         TagArea: {
-            backgroundColor: 'aqua',
+            display: 'flex',
+            flexDirection: 'row',
+            alignSelf:'stretch',  // Float elements to the left
+            flexWrap: 'wrap',
+            backgroundColor: 'white',
             padding: 5,
         },
         RatingArea: {
-            
+            display: 'flex',
+            flexDirection: 'row',
+            alignSelf:'stretch',  // Float elements to the left
+            flexWrap: 'wrap',
+            backgroundColor: 'white',
+            padding:5,
+            paddingLeft: 7,
+        },
+        InformationArea: {
+            display: 'flex',
+            alignSelf:'stretch',  // Float elements to the left
+            backgroundColor: 'white',
+        },
+        TitleLine:{
+            display: 'flex',
+            flexDirection: 'row',
+            alignSelf:'stretch',  // Float elements to the left
+            justifyContent: 'space-between',
+            alignItems:'center',
+        },
+        ProfilePicture:{
+            width:35,
+            height:35,
+            borderRadius:100,
+            marginRight:7,
         },
         GeneralInformationArea: {
-            
+            display:'flex',
+            flexDirection: 'row', 
+            alignSelf:'stretch',
+            justifyContent:'space-between'
         },
-        
+        DescriptionArea:{
+            padding:10,
+        },
         ChatArea:{
             
         },
         IMHereButtonArea: {
-
+            display: 'flex',
+            flexDirection: 'row',
+            alignSelf: 'stretch',
+            justifyContent: 'center',
+            // marginHorizontal: 10,
+            margin: 10,
+            borderRadius:9,
+            backgroundColor: 'black',
+            padding: 7,
+        },
+        IMHereButton: {
+            color:'white',
+            fontWeight: 'bold',
+            fontSize: 30,
         },
     });
 

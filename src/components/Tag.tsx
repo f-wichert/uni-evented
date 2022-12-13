@@ -9,10 +9,12 @@ export function Tag(props:any){
 
   const styles = StyleSheet.create({
     basicTagStyle: {
-      fontSize: 16,
+      fontSize: 20,
       backgroundColor:'orange',
       fontWeight:'bold',
       padding:5,
-      borderRadius:3
+      margin:2,
+      borderRadius:3,
+      paddingHorizontal:20,
     },
   });
