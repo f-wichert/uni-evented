@@ -1,6 +1,6 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { NavigationProp, ParamListBase } from '@react-navigation/native';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Dimensions, StyleSheet, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import Carousel from 'react-native-reanimated-carousel';
@@ -8,7 +8,7 @@ import Carousel from 'react-native-reanimated-carousel';
 import ImageDiscover from '../components/ImageDiscover';
 import VideoDiscover from '../components/VideoDiscover';
 import config from '../config';
-import { AuthContext } from '../contexts/authContext';
+import { getToken } from '../state/auth';
 import { ExtendedMedia, Media } from '../types';
 import { asyncHandler, request } from '../util';
 
@@ -18,10 +18,9 @@ declare type Props = {
 
 function DiscoverScreen({ navigation }: Props) {
     const [media, setMedia] = useState<ExtendedMedia[]>([]);
-    const { state: authState } = useContext(AuthContext);
 
     async function updateMedia() {
-        const responseData = await request('GET', 'info/all_media', authState.token);
+        const responseData = await request('GET', 'info/all_media', getToken());
         const data = responseData.media as Media[];
         const media: ExtendedMedia[] = data
             .filter((el) => el.fileAvailable)

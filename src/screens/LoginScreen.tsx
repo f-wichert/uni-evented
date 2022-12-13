@@ -1,23 +1,38 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { useContext, useState } from 'react';
+import { useState } from 'react';
 
-import { RootNavigatorParams } from '../App';
-import { AuthContext } from '../contexts/authContext';
+import { UnauthRootNavigatorParams } from '../App';
+import { useAuthStore } from '../state/auth';
 import { asyncHandler } from '../util';
 import BaseLoginScreen from './base/BaseLoginScreen';
 
-type ComponentProps = NativeStackScreenProps<RootNavigatorParams, 'LoginScreen'>;
+type ComponentProps = NativeStackScreenProps<UnauthRootNavigatorParams, 'LoginScreen'>;
 
 export default function LoginScreen({ navigation }: ComponentProps) {
     async function submitLogin() {
         // this automatically navigates to the main screen when the token gets set
         // TODO: require these to be non-empty in the UI
-        await signin({ email: user || '', password: password || '' });
+        if (!validatdeInputs()) {
+            return;
+        }
+        await signin({ username: user || '', password: password || '' });
     }
 
-    const { signin } = useContext(AuthContext);
-    const [user, setUser] = useState<string | undefined>();
-    const [password, setPassword] = useState<string | undefined>();
+    function validatdeInputs(): boolean {
+        if (user === '') {
+            toast.show('Please enter a user name.', { type: 'normal' });
+            return false;
+        } else if (password === '') {
+            toast.show('Please enter an email address.', { type: 'normal' });
+            return false;
+        }
+
+        return true;
+    }
+
+    const signin = useAuthStore((state) => state.signin);
+    const [user, setUser] = useState<string | undefined>('');
+    const [password, setPassword] = useState<string | undefined>('');
 
     return (
         <BaseLoginScreen
@@ -34,11 +49,18 @@ export default function LoginScreen({ navigation }: ComponentProps) {
                 callback: asyncHandler(submitLogin, { prefix: 'Login failed' }),
             }}
             header={{ title: 'Login', subTitle: 'Please sign in to continue.' }}
-            footer={{
-                text: "Don't have an account?",
-                buttonText: 'Sign up',
-                callback: () => navigation.navigate('RegisterScreen'),
-            }}
+            footer={[
+                {
+                    text: "Don't have an account?",
+                    buttonText: 'Sign up',
+                    callback: () => navigation.navigate('RegisterScreen'),
+                },
+                {
+                    text: "Forgot password?",
+                    buttonText: 'Reset',
+                    callback: () => navigation.navigate('ResetPasswordScreen'),
+                },
+            ]}
         />
     );
 }

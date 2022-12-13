@@ -1,17 +1,23 @@
-import { useContext } from 'react';
+import Constants from 'expo-constants';
+
 import config from './config';
-import { AuthContext } from './contexts/authContext';
 import { JSONObject } from './types';
+
+export const baseHeaders = Object.freeze({
+    // Currently required to access main API
+    'Client-ID': `evented/${Constants.expoConfig?.version}`,
+});
 
 export async function request(
     method: string,
     route: string,
-    token: string | null,
+    token: string | null | undefined,
     data?: JSONObject | FormData
 ): Promise<JSONObject> {
-    const url = `${config.BASE_URL}/${route}`;
+    // TODO: join url parts properly and fix double slashes
+    const url = `${config.BASE_URL}/api/${route}`;
 
-    const headers: Record<string, string> = {};
+    const headers: Record<string, string> = { ...baseHeaders };
     if (token) {
         headers['Authorization'] = `Bearer ${token}`;
     }
@@ -54,14 +60,4 @@ export function asyncHandler<Args extends unknown[]>(
             console.error(e, e instanceof Error ? e.stack : undefined);
         });
     };
-}
-
-export function getUserToken() {
-    const token = useContext(AuthContext).state.token;
-    if (!token) {
-        toast.show('User not signed in', { type: 'danger' });
-        console.error('User not signed in');
-        return undefined;
-    }
-    return token;
 }

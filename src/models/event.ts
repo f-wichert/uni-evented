@@ -1,26 +1,27 @@
+import { getToken } from '../state/auth';
 import { JSONObject } from '../types';
-import { getUserToken, request } from '../util';
-import Media, { MediaResponse } from './media';
-import User, { UserResponse } from './user';
+import { request } from '../util';
+import { Media, MediaManager, MediaResponse } from './media';
+import { User, UserManager, UserResponse } from './user';
 
 export const EventStatuses = ['scheduled', 'active', 'completed'] as const;
 export type EventStatus = typeof EventStatuses[number];
 
 export interface EventResponse extends JSONObject {
-    id: string;
-    name: string;
-    status: EventStatus;
-    lat: number;
-    lon: number;
-    hostId: string;
-    startDate: string;
-    endDate: string | null;
-    media: MediaResponse[] | null;
-    attendees: UserResponse[] | null;
-    currentAttendees: UserResponse[] | null;
+    readonly id: string;
+    readonly name: string;
+    readonly status: EventStatus;
+    readonly lat: number;
+    readonly lon: number;
+    readonly hostId: string;
+    readonly startDate: string;
+    readonly endDate: string | null;
+    readonly media: MediaResponse[] | null;
+    readonly attendees: UserResponse[] | null;
+    readonly currentAttendees: UserResponse[] | null;
 }
 
-export default class Event {
+export interface Event {
     readonly id: string;
     readonly name: string;
     readonly status: EventStatus;
@@ -29,73 +30,34 @@ export default class Event {
     readonly rad: number;
     readonly hostId: string;
     readonly startDate: Date;
-    readonly endDate: Date | null;
-    readonly media: Media[] | null;
-    readonly users: User[] | null;
-    readonly currentUsers: User[] | null;
+    readonly endDate?: Date | null;
+    readonly media?: Media[] | null;
+    readonly users?: User[] | null;
+    readonly currentUsers?: User[] | null;
+}
 
-    constructor({
-        id,
-        name,
-        status,
-        lat,
-        lon,
-        rad,
-        hostId,
-        startDate,
-        endDate,
-        media,
-        users,
-        currentUsers,
-    }: {
-        id: string;
-        name: string;
-        status: EventStatus;
-        lat: number;
-        lon: number;
-        rad?: number;
-        hostId: string;
-        startDate: Date;
-        endDate?: Date | null;
-        media?: Media[] | null;
-        users?: User[] | null;
-        currentUsers?: User[] | null;
-    }) {
-        this.id = id;
-        this.name = name;
-        this.status = status;
-        this.lat = lat;
-        this.lon = lon;
-        this.rad = rad || 5;
-        this.hostId = hostId;
-        this.startDate = startDate;
-        this.endDate = endDate || null;
-        this.media = media || null;
-        this.users = users || null;
-        this.currentUsers = currentUsers || null;
+export class EventManager {
+    static host(event: Event): User | undefined {
+        return event.users ? event.users.find((user) => user.id == event.hostId) : undefined;
     }
 
-    host() {
-        return this.users ? this.users.find((user) => user.id == this.hostId) : null;
-    }
-
-    async join(lat: number, lon: number) {
-        const token = getUserToken()!;
+    static async join(event: Event, lat: number, lon: number) {
+        const token = getToken();
 
         // TODO: client side validation
 
-        await request('POST', '/event/join', token, { eventId: this.id, lat, lon });
+        await request('POST', '/event/join', token, { eventId: event.id, lat, lon });
     }
 
-    async close() {
-        const token = getUserToken()!;
+    static async close(event: Event) {
+        const token = getToken();
 
         // TODO: client side validation
 
-        await request('POST', '/event/close', token, { eventId: this.id });
+        await request('POST', '/event/close', token, { eventId: event.id });
     }
 
-    static fromEventResponse(response: EventResponse) {
+    static fromEventResponse(response: EventResponse): Event {
         const {
             id,
             name,
@@ -110,7 +72,9 @@ export default class Event {
             currentAttendees,
         } = response;
 
-        const users = attendees ? attendees.map((user) => User.fromUserResponse(user)) : null;
+        const users = attendees
+            ? attendees.map((user) => UserManager.fromUserResponse(user))
+            : null;
         const currentUsers =
             users && currentAttendees
                 ? currentAttendees.map((curUser) => {
@@ -118,25 +82,26 @@ export default class Event {
                   })
                 : null;
 
-        return new Event({
+        return {
             id,
             name,
             status,
             lat,
             lon,
+            rad: 5,
             hostId,
             startDate: new Date(startDate),
-            endDate: endDate ? new Date(endDate) : null,
-            media: media ? media.map((med) => Media.fromMediaResponse(med)) : null,
+            endDate: endDate ? new Date(endDate) : undefined,
+            media: media ? media.map((med) => MediaManager.fromMediaResponse(med)) : undefined,
             users,
             currentUsers,
-        });
+        };
     }
 
     static async fromId(id: string) {
-        const token = getUserToken()!;
+        const token = getToken();
         const data = await request('GET', '/event/info', token, { eventId: id });
-        return Event.fromEventResponse(data as EventResponse);
+        return this.fromEventResponse(data as EventResponse);
     }
 
     static async create({
@@ -151,10 +116,10 @@ export default class Event {
         tags: string[];
         lat: number;
         lon: number;
-        startDate: Date | null;
-        endDate: Date | null;
+        startDate?: Date | null;
+        endDate?: Date | null;
     }) {
-        const token = getUserToken()!;
+        const token = getToken();
         const { eventId } = await request('POST', '/event/create', token, {
             name: name,
             tags: tags,
@@ -163,7 +128,7 @@ export default class Event {
             startDateTime: startDate ? startDate.toJSON() : null,
             endDateTime: endDate ? endDate.toJSON() : null,
         });
-        return await Event.fromId(eventId as string);
+        return await this.fromId(eventId as string);
     }
 
     static async find(options: {
@@ -175,9 +140,9 @@ export default class Event {
         maxResults?: number;
         maxRadius?: number;
     }) {
-        const token = getUserToken()!;
+        const token = getToken();
         const data = await request('GET', '/event/find', token, options);
         const eventResponses = data.events as EventResponse[];
-        return eventResponses.map((res) => Event.fromEventResponse(res));
+        return eventResponses.map((res) => this.fromEventResponse(res));
     }
 }

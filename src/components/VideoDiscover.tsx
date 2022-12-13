@@ -5,6 +5,8 @@ import { StyleSheet, View } from 'react-native';
 import { TouchableHighlight } from 'react-native-gesture-handler';
 import LoginScreen from '../screens/LoginScreen'
 
+import { baseHeaders } from '../util';
+
 declare type Props = {
     discoverData: { src: string };
     navigation: NavigationProp<ParamListBase>;

@@ -1,19 +1,22 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import React, { useContext } from 'react';
+import { BottomTabScreenProps, createBottomTabNavigator, BottomTabBar } from '@react-navigation/bottom-tabs';
+import { CompositeScreenProps } from '@react-navigation/native';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import React from 'react';
 
-import { EventContext } from '../contexts/eventContext';
-import CreateEventScreen from '../screens/CreateEventScreen';
+import { RootNavigatorParams } from '../App';
+
 import DiscoverScreen from '../screens/DiscoverScreen';
 import EventsScreen from '../screens/EventsScreen';
-import ProfileScreen from '../screens/ProfileScreen';
 import MapScreen from '../screens/MapScreen';
 import EventDetailScreen from '../screens/EventDetailScreen';
+import ProfileScreen from '../screens/ProfileScreen';
 import ViewEventScreen from '../screens/ViewEventScreen';
+import { useEventStore } from '../state/event';
 import { IoniconsName } from '../types';
+import CreateEventScreenStack from './CreateEventScreenStack';
 
 // https://reactnavigation.org/docs/typescript/
-
 export type TabNavigatorParams = {
     Discover: undefined;
     Map: undefined;
@@ -23,13 +26,20 @@ export type TabNavigatorParams = {
     Create: undefined;
 };
 
+// https://reactnavigation.org/docs/typescript/#combining-navigation-props
+export type TabPropsFor<T extends keyof TabNavigatorParams> = CompositeScreenProps<
+    BottomTabScreenProps<TabNavigatorParams, T>,
+    NativeStackScreenProps<RootNavigatorParams>
+>;
+
 export const Tab = createBottomTabNavigator<TabNavigatorParams>();
 
 export default function TabNavigator() {
-    const { state } = useContext(EventContext);
+    const eventId = useEventStore((state) => state.eventId);
 
     return (
         <Tab.Navigator
+            // tabBar={props => <BottomTabBar {...props} state={{...props.state, routes: props.state.routes.slice(0,4)}}></BottomTabBar>}
             screenOptions={({ route }) => ({
                 tabBarIcon: ({ focused, color, size }) => {
                     let iconName: IoniconsName;
@@ -56,18 +66,18 @@ export default function TabNavigator() {
                 tabBarActiveTintColor: 'tomato',
                 tabBarInactiveTintColor: 'gray',
             })}
-            initialRouteName={state.eventId ? 'Events' : 'Discover'}
+            initialRouteName={eventId ? 'Events' : 'Discover'}
         >
             <Tab.Screen name="Discover" component={DiscoverScreen} />
             <Tab.Screen name="Map" component={MapScreen} />
             <Tab.Screen name="Events" component={EventDetailScreen} />
-            <Tab.Screen name="Profile" component={ProfileScreen} />
-            {state.eventId ? (
+            <Tab.Screen name="Profile" component={ProfileScreen} options={{ headerShown: false }}/>
+
+            {eventId ? (
                 <Tab.Screen name="Event" component={ViewEventScreen} />
             ) : (
-                <Tab.Screen name="Create" component={CreateEventScreen} />
+                <Tab.Screen name="Create" component={CreateEventScreenStack} />
             )}
-
         </Tab.Navigator>
     ); // Temporarily changed component of 'Events' to EventDetailScreen for easy acces during developement. Previous value: 'EventsScreen'
 }

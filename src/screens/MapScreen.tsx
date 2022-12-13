@@ -1,17 +1,23 @@
+import Ionicons from '@expo/vector-icons/Ionicons';
 import * as Location from 'expo-location';
 import { LocationObject } from 'expo-location';
-import React, { useEffect, useState, useContext } from 'react';
-import { AuthContext } from '../contexts/authContext';
-import { Button, Dimensions, StyleSheet, View, TouchableOpacity, Text } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { Dimensions, StyleSheet, TouchableOpacity, View } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
-import { asyncHandler, request } from '../util';
-import Ionicons from '@expo/vector-icons/Ionicons';
-import { BottomTabBarHeightCallbackContext } from '@react-navigation/bottom-tabs';
-import CreateEventScreen from './CreateEventScreen';
 
-function MapScreen({ navigation }) {
-    const [location, setLocation] = useState<LocationObject | null>(null);
-    const { state: authState } = useContext(AuthContext);
+import { TabPropsFor } from '../nav/TabNavigator';
+import { getToken } from '../state/auth';
+import { asyncHandler, request } from '../util';
+
+type ComponentProps = TabPropsFor<'Map'>;
+
+function MapScreen({ navigation }: ComponentProps) {
+    const [location, setLocation] = useState<LocationObject | null>({
+        coords: {
+            latitude: 49.877616,
+            longitude: 8.652653
+        },
+    });
     // todo: fix types
     const [events, setEvents] = useState<any>([]);
 
@@ -27,7 +33,7 @@ function MapScreen({ navigation }) {
 
     useEffect(
         asyncHandler(async () => {
-            const eventList = await request('get', 'event/find', authState.token);
+            const eventList = await request('get', 'event/find', getToken());
             setEvents(eventList.events);
             await getCurrentPosition();
         }),
@@ -44,40 +50,31 @@ function MapScreen({ navigation }) {
                         latitudeDelta: 0.01,
                         longitudeDelta: 0.01,
                     }}
+                    showsUserLocation={true}
                     style={styles.map}
                 >
                     <>
-                        <Marker
-                            key={1}
-                            coordinate={{
-                                latitude: location.coords.latitude,
-                                longitude: location.coords.longitude,
-                            }}
-                            title="Your position"
-                            pinColor="orange"
-                        />
-                        {events.map((el: any) =>
+                        {events.map((el: any) => (
                             <Marker
                                 key={el.id}
                                 coordinate={{
-                                    latitude: el.lat,
-                                    longitude: el.lon,
+                                    latitude: parseFloat(el.lat),
+                                    longitude: parseFloat(el.lon),
                                 }}
                                 title={el.name}
                                 pinColor="teal"
                             />
-                        )}
+                        ))}
                     </>
                 </MapView>
-            ) : null
-            }
+            ) : null}
             <TouchableOpacity
-                style={[styles.create,]}
+                style={[styles.create]}
                 onPress={() => navigation.navigate('CreateEventScreen')}
             >
-                <Ionicons name='add-circle-outline' size={64} color='black' />
+                <Ionicons name="add-circle-outline" size={64} color="black" />
             </TouchableOpacity>
-        </View >
+        </View>
     );
 }
 
@@ -102,7 +99,7 @@ const styles = StyleSheet.create({
         width: Dimensions.get('window').width,
         height: Dimensions.get('window').height,
         zIndex: 99,
-    }
+    },
 });
 
 export default MapScreen;

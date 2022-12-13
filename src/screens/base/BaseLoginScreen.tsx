@@ -12,7 +12,7 @@ interface ComponentProps {
     }[];
     submitButton: { text: string; callback: () => void };
     header: { title: string; subTitle: string };
-    footer: { text: string; buttonText: string; callback: () => void };
+    footer: { text: string; buttonText: string; callback: () => void }[];
 }
 
 export default function BaseLoginScreen({ fields, submitButton, header, footer }: ComponentProps) {
@@ -60,29 +60,34 @@ export default function BaseLoginScreen({ fields, submitButton, header, footer }
                 </TouchableHighlight>
             </View>
 
+            
+
             <View style={styles.infoBlock}>
-                <View style={styles.footerText}>
-                    <Text
-                        style={{
-                            fontSize: 15,
-                            fontWeight: 'bold',
-                            color: '#bdbdbd',
-                        }}
-                    >
-                        {footer.text}
-                    </Text>
-                    <Text
-                        style={{
-                            fontSize: 15,
-                            fontWeight: 'bold',
-                            color: '#D9B611',
-                            marginHorizontal: 8,
-                        }}
-                        onPress={footer.callback}
-                    >
-                        {footer.buttonText}
-                    </Text>
-                </View>
+                {footer.map((foot, index) => {
+                    return (
+                    <View style={styles.footerText} key={index}>
+                        <Text
+                            style={{
+                                fontSize: 15,
+                                fontWeight: 'bold',
+                                color: '#bdbdbd',
+                            }}
+                        >
+                            {foot.text}
+                        </Text>
+                        <Text
+                            style={{
+                                fontSize: 15,
+                                fontWeight: 'bold',
+                                color: '#D9B611',
+                                marginHorizontal: 8,
+                            }}
+                            onPress={foot.callback}
+                        >
+                            {foot.buttonText}
+                        </Text>
+                    </View>
+                    )})}
             </View>
         </View>
     );
