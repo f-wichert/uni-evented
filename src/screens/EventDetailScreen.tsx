@@ -71,7 +71,7 @@ function EventDetailScreen() {
                     </View>
                     <View style={{display:'flex',flexDirection:'row', alignItems:'center', marginRight:10}}>
                         <Ionicons name='musical-notes-sharp' size={25}></Ionicons>
-                        <Text style={{fontSize:23}}>{event.musicStyle}</Text>
+                        <Text style={{fontSize:23, fontWeight:'900'}}>{event.musicStyle}</Text>
                     </View>
                 </View>
                 <View style={styles.DescriptionArea}>
@@ -81,9 +81,11 @@ function EventDetailScreen() {
             <View style={styles.ChatArea}>
 
             </View>
-            <Pressable style={styles.IMHereButtonArea} onPress={registerUserArrivalAtEvent}>
-                <Text style={styles.IMHereButton}> I'm Here!</Text>
-            </Pressable>
+            <View style={styles.IMHereButtonContainer}>
+                <Pressable style={styles.IMHereButtonArea} onPress={registerUserArrivalAtEvent}>
+                    <Text style={styles.IMHereButton}> I'm Here!</Text>
+                </Pressable>
+            </View>
         </View>
     );
 }
@@ -168,13 +170,21 @@ function EventDetailScreen() {
         ChatArea:{
             
         },
-        IMHereButtonArea: {
+        IMHereButtonContainer:{
             display: 'flex',
             flexDirection: 'row',
             alignSelf: 'stretch',
             justifyContent: 'center',
-            // marginHorizontal: 10,
-            margin: 10,
+            padding:6,
+            backgroundColor:'lightgrey',
+        },
+        IMHereButtonArea: {
+            display: 'flex',
+            flexDirection: 'row',
+            alignSelf: 'stretch',
+            flex:1,
+            justifyContent: 'center',
+            // marginHorizontal: 3,
             borderRadius:9,
             backgroundColor: 'black',
             padding: 7,
