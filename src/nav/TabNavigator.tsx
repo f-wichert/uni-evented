@@ -1,5 +1,5 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { BottomTabScreenProps, createBottomTabNavigator, BottomTabBar } from '@react-navigation/bottom-tabs';
+import { BottomTabScreenProps, createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { CompositeScreenProps } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import React from 'react';
@@ -11,7 +11,7 @@ import EventsScreen from '../screens/EventsScreen';
 import MapScreen from '../screens/MapScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import ViewEventScreen from '../screens/ViewEventScreen';
-import { useEventStore } from '../state/event';
+import { useAuthStore } from '../state/auth';
 import { IoniconsName } from '../types';
 import CreateEventScreenStack from './CreateEventScreenStack';
 
@@ -34,7 +34,7 @@ export type TabPropsFor<T extends keyof TabNavigatorParams> = CompositeScreenPro
 export const Tab = createBottomTabNavigator<TabNavigatorParams>();
 
 export default function TabNavigator() {
-    const eventId = useEventStore((state) => state.eventId);
+    const eventId = useAuthStore((state) => state.user?.currentEventId);
 
     return (
         <Tab.Navigator
@@ -70,7 +70,7 @@ export default function TabNavigator() {
             <Tab.Screen name="Discover" component={DiscoverScreen} />
             <Tab.Screen name="Map" component={MapScreen} />
             <Tab.Screen name="Events" component={EventsScreen} />
-            <Tab.Screen name="Profile" component={ProfileScreen} options={{ headerShown: false }}/>
+            <Tab.Screen name="Profile" component={ProfileScreen} options={{ headerShown: false }} />
 
             {eventId ? (
                 <Tab.Screen name="Event" component={ViewEventScreen} />

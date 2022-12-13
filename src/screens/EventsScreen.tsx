@@ -1,12 +1,10 @@
 import React from 'react';
-import { StyleSheet, View, Text } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 
 function EventsScreen() {
     return (
         <View>
-            <Text>
-                Hi
-            </Text>
+            <Text>Hi</Text>
         </View>
     );
 }
