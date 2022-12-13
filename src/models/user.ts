@@ -12,6 +12,11 @@ export interface User {
     readonly displayName: string;
 }
 
+export interface CurrentUser extends User {
+    readonly token: string;
+    readonly email: string;
+}
+
 export class UserManager {
     static fromUserResponse(response: UserResponse) {
         return { ...response, displayName: response.displayName || response.username };
