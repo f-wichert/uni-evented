@@ -1,4 +1,5 @@
 import create, { StateCreator, StoreMutatorIdentifier } from 'zustand';
+import { subscribeWithSelector } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
 
 import { log } from './log';
@@ -10,6 +11,6 @@ export const createStore = <T>(name: string) => {
     return <Mos extends [StoreMutatorIdentifier, unknown][] = []>(
         f: StateCreator<T, [['zustand/immer', never]], Mos>
     ) => {
-        return create<T>()(immer(log(f, name)));
+        return create<T>()(subscribeWithSelector(immer(log(f, name))));
     };
 };

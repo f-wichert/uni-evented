@@ -13,8 +13,8 @@ export interface User {
 }
 
 export interface CurrentUser extends User {
-    readonly token: string;
     readonly email: string;
+    readonly currentEventId: string | null;
 }
 
 export class UserManager {
