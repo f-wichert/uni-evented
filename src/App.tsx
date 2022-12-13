@@ -6,7 +6,6 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import ToastRoot from './components/ToastRoot';
 import TabNavigator from './nav/TabNavigator';
-import CreateEventScreen from './screens/CreateEventScreen';
 import LoadingScreen from './screens/LoadingScreen';
 import LoginScreen from './screens/LoginScreen';
 import RegisterScreen from './screens/RegisterScreen';

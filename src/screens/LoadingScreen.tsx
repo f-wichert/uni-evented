@@ -1,10 +1,10 @@
-import { StyleSheet, View } from 'react-native';
-import Spinner from 'react-native-loading-spinner-overlay';
+import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 
 export default function LoadingScreen() {
     return (
         <View style={styles.container}>
-            <Spinner textContent="Loading..." visible={true} cancelable={false} animation="fade" />
+            <ActivityIndicator size="large" />
+            <Text style={styles.text}>Loading...</Text>
         </View>
     );
 }
@@ -13,6 +13,11 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         justifyContent: 'center',
-        textAlign: 'center',
+        alignItems: 'center',
+    },
+    text: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        marginTop: 12,
     },
 });
