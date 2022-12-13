@@ -1,7 +1,8 @@
 import React from 'react';
 import { StyleSheet, Dimensions, View, Text, Image, Button, ScrollView, SafeAreaView} from 'react-native';
+import { useAuthStore } from '../state/auth';
 
-function getUserData(params) {
+function getUserData() {
     return {
         profilePicture: 'https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=745&q=80'
     }
@@ -9,7 +10,8 @@ function getUserData(params) {
 
 function ProfileScreen(props) {
     const userData = getUserData()
-    
+    const signout = useAuthStore((state) => state.signout);
+
     return (
         // <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
         <View>
@@ -66,7 +68,7 @@ function ProfileScreen(props) {
                     </View>
                     <View style={{...styles.optionSection, borderBottomWidth: 1}}>
                         <View style={styles.optionSectionBody}>
-                            <Text style={styles.optionText}>Logout</Text>
+                            <Text style={styles.optionText} onPress={() => {signout()}}>Logout</Text>
                         </View>
                     </View>
                 </ScrollView>

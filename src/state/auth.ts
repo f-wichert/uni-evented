@@ -3,9 +3,10 @@ import { createStore } from './utils/createStore';
 
 interface State {
     token: string | null;
-    signin: (params: { username: string; password: string }) => Promise<void>;
-    signup: (params: { username: string; email: string; password: string }) => Promise<void>;
-    signout: () => void;
+    signin:     (params: { username: string; password: string }) => Promise<void>;
+    signup:     (params: { username: string; email: string; password: string }) => Promise<void>;
+    signout:    () => void;
+    reset:      (params: { email: string }) => Promise<void>;
 }
 
 export const useAuthStore = createStore<State>('auth')((set) => ({
@@ -28,6 +29,15 @@ export const useAuthStore = createStore<State>('auth')((set) => ({
         });
     },
     signout: () => {
+        set((state) => {
+            state.token = null;
+        });
+    },
+    reset: async (params) => {
+        const data = await request('POST', '/auth/reset', null, params);
+        console.log(JSON.stringify(data));
+        
+
         set((state) => {
             state.token = null;
         });
