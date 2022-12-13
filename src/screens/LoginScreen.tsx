@@ -56,7 +56,7 @@ export default function LoginScreen({ navigation }: ComponentProps) {
                     callback: () => navigation.navigate('RegisterScreen'),
                 },
                 {
-                    text: "Forgot password?",
+                    text: 'Forgot password?',
                     buttonText: 'Reset',
                     callback: () => navigation.navigate('ResetPasswordScreen'),
                 },

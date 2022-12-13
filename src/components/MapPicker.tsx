@@ -40,7 +40,7 @@ export default function MapPicker({ route, navigation }) {
         if (status !== 'granted') {
             throw new Error('Location access not granted');
         }
-        
+
         const location = await Location.getCurrentPositionAsync();
         setLocation(location);
 

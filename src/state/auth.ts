@@ -6,10 +6,10 @@ import { createStore } from './utils/createStore';
 
 interface State {
     token: string | null;
-    signin:     (params: { username: string; password: string }) => Promise<void>;
-    signup:     (params: { username: string; email: string; password: string }) => Promise<void>;
-    signout:    () => void;
-    reset:      (params: { email: string }) => Promise<void>;
+    signin: (params: { username: string; password: string }) => Promise<void>;
+    signup: (params: { username: string; email: string; password: string }) => Promise<void>;
+    signout: () => void;
+    reset: (params: { email: string }) => Promise<void>;
 }
 
 // TODO: show loading state while waiting for hydration: https://github.com/pmndrs/zustand/blob/main/docs/integrations/persisting-store-data.md#hydration-and-asynchronous-storages

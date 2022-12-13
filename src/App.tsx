@@ -64,7 +64,7 @@ function App() {
                     component={RegisterScreen}
                     options={{ headerShown: false }}
                 />
-                <Stack.Screen 
+                <Stack.Screen
                     name="ResetPasswordScreen"
                     component={ResetPasswordScreen}
                     options={{ headerShown: false }}

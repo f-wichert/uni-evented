@@ -67,11 +67,13 @@ export default function RegisterScreen({ navigation }: ComponentProps) {
                 callback: asyncHandler(submitRegister, { prefix: 'Registration failed' }),
             }}
             header={{ title: 'Register', subTitle: 'Please create an account to continue.' }}
-            footer={[{
-                text: 'Already have an account?',
-                buttonText: 'Login',
-                callback: () => navigation.navigate('LoginScreen'),
-            }]}
+            footer={[
+                {
+                    text: 'Already have an account?',
+                    buttonText: 'Login',
+                    callback: () => navigation.navigate('LoginScreen'),
+                },
+            ]}
         />
     );
 }

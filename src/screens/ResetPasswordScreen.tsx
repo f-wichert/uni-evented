@@ -1,10 +1,10 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { useContext, useState } from 'react';
+import { useState } from 'react';
 
 import { UnauthRootNavigatorParams } from '../App';
+import { useAuthStore } from '../state/auth';
 import { asyncHandler } from '../util';
 import BaseLoginScreen from './base/BaseLoginScreen';
-import { useAuthStore } from '../state/auth';
 
 type ComponentProps = NativeStackScreenProps<UnauthRootNavigatorParams, 'ResetPasswordScreen'>;
 
@@ -22,7 +22,7 @@ export default function ResetPasswordScreen({ navigation }: ComponentProps) {
         if (email === '') {
             toast.show('Please enter an email address.', { type: 'normal' });
             return false;
-        } 
+        }
 
         return true;
     }
@@ -32,19 +32,23 @@ export default function ResetPasswordScreen({ navigation }: ComponentProps) {
 
     return (
         <BaseLoginScreen
-            fields={[
-                { icon: 'mail-outline', onChange: setEmail },
-            ]}
+            fields={[{ icon: 'mail-outline', onChange: setEmail }]}
             submitButton={{
                 text: 'Reset',
                 callback: asyncHandler(submitReset, { prefix: 'Login failed' }),
             }}
-            header={{ title: 'Reset Password', subTitle: 'Please enter your email address. You will recieve a futher instructions.' }}
-            footer={[{
-                text: "Remebered?",
-                buttonText: 'Sign in',
-                callback: () => navigation.navigate('LoginScreen'),
-            }]}
+            header={{
+                title: 'Reset Password',
+                subTitle:
+                    'Please enter your email address. You will recieve a futher instructions.',
+            }}
+            footer={[
+                {
+                    text: 'Remebered?',
+                    buttonText: 'Sign in',
+                    callback: () => navigation.navigate('LoginScreen'),
+                },
+            ]}
         />
     );
 }
