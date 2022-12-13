@@ -85,11 +85,6 @@ function App() {
                     component={TabNavigator}
                     options={{ headerShown: false, animation: 'fade' }}
                 />
-                <Stack.Screen
-                    name="CreateEventScreen"
-                    component={CreateEventScreen}
-                    options={{ headerShown: false }}
-                />
             </>
         );
     }

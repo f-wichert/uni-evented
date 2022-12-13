@@ -76,7 +76,7 @@ function MapScreen({ navigation }: ComponentProps) {
             ) : null}
             <TouchableOpacity
                 style={[styles.create]}
-                onPress={() => navigation.navigate('CreateEventScreen')}
+                onPress={() => navigation.navigate('Create')}
             >
                 <Ionicons name="add-circle-outline" size={64} color="black" />
             </TouchableOpacity>
