@@ -36,7 +36,9 @@ const loggerImpl: LoggerImpl = (f, name) => (set, get, store) => {
         store.setState = (...args) => {
             const old = get();
             set(...args);
-            console.debug(`state update (${name}):`, diff(old, get()));
+
+            const changes = diff(old, get());
+            if (Object.keys(changes).length) console.debug(`state update (${name}):`, changes);
         };
     }
 
