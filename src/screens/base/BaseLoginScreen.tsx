@@ -56,7 +56,9 @@ export default function BaseLoginScreen({ fields, submitButton, header, footer }
                     );
                 })}
 
-                <Button text={submitButton.text} onPress={submitButton.callback} />
+                <View style={styles.submitButtonContainer}>
+                    <Button text={submitButton.text} onPress={submitButton.callback} />
+                </View>
             </View>
 
             <View style={styles.infoBlock}>
@@ -147,5 +149,10 @@ const styles = StyleSheet.create({
         fontSize: 15,
         fontWeight: 'bold',
         color: '#bdbdbd',
+        // TODO: rework layout/styles to use view containers properly
+        width: 300,
+    },
+    submitButtonContainer: {
+        alignItems: 'flex-start',
     },
 });
