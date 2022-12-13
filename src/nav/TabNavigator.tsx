@@ -8,14 +8,12 @@ import { RootNavigatorParams } from '../App';
 import { EventContext } from '../contexts/eventContext';
 import { IoniconsName } from '../types';
 
-import CreateEventScreen from '../screens/CreateEventScreen';
 import DiscoverScreen from '../screens/DiscoverScreen';
 import EventsScreen from '../screens/EventsScreen';
 import MapScreen from '../screens/MapScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import ViewEventScreen from '../screens/ViewEventScreen';
 import CreateEventScreenStack from './CreateEventScreenStack';
-import { IoniconsName } from '../types';
 
 // https://reactnavigation.org/docs/typescript/
 export type TabNavigatorParams = {

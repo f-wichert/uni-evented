@@ -13,12 +13,12 @@ export default function LoginScreen({ navigation }: ComponentProps) {
         // this automatically navigates to the main screen when the token gets set
         // TODO: require these to be non-empty in the UI
         if (!validatdeInputs()) {
-            return
+            return;
         }
         await signin({ email: user || '', password: password || '' });
     }
 
-    function validatdeInputs():boolean {
+    function validatdeInputs(): boolean {
         if (user === '') {
             toast.show('Please enter a user name.', { type: 'normal' });
             return false;
@@ -27,7 +27,7 @@ export default function LoginScreen({ navigation }: ComponentProps) {
             return false;
         }
 
-        return true
+        return true;
     }
 
     const { signin } = useContext(AuthContext);

@@ -1,18 +1,24 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { DateTimePickerAndroid, DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import * as Location from 'expo-location';
-import { LocationObject } from 'expo-location';
 import React, { useContext, useState } from 'react';
-import { Button, Dimensions, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import {
+    Button,
+    Dimensions,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
+} from 'react-native';
 import DropDownPicker from 'react-native-dropdown-picker';
 // import DateTimePicker from '@react-native-community/datetimepicker';
 
+import MapView, { LatLng, Marker } from 'react-native-maps';
+import { INPUT_BACKGR_COLOR } from '../const';
 import { useToken } from '../contexts/authContext';
 import { EventContext } from '../contexts/eventContext';
 import { IoniconsName } from '../types';
-import { INPUT_BACKGR_COLOR, BACKGR_COLOR } from '../const'; 
-import { asyncHandler } from '../util';
-import MapView, { LatLng, Marker } from 'react-native-maps';
 
 const width = Dimensions.get('window').width;
 // const height = Dimensions.get('window').height;
@@ -57,7 +63,6 @@ function CreateEventScreen(props) {
         // console.log(`location recieved: ${JSON.stringify(loc)}`);
         setLocation(loc);
         // console.log(`Assigend location: ${location}`);
-        
     };
 
     const onChange = (event: DateTimePickerEvent, selectedDate?: Date) => {
@@ -97,7 +102,7 @@ function CreateEventScreen(props) {
     const formatStartTime = (date: Date) => {
         const hours = date.getHours().toString().padStart(2, '0');
         const minutes = date.getMinutes().toString().padStart(2, '0');
-        return `${hours}:${minutes}`
+        return `${hours}:${minutes}`;
     };
 
     const formatStartDate = (date: Date) => {
@@ -111,10 +116,10 @@ function CreateEventScreen(props) {
         console.log('Location grabbed');
 
         props.navigation.navigate('MapPicker', {
-            returnLocation: recieveLocation
-        })
-        return
-        
+            returnLocation: recieveLocation,
+        });
+        return;
+
         const { status } = await Location.requestForegroundPermissionsAsync();
         if (status !== 'granted') {
             setIconName('bug');
@@ -129,14 +134,12 @@ function CreateEventScreen(props) {
         // TODO: require these to be non-empty in the UI
         console.log(`name: ${name}`);
         console.log(`loc: ${JSON.stringify(location)}`);
-        
+
         if (!location || !name) {
             throw new Error('Invalid name or location');
         }
         await createEvent({ name: name, location: location, startDate: start }, token);
     };
-
-
 
     return (
         <View style={styles.container}>
@@ -149,56 +152,56 @@ function CreateEventScreen(props) {
                             style={styles.textInput}
                             placeholder="Type out your event name..."
                             onChangeText={setName}
-                        />  
-                    </View>               
+                        />
+                    </View>
                 </View>
             </View>
-                
+
             <View style={styles.section}>
                 <View style={{ flexDirection: 'row' }}>
                     <Text style={styles.sectionTitle}>Location</Text>
                     <Ionicons onPress={grabLocation} name={iconName} size={26} color={'orange'} />
                 </View>
-                
+
                 <View style={styles.sectionBody}>
-                { location ? (
-                    <TouchableOpacity
-                        onPressIn={console.log('hi')}
-                    >
-                        <MapView 
-                            style={styles.locationPreviewMap}
-                            onPress={(e) => console.log('E')}
-                            zoomEnabled={false}
-                            scrollEnabled={false}
-                            initialRegion={{
-                                latitude: location.latitude,
-                                longitude: location.longitude,
-                                latitudeDelta: 0.001,
-                                longitudeDelta: 0.001,
-                            }}
-                        >
-                            <Marker
-                                key={1}
-                                coordinate={{
+                    {location ? (
+                        <TouchableOpacity onPressIn={console.log('hi')}>
+                            <MapView
+                                style={styles.locationPreviewMap}
+                                onPress={(e) => console.log('E')}
+                                zoomEnabled={false}
+                                scrollEnabled={false}
+                                initialRegion={{
                                     latitude: location.latitude,
                                     longitude: location.longitude,
+                                    latitudeDelta: 0.001,
+                                    longitudeDelta: 0.001,
                                 }}
-                                title="Your party location"
-                            />
-                        </MapView>
-                    </TouchableOpacity>
-                ) : null
-                }
+                            >
+                                <Marker
+                                    key={1}
+                                    coordinate={{
+                                        latitude: location.latitude,
+                                        longitude: location.longitude,
+                                    }}
+                                    title="Your party location"
+                                />
+                            </MapView>
+                        </TouchableOpacity>
+                    ) : null}
                 </View>
             </View>
 
             <View style={styles.section}>
                 <Text style={styles.sectionTitle}>Date & Time</Text>
-                
+
                 <Text style={styles.sectionSubtitle}>Start</Text>
                 <View style={styles.sectionBody}>
                     <View style={styles.dateTimeWrapper}>
-                        <TouchableOpacity style={styles.timeInput} onPress={showTimepickerStartPicker}>
+                        <TouchableOpacity
+                            style={styles.timeInput}
+                            onPress={showTimepickerStartPicker}
+                        >
                             <Text>{formatStartTime(start)}</Text>
                         </TouchableOpacity>
                         <TouchableOpacity style={styles.dateInput}>
@@ -207,7 +210,7 @@ function CreateEventScreen(props) {
                     </View>
                 </View>
 
-                <Text style={{...styles.sectionSubtitle, marginTop: 10}}>End...</Text>
+                <Text style={{ ...styles.sectionSubtitle, marginTop: 10 }}>End...</Text>
 
                 {/* <Text style={styles.text}>Start: {formatDate(start)}</Text>
                 <Ionicons
@@ -256,11 +259,7 @@ function CreateEventScreen(props) {
                 </View>
             </View>
 
-
-            <Button
-                color="orange"
-                title="Create event!"
-            />
+            <Button color="orange" title="Create event!" />
         </View>
     );
 }
@@ -281,18 +280,17 @@ const styles = StyleSheet.create({
     sectionTitle: {
         fontSize: 20,
         fontWeight: 'bold',
-        
     },
     sectionSubtitle: {
         fontSize: 16,
     },
     sectionBody: {
         marginTop: 8,
-        marginRight: 10
+        marginRight: 10,
     },
     textInputWrapper: {
         backgroundColor: INPUT_BACKGR_COLOR,
-        borderRadius: 5
+        borderRadius: 5,
     },
     textInput: {
         // borderBottomColor: 'black',
@@ -304,10 +302,10 @@ const styles = StyleSheet.create({
         // backgroundColor: '#d6d6d6',
         // borderRadius: 5
         marginLeft: 5,
-        minHeight: 10
+        minHeight: 10,
     },
     dateTimeWrapper: {
-        flexDirection: 'row'
+        flexDirection: 'row',
     },
     timeInput: {
         justifyContent: 'center',
@@ -315,7 +313,7 @@ const styles = StyleSheet.create({
         width: 80,
         height: 30,
         borderRadius: 5,
-        backgroundColor: INPUT_BACKGR_COLOR
+        backgroundColor: INPUT_BACKGR_COLOR,
     },
     dateInput: {
         justifyContent: 'center',
@@ -324,7 +322,7 @@ const styles = StyleSheet.create({
         height: 30,
         marginLeft: 20,
         borderRadius: 5,
-        backgroundColor: INPUT_BACKGR_COLOR
+        backgroundColor: INPUT_BACKGR_COLOR,
     },
     dropdown: {
         marginTop: 10,
@@ -349,8 +347,8 @@ const styles = StyleSheet.create({
     locationPreviewMap: {
         width: '100%',
         height: 90,
-        borderRadius: 5
-    }
+        borderRadius: 5,
+    },
 });
 
 export default CreateEventScreen;

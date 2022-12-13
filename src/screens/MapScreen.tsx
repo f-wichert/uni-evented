@@ -15,8 +15,8 @@ function MapScreen({ navigation }: ComponentProps) {
     const [location, setLocation] = useState<LocationObject | null>({
         coords: {
             latitude: 49.877616,
-            longitude: 8.652653
-        }
+            longitude: 8.652653,
+        },
     });
     const token = useToken();
     // todo: fix types

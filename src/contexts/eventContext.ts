@@ -1,4 +1,3 @@
-import { LocationObject } from 'expo-location';
 import { Dispatch } from 'react';
 import { LatLng } from 'react-native-maps';
 

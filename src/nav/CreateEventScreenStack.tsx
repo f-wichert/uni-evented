@@ -1,9 +1,8 @@
-import React from 'react';
-import { View } from 'react-native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import React from 'react';
 
-import CreateEventScreen from '../screens/CreateEventScreen';
 import MapPicker from '../components/MapPicker';
+import CreateEventScreen from '../screens/CreateEventScreen';
 
 const Stack = createNativeStackNavigator<RootNavigatorParams>();
 
@@ -15,11 +14,7 @@ function CreateEventScreenStack(props) {
                 component={CreateEventScreen}
                 options={{ headerShown: false, animation: 'fade' }}
             />
-            <Stack.Screen
-                name="MapPicker"
-                component={MapPicker}
-                options={{ headerShown: false }}
-            />
+            <Stack.Screen name="MapPicker" component={MapPicker} options={{ headerShown: false }} />
         </Stack.Navigator>
     );
 }
