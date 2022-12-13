@@ -1,18 +1,18 @@
 import { Icon } from '@expo/vector-icons/build/createIconSet';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { NavigationProp, ParamListBase } from '@react-navigation/native';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type IconName<T extends Icon<any, any>> = keyof T['glyphMap'];
 export type IoniconsName = IconName<typeof Ionicons>;
-<<<<<<< HEAD
-export type VideoIdentifyer = {id:string,src:string};
-export type JSONValue = string | number | boolean | JSONObject | JSONValue[];
-export type BackendMediaRequest = {id:string}
-=======
 
 export type JSONValue = string | number | boolean | JSONObject | JSONValue[] | null;
 
->>>>>>> main
+export type Props = {
+    any:any;
+    navigation: NavigationProp<ParamListBase>;
+};
+
 export interface JSONObject {
     [x: string]: JSONValue;
 }

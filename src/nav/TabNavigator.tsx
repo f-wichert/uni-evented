@@ -8,6 +8,7 @@ import DiscoverScreen from '../screens/DiscoverScreen';
 import EventsScreen from '../screens/EventsScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import MapScreen from '../screens/MapScreen';
+import EventDetailScreen from '../screens/EventDetailScreen';
 import ViewEventScreen from '../screens/ViewEventScreen';
 import { IoniconsName } from '../types';
 
@@ -59,9 +60,8 @@ export default function TabNavigator() {
         >
             <Tab.Screen name="Discover" component={DiscoverScreen} />
             <Tab.Screen name="Map" component={MapScreen} />
-            <Tab.Screen name="Events" component={EventsScreen} />
+            <Tab.Screen name="Events" component={EventDetailScreen} />
             <Tab.Screen name="Profile" component={ProfileScreen} />
-
             {state.eventId ? (
                 <Tab.Screen name="Event" component={ViewEventScreen} />
             ) : (
@@ -69,5 +69,5 @@ export default function TabNavigator() {
             )}
 
         </Tab.Navigator>
-    );
+    ); // Temporarily changed component of 'Events' to EventDetailScreen for easy acces during developement. Previous value: 'EventsScreen'
 }

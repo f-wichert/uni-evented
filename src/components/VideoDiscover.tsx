@@ -14,7 +14,7 @@ function VideoDiscover({ discoverData, navigation }: Props) {
     const video = React.useRef(null);
     const [status, setStatus] = React.useState({});
 
-    const onPress = () => {navigation.}
+    const onPress = () => {navigation.navigate('')}
 
     return (
         <View style={styles.container}>
