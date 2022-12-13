@@ -1,7 +1,7 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { NavigationProp, ParamListBase } from '@react-navigation/native';
 import React, { useEffect, useState } from 'react';
-import { Dimensions, StyleSheet, View } from 'react-native';
+import { Dimensions, StyleSheet, View, Text } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import Carousel from 'react-native-reanimated-carousel';
 
@@ -35,6 +35,8 @@ function DiscoverScreen({ navigation }: Props) {
     }
 
     const width = Dimensions.get('window').width;
+    // var height = Dimensions.get('window').height;
+    var height = 500
 
     useEffect(() => {
         // Use `setOptions` to update the button that we previously specified
@@ -52,15 +54,29 @@ function DiscoverScreen({ navigation }: Props) {
                 />
             ),
         });
-    }, [navigation]);
+
+        // Get appropriate height for carousel
+        height = Dimensions.get('window').height;
+    }, [navigation, height]);
 
     return (
         <View style={styles.container}>
+            { media.length == 0 ? (
+            <View style={styles.sadContainer}>
+                <Ionicons
+                    name="sad-outline"
+                    size={50}
+                    color="black"
+                    style={styles.sadIcon}
+                />
+                <Text style={styles.sadText}>Seems like there are no clips right now...</Text>
+            </View>
+            ) : (
             <GestureHandlerRootView>
                 <Carousel
                     vertical={true}
                     width={width}
-                    height={580}
+                    height={500}
                     autoPlay={false}
                     loop={false}
                     data={media}
@@ -82,6 +98,8 @@ function DiscoverScreen({ navigation }: Props) {
                     )}
                 />
             </GestureHandlerRootView>
+            )
+            }
         </View>
     );
 }
@@ -93,6 +111,16 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
     },
+    sadContainer: {
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    sadIcon: {
+        marginBottom: 20
+    },
+    sadText: {
+        fontSize: 20
+    }
 });
 
 export default DiscoverScreen;

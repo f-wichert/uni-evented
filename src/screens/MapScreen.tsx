@@ -36,13 +36,30 @@ function MapScreen({ navigation }: ComponentProps) {
         });
     };
 
+    const updateEventList = async () => {
+        const eventList = await request('get', 'event/find', getToken());
+        setEvents(eventList.events);
+    };
+
     useEffect(
         asyncHandler(async () => {
-            const eventList = await request('get', 'event/find', getToken());
-            setEvents(eventList.events);
+            navigation.setOptions({
+                headerRight: () => (
+                    <Ionicons
+                        name="refresh-outline"
+                        size={32}
+                        color="black"
+                        onPress={asyncHandler(updateEventList, { prefix: 'Failed to update media' })}
+                        style={{
+                            marginRight: 10,
+                        }}
+                    />
+                ),
+            });
+            updateEventList();
             await getCurrentPosition();
         }),
-        []
+        [navigation]
     );
 
     return (
