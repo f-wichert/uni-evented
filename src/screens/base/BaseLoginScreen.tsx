@@ -63,8 +63,9 @@ export default function BaseLoginScreen({ fields, submitButton, header, footer }
             
 
             <View style={styles.infoBlock}>
-                {footer.map((foot) => (
-                    <View style={styles.footerText}>
+                {footer.map((foot, index) => {
+                    return (
+                    <View style={styles.footerText} key={index}>
                         <Text
                             style={{
                                 fontSize: 15,
@@ -86,7 +87,7 @@ export default function BaseLoginScreen({ fields, submitButton, header, footer }
                             {foot.buttonText}
                         </Text>
                     </View>
-                    ))}
+                    )})}
             </View>
         </View>
     );

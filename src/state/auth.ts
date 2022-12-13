@@ -26,6 +26,7 @@ export const useAuthStore = createStore<State>('auth')(
             token: null,
 
             signin: async (params) => {
+                console.log('SubmitSignin');
                 const data = await request('POST', '/auth/login', null, params);
 
                 // TODO: validate types
