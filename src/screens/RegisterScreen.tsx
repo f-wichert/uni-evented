@@ -1,8 +1,8 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { useContext, useState } from 'react';
+import { useState } from 'react';
 
 import { UnauthRootNavigatorParams } from '../App';
-import { AuthContext } from '../contexts/authContext';
+import { useAuthStore } from '../state/auth';
 import { asyncHandler } from '../util';
 import BaseLoginScreen from './base/BaseLoginScreen';
 
@@ -39,7 +39,7 @@ export default function RegisterScreen({ navigation }: ComponentProps) {
         return true;
     }
 
-    const { signup } = useContext(AuthContext);
+    const signup = useAuthStore((state) => state.signup);
     const [user, setUser] = useState<string | undefined>('');
     const [email, setEmail] = useState<string | undefined>('');
     // TODO: compare these two values before enabling submit button

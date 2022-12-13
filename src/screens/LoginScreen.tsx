@@ -1,8 +1,8 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { useContext, useState } from 'react';
+import { useState } from 'react';
 
 import { UnauthRootNavigatorParams } from '../App';
-import { AuthContext } from '../contexts/authContext';
+import { useAuthStore } from '../state/auth';
 import { asyncHandler } from '../util';
 import BaseLoginScreen from './base/BaseLoginScreen';
 
@@ -15,7 +15,7 @@ export default function LoginScreen({ navigation }: ComponentProps) {
         if (!validatdeInputs()) {
             return;
         }
-        await signin({ email: user || '', password: password || '' });
+        await signin({ username: user || '', password: password || '' });
     }
 
     function validatdeInputs(): boolean {
@@ -30,7 +30,7 @@ export default function LoginScreen({ navigation }: ComponentProps) {
         return true;
     }
 
-    const { signin } = useContext(AuthContext);
+    const signin = useAuthStore((state) => state.signin);
     const [user, setUser] = useState<string | undefined>('');
     const [password, setPassword] = useState<string | undefined>('');
 

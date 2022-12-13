@@ -1,4 +1,4 @@
-import { useToken } from '../contexts/authContext';
+import { getToken } from '../state/auth';
 import { JSONObject } from '../types';
 import { request } from '../util';
 import Media, { MediaResponse } from './media';
@@ -81,7 +81,7 @@ export default class Event {
     }
 
     async join(lat: number, lon: number) {
-        const token = useToken();
+        const token = getToken();
 
         // TODO: client side validation
 
@@ -89,7 +89,7 @@ export default class Event {
     }
 
     async close() {
-        const token = useToken();
+        const token = getToken();
 
         // TODO: client side validation
 
@@ -135,7 +135,7 @@ export default class Event {
     }
 
     static async fromId(id: string) {
-        const token = useToken();
+        const token = getToken();
         const data = await request('GET', '/event/info', token, { eventId: id });
         return Event.fromEventResponse(data as EventResponse);
     }
@@ -155,7 +155,7 @@ export default class Event {
         startDate: Date | null;
         endDate: Date | null;
     }) {
-        const token = useToken();
+        const token = getToken();
         const { eventId } = await request('POST', '/event/create', token, {
             name: name,
             tags: tags,
@@ -176,7 +176,7 @@ export default class Event {
         maxResults?: number;
         maxRadius?: number;
     }) {
-        const token = useToken();
+        const token = getToken();
         const data = await request('GET', '/event/find', token, options);
         const eventResponses = data.events as EventResponse[];
         return eventResponses.map((res) => Event.fromEventResponse(res));

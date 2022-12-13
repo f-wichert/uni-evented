@@ -5,8 +5,8 @@ import React, { useEffect, useState } from 'react';
 import { Dimensions, StyleSheet, TouchableOpacity, View } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 
-import { useToken } from '../contexts/authContext';
 import { TabPropsFor } from '../nav/TabNavigator';
+import { getToken } from '../state/auth';
 import { asyncHandler, request } from '../util';
 
 type ComponentProps = TabPropsFor<'Map'>;
@@ -18,7 +18,6 @@ function MapScreen({ navigation }: ComponentProps) {
             longitude: 8.652653
         },
     });
-    const token = useToken();
     // todo: fix types
     const [events, setEvents] = useState<any>([]);
 
@@ -34,7 +33,7 @@ function MapScreen({ navigation }: ComponentProps) {
 
     useEffect(
         asyncHandler(async () => {
-            const eventList = await request('get', 'event/find', token);
+            const eventList = await request('get', 'event/find', getToken());
             setEvents(eventList.events);
             await getCurrentPosition();
         }),
