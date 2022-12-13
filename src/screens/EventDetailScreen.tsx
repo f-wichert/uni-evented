@@ -5,6 +5,7 @@ import { max } from 'react-native-reanimated';
 import VideoCamera from '../components/VideoCamera';
 import { EventContext } from '../contexts/eventContext';
 import {Props} from '../types'
+import { Tag } from '../components/Tag';
 
 import { asyncHandler } from '../util';
 
@@ -21,6 +22,19 @@ function EventDetailScreen() {
 
     console.log(state.eventId);
 
+    // Developement Values TODO: replace with request to real ones
+    let event = {
+        title:'Herrengarten Rave',
+        tags: ['Beer', 'Rave', 'Techno'],
+        numberOfAttendants: 5,
+        startingTime: '19:00',
+        endingTime: '23:30',
+        address: 'Herrengarten and der Uni',
+        musicStyle: 'Funk',
+        rating: 4,
+        description: 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum.'
+    }
+
     // TODO: But back in when event creatin is smooth
     // if (state.eventId == null) {  // If no event has been created, gibe error
 
@@ -32,35 +46,51 @@ function EventDetailScreen() {
     //     )
     // }
 
-
+    
     return (
         <View style={[styles.container]}>
-            <View style={[styles.flexEl, styles.camera]}>
+            <View style={styles.camera}>
                 <Ionicons
                     name="camera"
-                    size={32}
+                    size={64}
                     color="orange"
                     onPress={() => setCameraActive(true)}
                 />
+                <Text>Load Picture/Video of event here</Text>
             </View>
-            <Text style={[styles.flexEl]}>Event Detail Screen</Text>
+            <View style={styles.TagArea}>
+                
+                <Tag style={{}}>Helllol</Tag>
+            </View>
+            <View style={styles.RatingArea}>
+
+            </View>
+            <View style={styles.GeneralInformationArea}>
+
+            </View>
+            <View style={styles.ChatArea}>
+
+            </View>
+            <View style={styles.IMHereButtonArea}>
             <Button
                 // TODO: Button does not accept 'style'
                 // https://docs.expo.dev/ui-programming/react-native-styling-buttons/
                 // style={[styles.flexEl, styles.button]}
-                color="orange"
-                title="Close Event"
-                onPress={() => closeEvent()}
-            />
+                color="black"
+                title="I'm here!"
+                onPress={() => registerUserArrivalAtEvent()} />
+            </View>
         </View>
     );
 }
 
+    function registerUserArrivalAtEvent() {
+        console.log(`You are now checked in at the Event (Mock Message, did nothing)`)
+    }
+
       const styles = StyleSheet.create({
         container: {
-            display: 'flex',
-            flex: 1,
-            justifyContent: 'space-between',
+            
             alignItems: 'center',
         },
         column: {
@@ -78,13 +108,30 @@ function EventDetailScreen() {
             flex: 0.5,
             padding: 20,
         },
-        button: {},
         camera: {
             display: 'flex',
             backgroundColor: 'grey',
             alignSelf: 'stretch',
             alignItems: 'center',
             justifyContent: 'center',
+            minHeight:200,
+        },
+        TagArea: {
+            backgroundColor: 'aqua',
+            padding: 5,
+        },
+        RatingArea: {
+            
+        },
+        GeneralInformationArea: {
+            
+        },
+        
+        ChatArea:{
+            
+        },
+        IMHereButtonArea: {
+
         },
     });
 
