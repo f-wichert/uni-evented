@@ -49,9 +49,10 @@ export const useAuthStore = createStore<State>('auth')(
             },
             reset: async (params) => {
                 const data = await request('POST', '/auth/reset', null, params);
-                console.log(JSON.stringify(data));
-                
-        
+                // console.log(JSON.stringify(data));
+                // if (data.responseCode == '10') {
+
+                // }
                 set((state) => {
                     state.token = null;
                 });
