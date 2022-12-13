@@ -1,35 +1,23 @@
 import { JSONObject } from '../types';
 
 export interface UserResponse extends JSONObject {
-    id: string;
-    username: string;
-    displayName: string | null;
+    readonly id: string;
+    readonly username: string;
+    readonly displayName: string | null;
 }
 
-export default class User {
+export interface User {
     readonly id: string;
     readonly username: string;
     readonly displayName: string;
+}
 
-    constructor({
-        id,
-        username,
-        displayName,
-    }: {
-        id: string;
-        username: string;
-        displayName?: string | null;
-    }) {
-        this.id = id;
-        this.username = username;
-        this.displayName = displayName || username;
-    }
-
+export class UserManager {
     static fromUserResponse(response: UserResponse) {
-        return new User(response);
+        return { ...response, displayName: response.displayName || response.username };
     }
 
-    async fromId(id: string) {
+    static async fromId(id: string) {
         // TODO
     }
 }
