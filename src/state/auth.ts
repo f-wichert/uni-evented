@@ -1,3 +1,6 @@
+import * as SecureStore from 'expo-secure-store';
+import { persist, StateStorage } from 'zustand/middleware';
+
 import { request } from '../util';
 import { createStore } from './utils/createStore';
 
@@ -9,40 +12,57 @@ interface State {
     reset:      (params: { email: string }) => Promise<void>;
 }
 
-export const useAuthStore = createStore<State>('auth')((set) => ({
-    token: null,
+// TODO: show loading state while waiting for hydration: https://github.com/pmndrs/zustand/blob/main/docs/integrations/persisting-store-data.md#hydration-and-asynchronous-storages
+// TODO: SecureStore doesn't work on web, may be the only blocker
+const secureStoreWrapper: StateStorage = {
+    getItem: SecureStore.getItemAsync.bind(SecureStore),
+    setItem: SecureStore.setItemAsync.bind(SecureStore),
+    removeItem: SecureStore.deleteItemAsync.bind(SecureStore),
+};
 
-    signin: async (params) => {
-        const data = await request('POST', '/auth/login', null, params);
+export const useAuthStore = createStore<State>('auth')(
+    persist(
+        (set) => ({
+            token: null,
 
-        // TODO: validate types
-        set((state) => {
-            state.token = data.token as string;
-        });
-    },
-    signup: async (params) => {
-        const data = await request('POST', '/auth/register', null, params);
+            signin: async (params) => {
+                const data = await request('POST', '/auth/login', null, params);
 
-        // TODO: validate types
-        set((state) => {
-            state.token = data.token as string;
-        });
-    },
-    signout: () => {
-        set((state) => {
-            state.token = null;
-        });
-    },
-    reset: async (params) => {
-        const data = await request('POST', '/auth/reset', null, params);
-        console.log(JSON.stringify(data));
+                // TODO: validate types
+                set((state) => {
+                    state.token = data.token as string;
+                });
+            },
+            signup: async (params) => {
+                const data = await request('POST', '/auth/register', null, params);
+
+                // TODO: validate types
+                set((state) => {
+                    state.token = data.token as string;
+                });
+            },
+            signout: () => {
+                set((state) => {
+                    state.token = null;
+                });
+            },
+            reset: async (params) => {
+                const data = await request('POST', '/auth/reset', null, params);
+                console.log(JSON.stringify(data));
+                
         
-
-        set((state) => {
-            state.token = null;
-        });
-    },
-}));
+                set((state) => {
+                    state.token = null;
+                });
+            },
+        }),
+        {
+            name: 'auth',
+            getStorage: () => secureStoreWrapper,
+            partialize: (state) => ({ token: state.token }),
+        }
+    )
+);
 
 // NOTE: This isn't a hook, it accesses the state directly and is not reactive.
 // For auth tokens, this is fine, but generally hooks should be used
