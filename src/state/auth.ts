@@ -3,7 +3,7 @@ import { LatLng } from 'react-native-maps';
 import { persist, StateStorage } from 'zustand/middleware';
 
 import { CurrentUser } from '../models';
-import { request } from '../util';
+import { handleError, request } from '../util';
 import { createStore } from './utils/createStore';
 
 interface State {
@@ -63,11 +63,8 @@ export const useAuthStore = createStore<State>('auth')(
                 });
             },
             reset: async (params) => {
-                const data = await request('POST', '/auth/reset', null, params);
-                // console.log(JSON.stringify(data));
-                // if (data.responseCode == '10') {
+                await request('POST', '/auth/reset', null, params);
 
-                // }
                 set((state) => {
                     state.token = null;
                 });
@@ -122,15 +119,26 @@ useAuthStore.subscribe(
     (state) => state.token,
     (token) => {
         // TODO: this might be bad practice: https://github.com/pmndrs/zustand/discussions/1363#discussioncomment-3874571
-        // TODO: error handling
+
+        // clear stored user if token changed
         useAuthStore.setState((state) => {
-            // clear stored user if token changed
             state.user = null;
-            // start fetching user data if there's a new token
-            if (token) {
-                void state.fetchUser();
-            }
         });
+
+        // start fetching user data if there's a new token
+        if (token) {
+            useAuthStore
+                .getState()
+                .fetchUser()
+                .catch((e) => {
+                    handleError(e, { prefix: 'Failed to retrieve user data' });
+                    // reset token if we failed to fetch the user data
+                    // TODO: show a 'try again' button instead
+                    useAuthStore.setState((state) => {
+                        state.token = null;
+                    });
+                });
+        }
     },
     { fireImmediately: true }
 );
