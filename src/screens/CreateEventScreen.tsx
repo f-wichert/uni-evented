@@ -16,7 +16,7 @@ import DropDownPicker from 'react-native-dropdown-picker';
 
 import MapView, { LatLng, Marker } from 'react-native-maps';
 import { INPUT_BACKGR_COLOR } from '../const';
-import { useEventStore } from '../state/event';
+import { useAuthStore } from '../state/auth';
 import { IoniconsName } from '../types';
 
 const width = Dimensions.get('window').width;
@@ -55,7 +55,7 @@ function CreateEventScreen(props) {
     // Location icon
     const [iconName, setIconName] = useState<IoniconsName>('location-outline');
 
-    const createEvent = useEventStore((state) => state.createEvent);
+    const createEvent = useAuthStore((state) => state.createEvent);
 
     const recieveLocation = (loc) => {
         // console.log(`location recieved: ${JSON.stringify(loc)}`);

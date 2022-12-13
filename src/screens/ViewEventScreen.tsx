@@ -3,10 +3,10 @@ import React, { useState } from 'react';
 import { Button, StyleSheet, Text, View } from 'react-native';
 
 import VideoCamera from '../components/VideoCamera';
-import { useEventStore } from '../state/event';
+import { useAuthStore } from '../state/auth';
 
 function ViewEventScreen() {
-    const closeEvent = useEventStore((state) => state.closeEvent);
+    const closeEvent = useAuthStore((state) => state.closeEvent);
     const [cameraActive, setCameraActive] = useState(false);
 
     return (

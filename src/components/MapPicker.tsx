@@ -40,10 +40,11 @@ export default function MapPicker({ route, navigation }) {
         if (status !== 'granted') {
             throw new Error('Location access not granted');
         }
-        const location = await Location.getCurrentPositionAsync();
 
+        const location = await Location.getCurrentPositionAsync();
         setLocation(location);
-        mapRef.current.animateCamera({
+
+        mapRef.current?.animateCamera({
             center: { latitude: location.coords.latitude, longitude: location.coords.longitude },
         });
     };

@@ -12,10 +12,11 @@ import { asyncHandler, request } from '../util';
 type ComponentProps = TabPropsFor<'Map'>;
 
 function MapScreen({ navigation }: ComponentProps) {
+    const mapRef = React.useRef<MapView>(null);
     const [location, setLocation] = useState<LocationObject | null>({
         coords: {
-            latitude: 49.877616,
-            longitude: 8.652653
+            latitude: 48.877616,
+            longitude: 8.652653,
         },
     });
     // todo: fix types
@@ -29,6 +30,10 @@ function MapScreen({ navigation }: ComponentProps) {
 
         const location = await Location.getCurrentPositionAsync();
         setLocation(location);
+
+        mapRef.current?.animateCamera({
+            center: { latitude: location.coords.latitude, longitude: location.coords.longitude },
+        });
     };
 
     useEffect(
@@ -50,6 +55,7 @@ function MapScreen({ navigation }: ComponentProps) {
                         latitudeDelta: 0.01,
                         longitudeDelta: 0.01,
                     }}
+                    ref={mapRef}
                     showsUserLocation={true}
                     style={styles.map}
                 >

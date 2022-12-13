@@ -1,29 +1,29 @@
 import React from 'react';
-import { StyleSheet, Dimensions, View, Text, Image, Button, ScrollView, SafeAreaView} from 'react-native';
+import { Dimensions, Image, SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useAuthStore } from '../state/auth';
 
 function getUserData() {
     return {
-        profilePicture: 'https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=745&q=80'
-    }
+        profilePicture:
+            'https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=745&q=80',
+    };
 }
 
 function ProfileScreen(props) {
-    const userData = getUserData()
+    const userData = getUserData();
     const signout = useAuthStore((state) => state.signout);
 
     return (
         // <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
         <View>
             <View style={styles.profileHeader}>
-                <Image
-                    style={styles.profilePicture}
-                    source={{uri:userData.profilePicture}}
-                />
-                <Text style={{
-                    paddingTop: 20,
-                    fontSize: 30
-                }}>
+                <Image style={styles.profilePicture} source={{ uri: userData.profilePicture }} />
+                <Text
+                    style={{
+                        paddingTop: 20,
+                        fontSize: 30,
+                    }}
+                >
                     Myself
                 </Text>
             </View>
@@ -66,9 +66,16 @@ function ProfileScreen(props) {
                             <Text style={styles.optionText}>Other Option 2</Text>
                         </View>
                     </View>
-                    <View style={{...styles.optionSection, borderBottomWidth: 1}}>
+                    <View style={{ ...styles.optionSection, borderBottomWidth: 1 }}>
                         <View style={styles.optionSectionBody}>
-                            <Text style={styles.optionText} onPress={() => {signout()}}>Logout</Text>
+                            <Text
+                                style={styles.optionText}
+                                onPress={() => {
+                                    signout();
+                                }}
+                            >
+                                Logout
+                            </Text>
                         </View>
                     </View>
                 </ScrollView>
@@ -89,11 +96,11 @@ const styles = StyleSheet.create({
     profilePicture: {
         width: 200,
         height: 200,
-        borderRadius: 100
+        borderRadius: 100,
     },
     optionsBody: {
         justifyContent: 'center',
-        alignItems: 'center'
+        alignItems: 'center',
     },
     optionSection: {
         width: '100%',
@@ -111,7 +118,7 @@ const styles = StyleSheet.create({
         fontSize: 16,
     },
     scrollView: {
-        width: '95%'
+        width: '95%',
     },
     text: {
         fontSize: 42,

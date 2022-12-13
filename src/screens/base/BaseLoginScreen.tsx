@@ -60,34 +60,33 @@ export default function BaseLoginScreen({ fields, submitButton, header, footer }
                 </TouchableHighlight>
             </View>
 
-            
-
             <View style={styles.infoBlock}>
                 {footer.map((foot, index) => {
                     return (
-                    <View style={styles.footerText} key={index}>
-                        <Text
-                            style={{
-                                fontSize: 15,
-                                fontWeight: 'bold',
-                                color: '#bdbdbd',
-                            }}
-                        >
-                            {foot.text}
-                        </Text>
-                        <Text
-                            style={{
-                                fontSize: 15,
-                                fontWeight: 'bold',
-                                color: '#D9B611',
-                                marginHorizontal: 8,
-                            }}
-                            onPress={foot.callback}
-                        >
-                            {foot.buttonText}
-                        </Text>
-                    </View>
-                    )})}
+                        <View style={styles.footerText} key={index}>
+                            <Text
+                                style={{
+                                    fontSize: 15,
+                                    fontWeight: 'bold',
+                                    color: '#bdbdbd',
+                                }}
+                            >
+                                {foot.text}
+                            </Text>
+                            <Text
+                                style={{
+                                    fontSize: 15,
+                                    fontWeight: 'bold',
+                                    color: '#D9B611',
+                                    marginHorizontal: 8,
+                                }}
+                                onPress={foot.callback}
+                            >
+                                {foot.buttonText}
+                            </Text>
+                        </View>
+                    );
+                })}
             </View>
         </View>
     );

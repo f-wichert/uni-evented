@@ -1,5 +1,5 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { BottomTabScreenProps, createBottomTabNavigator, BottomTabBar } from '@react-navigation/bottom-tabs';
+import { BottomTabScreenProps, createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { CompositeScreenProps } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import React from 'react';
@@ -12,7 +12,7 @@ import MapScreen from '../screens/MapScreen';
 import EventDetailScreen from '../screens/EventDetailScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import ViewEventScreen from '../screens/ViewEventScreen';
-import { useEventStore } from '../state/event';
+import { useAuthStore } from '../state/auth';
 import { IoniconsName } from '../types';
 import CreateEventScreenStack from './CreateEventScreenStack';
 
@@ -35,7 +35,7 @@ export type TabPropsFor<T extends keyof TabNavigatorParams> = CompositeScreenPro
 export const Tab = createBottomTabNavigator<TabNavigatorParams>();
 
 export default function TabNavigator() {
-    const eventId = useEventStore((state) => state.eventId);
+    const eventId = useAuthStore((state) => state.user?.currentEventId);
 
     return (
         <Tab.Navigator
