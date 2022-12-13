@@ -15,7 +15,7 @@ function MapScreen({ navigation }: ComponentProps) {
     const [location, setLocation] = useState<LocationObject | null>({
         coords: {
             latitude: 49.877616,
-            longitude: 8.652653,
+            longitude: 8.652653
         },
     });
     const token = useToken();
@@ -51,24 +51,16 @@ function MapScreen({ navigation }: ComponentProps) {
                         latitudeDelta: 0.01,
                         longitudeDelta: 0.01,
                     }}
+                    showsUserLocation={true}
                     style={styles.map}
                 >
                     <>
-                        <Marker
-                            key={1}
-                            coordinate={{
-                                latitude: location.coords.latitude,
-                                longitude: location.coords.longitude,
-                            }}
-                            title="Your position"
-                            pinColor="orange"
-                        />
                         {events.map((el: any) => (
                             <Marker
                                 key={el.id}
                                 coordinate={{
-                                    latitude: el.lat,
-                                    longitude: el.lon,
+                                    latitude: parseFloat(el.lat),
+                                    longitude: parseFloat(el.lon),
                                 }}
                                 title={el.name}
                                 pinColor="teal"
