@@ -104,6 +104,7 @@ export const useAuthStore = createStore<State>('auth')(
                 set((state) => {
                     if (!state.user) {
                         console.warn('No current user stored, cannot clear event ID');
+                        return;
                     }
                     state.user.currentEventId = null;
                 });
