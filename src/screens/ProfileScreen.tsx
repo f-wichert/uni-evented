@@ -1,128 +1,60 @@
 import React from 'react';
-import { Dimensions, Image, SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { useAuthStore } from '../state/auth';
+import { ScrollView, StyleSheet, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { Cell, Section, TableView } from 'react-native-tableview-simple';
+import Button from '../components/Button';
 
-function getUserData() {
-    return {
-        profilePicture:
-            'https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=745&q=80',
-    };
-}
+import ProfileHeader from '../components/ProfileHeader';
+import Separator from '../components/Separator';
 
-function ProfileScreen(props) {
-    const userData = getUserData();
+import { useAuthStore, useCurrentUser } from '../state/auth';
+
+export default function ProfileScreen() {
+    const user = useCurrentUser();
     const signout = useAuthStore((state) => state.signout);
 
     return (
-        // <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <View>
+        <SafeAreaView>
             <View style={styles.profileHeader}>
-                <Image style={styles.profilePicture} source={{ uri: userData.profilePicture }} />
-                <Text
-                    style={{
-                        paddingTop: 20,
-                        fontSize: 30,
-                    }}
-                >
-                    Myself
-                </Text>
+                <ProfileHeader
+                    imageUri="https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=745&q=80"
+                    displayName={user.displayName}
+                    username={user.username}
+                />
             </View>
-            {/* <View style={styles.optionsBody}>
-                <View style={styles.optionSection}>
-                    <View style={styles.optionSectionBody}>
-                        <Text style={styles.optionText}>Logout</Text>
-                    </View>
+
+            <Separator color="black" />
+            <ScrollView style={styles.tableContainer}>
+                <TableView style={styles.table}>
+                    <Section>
+                        <Cell title="Option 1" />
+                        <Cell title="Option 2" />
+                        <Cell title="Option 3" />
+                        <Cell title="Option 4" />
+                        <Cell title="Option 5" />
+                    </Section>
+                </TableView>
+
+                <View style={styles.logoutContainer}>
+                    <Button text="Logout" onPress={signout} />
                 </View>
-                <View style={{...styles.optionSection, borderBottomWidth: 1}}>
-                    <View style={styles.optionSectionBody}>
-                        <Text style={styles.optionText}>Logout</Text>
-                    </View>
-                </View>
-            </View> */}
-            <SafeAreaView style={styles.optionsBody}>
-                <ScrollView style={styles.scrollView}>
-                    <View style={styles.optionSection}>
-                        <View style={styles.optionSectionBody}>
-                            <Text style={styles.optionText}>Option 2</Text>
-                        </View>
-                    </View>
-                    <View style={styles.optionSection}>
-                        <View style={styles.optionSectionBody}>
-                            <Text style={styles.optionText}>Option 3</Text>
-                        </View>
-                    </View>
-                    <View style={styles.optionSection}>
-                        <View style={styles.optionSectionBody}>
-                            <Text style={styles.optionText}>Option 4</Text>
-                        </View>
-                    </View>
-                    <View style={styles.optionSection}>
-                        <View style={styles.optionSectionBody}>
-                            <Text style={styles.optionText}>Other Option 1</Text>
-                        </View>
-                    </View>
-                    <View style={styles.optionSection}>
-                        <View style={styles.optionSectionBody}>
-                            <Text style={styles.optionText}>Other Option 2</Text>
-                        </View>
-                    </View>
-                    <View style={{ ...styles.optionSection, borderBottomWidth: 1 }}>
-                        <View style={styles.optionSectionBody}>
-                            <Text
-                                style={styles.optionText}
-                                onPress={() => {
-                                    signout();
-                                }}
-                            >
-                                Logout
-                            </Text>
-                        </View>
-                    </View>
-                </ScrollView>
-            </SafeAreaView>
-        </View>
+            </ScrollView>
+        </SafeAreaView>
     );
 }
 
 const styles = StyleSheet.create({
-    profileHeader: {
-        width: Dimensions.get('window').width,
-        height: 350,
-        marginTop: 80,
-        justifyContent: 'center',
-        alignItems: 'center',
-        // backgroundColor: 'green'
+    tableContainer: {
+        height: '100%',
     },
-    profilePicture: {
-        width: 200,
-        height: 200,
-        borderRadius: 100,
-    },
-    optionsBody: {
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    optionSection: {
+    table: {
         width: '100%',
-        height: 50,
-        paddingLeft: 8,
-        borderTopWidth: 1,
-        borderColor: '#e3e3e3',
-        justifyContent: 'center',
     },
-    optionSectionBody: {
-        marginVertical: 5,
-        justifyContent: 'center',
+    profileHeader: {
+        marginTop: 40,
+        marginBottom: 20,
     },
-    optionText: {
-        fontSize: 16,
-    },
-    scrollView: {
-        width: '95%',
-    },
-    text: {
-        fontSize: 42,
+    logoutContainer: {
+        alignItems: 'center',
     },
 });
-
-export default ProfileScreen;

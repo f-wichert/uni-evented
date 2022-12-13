@@ -135,7 +135,7 @@ useAuthStore.subscribe(
     { fireImmediately: true }
 );
 
-export function useUser() {
+export function useCurrentUser() {
     const token = useAuthStore((state) => state.token);
     if (!token) throw new Error('No token stored.');
 

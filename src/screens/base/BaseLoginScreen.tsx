@@ -1,7 +1,8 @@
 import { Ionicons } from '@expo/vector-icons';
-import { Image, StyleSheet, Text, TextInput, TouchableHighlight, View } from 'react-native';
+import { Image, StyleSheet, Text, TextInput, View } from 'react-native';
 
 import yellowSplash from '../../../assets/yellow_splash.png';
+import Button from '../../components/Button';
 import { IoniconsName } from '../../types';
 
 interface ComponentProps {
@@ -55,9 +56,7 @@ export default function BaseLoginScreen({ fields, submitButton, header, footer }
                     );
                 })}
 
-                <TouchableHighlight style={styles.submitButton} onPress={submitButton.callback}>
-                    <Text style={styles.submitButtonText}>{submitButton.text}</Text>
-                </TouchableHighlight>
+                <Button text={submitButton.text} onPress={submitButton.callback} />
             </View>
 
             <View style={styles.infoBlock}>
@@ -143,18 +142,6 @@ const styles = StyleSheet.create({
     input: {
         height: '100%',
         width: '100%',
-    },
-    submitButton: {
-        width: 110,
-        height: 40,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#D9B611',
-        borderRadius: 20,
-    },
-    submitButtonText: {
-        fontSize: 18,
-        fontWeight: 'bold',
     },
     subtitleText: {
         fontSize: 15,
