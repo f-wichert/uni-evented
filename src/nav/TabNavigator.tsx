@@ -1,5 +1,5 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { BottomTabScreenProps, createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { BottomTabScreenProps, createBottomTabNavigator, BottomTabBar } from '@react-navigation/bottom-tabs';
 import { CompositeScreenProps } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import React, { useContext } from 'react';
@@ -33,11 +33,12 @@ export type TabPropsFor<T extends keyof TabNavigatorParams> = CompositeScreenPro
 
 export const Tab = createBottomTabNavigator<TabNavigatorParams>();
 
-export default function TabNavigator() {
+export default function TabNavigator(props) {
     const { state } = useContext(EventContext);
 
     return (
         <Tab.Navigator
+            // tabBar={props => <BottomTabBar {...props} state={{...props.state, routes: props.state.routes.slice(0,4)}}></BottomTabBar>}
             screenOptions={({ route }) => ({
                 tabBarIcon: ({ focused, color, size }) => {
                     let iconName: IoniconsName;
@@ -69,7 +70,7 @@ export default function TabNavigator() {
             <Tab.Screen name="Discover" component={DiscoverScreen} />
             <Tab.Screen name="Map" component={MapScreen} />
             <Tab.Screen name="Events" component={EventsScreen} />
-            <Tab.Screen name="Profile" component={ProfileScreen} />
+            <Tab.Screen name="Profile" component={ProfileScreen} options={{ headerShown: false }}/>
 
             {state.eventId ? (
                 <Tab.Screen name="Event" component={ViewEventScreen} />
