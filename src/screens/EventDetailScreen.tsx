@@ -3,7 +3,6 @@ import React, { useContext, useState } from 'react';
 import { Button, StyleSheet, Text, View } from 'react-native';
 import { max } from 'react-native-reanimated';
 import VideoCamera from '../components/VideoCamera';
-import { EventContext } from '../contexts/eventContext';
 import {Props} from '../types'
 import { Tag } from '../components/Tag';
 
@@ -15,12 +14,9 @@ function EventDetailScreen() {
     //       <Text>Details Screen</Text>
     //     </View>
     //   );
-    const { closeEvent } = useContext(EventContext);
     const [cameraActive, setCameraActive] = useState(false);
 
-    const { state } = useContext(EventContext); // Use this as a way to get event ID untill it can properly be parsed via props param
-
-    console.log(state.eventId);
+    const eventID = 0 // TODO: Mock Value. Replace with real value once this part gets connected
 
     // Developement Values TODO: replace with request to real ones
     let event = {
