@@ -1,13 +1,13 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { NavigationProp, ParamListBase } from '@react-navigation/native';
 import React, { useEffect, useState } from 'react';
-import { Dimensions, StyleSheet, View, Text } from 'react-native';
+import { Dimensions, StyleSheet, Text, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import Carousel from 'react-native-reanimated-carousel';
 
 import ImageDiscover from '../components/ImageDiscover';
 import VideoDiscover from '../components/VideoDiscover';
-import config from '../config';
+import { MediaManager } from '../models';
 import { getToken } from '../state/auth';
 import { ExtendedMedia, Media } from '../types';
 import { asyncHandler, request } from '../util';
@@ -24,19 +24,13 @@ function DiscoverScreen({ navigation }: Props) {
         const data = responseData.media as Media[];
         const media: ExtendedMedia[] = data
             .filter((el) => el.fileAvailable)
-            .map((el) => {
-                const file = el.type == 'image' ? 'high.jpg' : 'index.m3u8';
-                return {
-                    ...el,
-                    src: `${config.BASE_URL}/media/${el.type}/${el.id}/${file}`,
-                };
-            });
+            .map((el) => ({ ...el, src: MediaManager.src(el, 'high') }));
         setMedia(media);
     }
 
     const width = Dimensions.get('window').width;
     // var height = Dimensions.get('window').height;
-    var height = 700
+    var height = 700;
 
     useEffect(() => {
         // Use `setOptions` to update the button that we previously specified
@@ -61,45 +55,39 @@ function DiscoverScreen({ navigation }: Props) {
 
     return (
         <View style={styles.container}>
-            { media.length == 0 ? (
-            <View style={styles.sadContainer}>
-                <Ionicons
-                    name="sad-outline"
-                    size={50}
-                    color="black"
-                    style={styles.sadIcon}
-                />
-                <Text style={styles.sadText}>Seems like there are no clips right now...</Text>
-            </View>
+            {media.length == 0 ? (
+                <View style={styles.sadContainer}>
+                    <Ionicons name="sad-outline" size={50} color="black" style={styles.sadIcon} />
+                    <Text style={styles.sadText}>Seems like there are no clips right now...</Text>
+                </View>
             ) : (
-            <GestureHandlerRootView>
-                <Carousel
-                    vertical={true}
-                    width={width}
-                    height={700}
-                    autoPlay={false}
-                    loop={false}
-                    data={media}
-                    scrollAnimationDuration={450}
-                    renderItem={({ item, index }) => (
-                        <>
-                            {item.type === 'video' ? (
-                                <VideoDiscover
-                                    discoverData={media[index]}
-                                    navigation={navigation}
-                                />
-                            ) : (
-                                <ImageDiscover
-                                    discoverData={media[index]}
-                                    navigation={navigation}
-                                />
-                            )}
-                        </>
-                    )}
-                />
-            </GestureHandlerRootView>
-            )
-            }
+                <GestureHandlerRootView>
+                    <Carousel
+                        vertical={true}
+                        width={width}
+                        height={700}
+                        autoPlay={false}
+                        loop={false}
+                        data={media}
+                        scrollAnimationDuration={450}
+                        renderItem={({ item, index }) => (
+                            <>
+                                {item.type === 'video' ? (
+                                    <VideoDiscover
+                                        discoverData={media[index]}
+                                        navigation={navigation}
+                                    />
+                                ) : (
+                                    <ImageDiscover
+                                        discoverData={media[index]}
+                                        navigation={navigation}
+                                    />
+                                )}
+                            </>
+                        )}
+                    />
+                </GestureHandlerRootView>
+            )}
         </View>
     );
 }
@@ -116,11 +104,11 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     sadIcon: {
-        marginBottom: 20
+        marginBottom: 20,
     },
     sadText: {
-        fontSize: 20
-    }
+        fontSize: 20,
+    },
 });
 
 export default DiscoverScreen;

@@ -1,128 +1,90 @@
-import React from 'react';
-import { Dimensions, Image, SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { useAuthStore } from '../state/auth';
+import { Ionicons } from '@expo/vector-icons';
+import React, { useCallback } from 'react';
+import { Alert, ScrollView, StyleSheet, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { Cell, Section, TableView } from 'react-native-tableview-simple';
 
-function getUserData() {
-    return {
-        profilePicture:
-            'https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=745&q=80',
-    };
-}
+import ProfileHeader from '../components/ProfileHeader';
+import Separator from '../components/Separator';
+import { useAuthStore, useCurrentUser } from '../state/auth';
+import { IoniconsName } from '../types';
 
-function ProfileScreen(props) {
-    const userData = getUserData();
+export default function ProfileScreen() {
+    const user = useCurrentUser();
     const signout = useAuthStore((state) => state.signout);
 
+    const confirmLogout = useCallback(() => {
+        Alert.alert('Confirm Logout', 'Are you sure that you want to log out?', [
+            {
+                text: 'Cancel',
+                style: 'cancel',
+            },
+            { text: 'Confirm', style: 'destructive', onPress: signout },
+        ]);
+    }, [signout]);
+
+    const getCellIcon = (name: IoniconsName) => <Ionicons name={name} size={27} />;
+
     return (
-        // <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <View>
+        <SafeAreaView>
             <View style={styles.profileHeader}>
-                <Image style={styles.profilePicture} source={{ uri: userData.profilePicture }} />
-                <Text
-                    style={{
-                        paddingTop: 20,
-                        fontSize: 30,
-                    }}
-                >
-                    Myself
-                </Text>
+                <ProfileHeader
+                    imageUri="https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=745&q=80"
+                    displayName={user.displayName}
+                    username={user.username}
+                />
             </View>
-            {/* <View style={styles.optionsBody}>
-                <View style={styles.optionSection}>
-                    <View style={styles.optionSectionBody}>
-                        <Text style={styles.optionText}>Logout</Text>
-                    </View>
-                </View>
-                <View style={{...styles.optionSection, borderBottomWidth: 1}}>
-                    <View style={styles.optionSectionBody}>
-                        <Text style={styles.optionText}>Logout</Text>
-                    </View>
-                </View>
-            </View> */}
-            <SafeAreaView style={styles.optionsBody}>
-                <ScrollView style={styles.scrollView}>
-                    <View style={styles.optionSection}>
-                        <View style={styles.optionSectionBody}>
-                            <Text style={styles.optionText}>Option 2</Text>
-                        </View>
-                    </View>
-                    <View style={styles.optionSection}>
-                        <View style={styles.optionSectionBody}>
-                            <Text style={styles.optionText}>Option 3</Text>
-                        </View>
-                    </View>
-                    <View style={styles.optionSection}>
-                        <View style={styles.optionSectionBody}>
-                            <Text style={styles.optionText}>Option 4</Text>
-                        </View>
-                    </View>
-                    <View style={styles.optionSection}>
-                        <View style={styles.optionSectionBody}>
-                            <Text style={styles.optionText}>Other Option 1</Text>
-                        </View>
-                    </View>
-                    <View style={styles.optionSection}>
-                        <View style={styles.optionSectionBody}>
-                            <Text style={styles.optionText}>Other Option 2</Text>
-                        </View>
-                    </View>
-                    <View style={{ ...styles.optionSection, borderBottomWidth: 1 }}>
-                        <View style={styles.optionSectionBody}>
-                            <Text
-                                style={styles.optionText}
-                                onPress={() => {
-                                    signout();
-                                }}
-                            >
-                                Logout
-                            </Text>
-                        </View>
-                    </View>
-                </ScrollView>
-            </SafeAreaView>
-        </View>
+
+            <Separator color="black" width="90%" />
+            <ScrollView style={styles.tableContainer} alwaysBounceVertical={false}>
+                <TableView style={styles.table}>
+                    <Section>
+                        <Cell
+                            image={getCellIcon('person-circle-outline')}
+                            title="Profile"
+                            accessory="DisclosureIndicator"
+                        />
+                        <Cell
+                            image={getCellIcon('earth-outline')}
+                            title="My Events"
+                            accessory="DisclosureIndicator"
+                        />
+                        <Cell
+                            image={getCellIcon('time-outline')}
+                            title="Visited Events"
+                            accessory="DisclosureIndicator"
+                        />
+                    </Section>
+                    <Section sectionPaddingTop={0}>
+                        <Cell
+                            image={getCellIcon('build-outline')}
+                            title="Manage Account"
+                            accessory="DisclosureIndicator"
+                        />
+                        <Cell
+                            image={getCellIcon('exit-outline')}
+                            title="Logout"
+                            onPress={confirmLogout}
+                        />
+                    </Section>
+                </TableView>
+            </ScrollView>
+        </SafeAreaView>
     );
 }
 
 const styles = StyleSheet.create({
-    profileHeader: {
-        width: Dimensions.get('window').width,
-        height: 350,
-        marginTop: 80,
-        justifyContent: 'center',
-        alignItems: 'center',
-        // backgroundColor: 'green'
+    tableContainer: {
+        height: '100%',
     },
-    profilePicture: {
-        width: 200,
-        height: 200,
-        borderRadius: 100,
-    },
-    optionsBody: {
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    optionSection: {
+    table: {
         width: '100%',
-        height: 50,
-        paddingLeft: 8,
-        borderTopWidth: 1,
-        borderColor: '#e3e3e3',
-        justifyContent: 'center',
     },
-    optionSectionBody: {
-        marginVertical: 5,
-        justifyContent: 'center',
+    profileHeader: {
+        marginTop: 40,
+        marginBottom: 20,
     },
-    optionText: {
-        fontSize: 16,
-    },
-    scrollView: {
-        width: '95%',
-    },
-    text: {
-        fontSize: 42,
+    logoutContainer: {
+        alignItems: 'center',
     },
 });
-
-export default ProfileScreen;

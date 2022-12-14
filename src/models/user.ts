@@ -9,7 +9,7 @@ export interface UserResponse extends JSONObject {
 export interface User {
     readonly id: string;
     readonly username: string;
-    readonly displayName: string;
+    readonly displayName: string | null;
 }
 
 export interface CurrentUser extends User {
