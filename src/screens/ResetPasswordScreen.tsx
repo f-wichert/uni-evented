@@ -39,8 +39,7 @@ export default function ResetPasswordScreen({ navigation }: ComponentProps) {
             }}
             header={{
                 title: 'Reset Password',
-                subTitle:
-                    'Please enter your email address. You will recieve a futher instructions.',
+                subTitle: 'Please enter your email address to recieve further instructions.',
             }}
             footer={[
                 {

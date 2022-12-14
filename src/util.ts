@@ -1,4 +1,5 @@
 import Constants from 'expo-constants';
+import urlJoin from 'url-join';
 
 import config from './config';
 import { JSONObject } from './types';
@@ -14,8 +15,8 @@ export async function request(
     token: string | null | undefined,
     data?: JSONObject | FormData
 ): Promise<JSONObject> {
-    // TODO: join url parts properly and fix double slashes
-    const url = `${config.BASE_URL}/api/${route}`;
+    // join given route to base url, removing leading `/` if exists
+    const url = urlJoin(config.BASE_URL, 'api', route.replace(/^\//, ''));
 
     const headers: Record<string, string> = { ...baseHeaders };
     if (token) {
@@ -44,20 +45,26 @@ export async function request(
     return (await response.json()) as JSONObject;
 }
 
+export interface ErrorHandlerParams {
+    prefix?: string;
+}
+
+export function handleError(e: unknown, opts: ErrorHandlerParams = {}): void {
+    let errStr = config.NODE_ENV === 'production' ? 'An error occurred' : `${e}`;
+    if (opts.prefix) {
+        errStr = `${opts.prefix}:\n${errStr}`;
+    }
+    toast.show(errStr, { type: 'danger' });
+    console.error(e, e instanceof Error ? e.stack : undefined);
+}
+
 // Used for passing async functions to react event handlers like `onPress`.
 // Automatically displays toast on screen in case of error.
 export function asyncHandler<Args extends unknown[]>(
     handler: (...args: Args) => Promise<void>,
-    opts: { prefix?: string } = {}
+    opts: ErrorHandlerParams = {}
 ): (...args: Args) => void {
     return (...args) => {
-        handler(...args).catch((e) => {
-            let errStr = config.NODE_ENV === 'production' ? 'An error occurred' : `${e}`;
-            if (opts.prefix) {
-                errStr = `${opts.prefix}:\n${errStr}`;
-            }
-            toast.show(errStr, { type: 'danger' });
-            console.error(e, e instanceof Error ? e.stack : undefined);
-        });
+        handler(...args).catch((e) => handleError(e, opts));
     };
 }

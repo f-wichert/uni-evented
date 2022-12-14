@@ -6,7 +6,6 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import ToastRoot from './components/ToastRoot';
 import TabNavigator from './nav/TabNavigator';
-import CreateEventScreen from './screens/CreateEventScreen';
 import LoadingScreen from './screens/LoadingScreen';
 import LoginScreen from './screens/LoginScreen';
 import RegisterScreen from './screens/RegisterScreen';
@@ -84,11 +83,6 @@ function App() {
                     name="TabScreen"
                     component={TabNavigator}
                     options={{ headerShown: false, animation: 'fade' }}
-                />
-                <Stack.Screen
-                    name="CreateEventScreen"
-                    component={CreateEventScreen}
-                    options={{ headerShown: false }}
                 />
             </>
         );
