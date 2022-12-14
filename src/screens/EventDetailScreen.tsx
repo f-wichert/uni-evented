@@ -29,16 +29,6 @@ function EventDetailScreen() {
     return eventData ? run(eventData) : <Text>Placeholder</Text>;
 
 
-    // useEffect(run, eventData)
-
-
-        //     return  (async () => {
-        //     eventData = EventManager.fromId(eventID!) as Event
-        //     console.log('Event:', eventData);
-        //     loaded = true;
-        //     return eventData
-        // }).then(run(eventData))
-
     function getProfilePicture() {
         return {
             profilePicture:
@@ -52,14 +42,14 @@ function EventDetailScreen() {
             title: data.name,
             tags: [{name:'Beer', color:'orange'}, {name:'Rave', color:'green'}, {name:'Techno',color:'red'}],
             numberOfAttendants: data.users!.length,
-            startingTime: '19:00',
+            startingTime: data.startDate.valueOf() ? data.startDate.toString() : '19:00',
             endingTime: '23:30',
             address: 'Schloßgartenstraße, 64289 Darmstadt',
             musicStyle: 'Techno',
             rating: 4,
             description: 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum.'
         }
-        console.log('Time', data.startDate)
+        console.log('Time: ', data.startDate)
         
         return (
             <SafeAreaView style={{display:'flex'}}>
@@ -126,7 +116,6 @@ function EventDetailScreen() {
 
       const styles = StyleSheet.create({
         container: {
-            
             alignItems: 'center',
         },
         column: {
