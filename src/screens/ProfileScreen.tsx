@@ -3,11 +3,10 @@ import React from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Cell, Section, TableView } from 'react-native-tableview-simple';
-import Button from '../components/Button';
 
+import Button from '../components/Button';
 import ProfileHeader from '../components/ProfileHeader';
 import Separator from '../components/Separator';
-
 import { useAuthStore, useCurrentUser } from '../state/auth';
 import { IoniconsName } from '../types';
 
@@ -15,7 +14,7 @@ export default function ProfileScreen() {
     const user = useCurrentUser();
     const signout = useAuthStore((state) => state.signout);
 
-    const getCellIcon = (name: IoniconsName) => <Ionicons name={name} size={29} />;
+    const getCellIcon = (name: IoniconsName) => <Ionicons name={name} size={27} />;
 
     return (
         <SafeAreaView>
@@ -32,19 +31,24 @@ export default function ProfileScreen() {
                 <TableView style={styles.table}>
                     <Section>
                         <Cell
-                            image={getCellIcon('create-outline')}
+                            image={getCellIcon('person-circle-outline')}
                             title="Profile"
                             accessory="DisclosureIndicator"
                         />
                         <Cell
-                            image={getCellIcon('time-outline')}
+                            image={getCellIcon('earth-outline')}
                             title="My Events"
+                            accessory="DisclosureIndicator"
+                        />
+                        <Cell
+                            image={getCellIcon('time-outline')}
+                            title="Visited Events"
                             accessory="DisclosureIndicator"
                         />
                     </Section>
                     <Section sectionPaddingTop={0}>
                         <Cell
-                            image={getCellIcon('cog-outline')}
+                            image={getCellIcon('build-outline')}
                             title="Manage Account"
                             accessory="DisclosureIndicator"
                         />
