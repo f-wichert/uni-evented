@@ -36,7 +36,7 @@ function EventDetailScreen({ route }) {
 
     console.log(`Data: ${JSON.stringify(eventData)}`);
     
-    return eventData ? run(eventData) : <Text>Placeholder</Text>;
+    return eventData ? run(eventData) : <View style={{display:'flex', justifyContent:'center',alignContent:'center'}}><Text>Placeholder</Text></View>;
 
 
     function registerUserArrivalAtEvent() {
