@@ -19,7 +19,7 @@ import CreateEventScreenStack from './CreateEventScreenStack';
 export type TabNavigatorParams = {
     Discover: undefined;
     Map: undefined;
-    Events: undefined;
+    Events: { eventId?: string };
     Profile: undefined;
     Event: undefined;
     Create: undefined;
