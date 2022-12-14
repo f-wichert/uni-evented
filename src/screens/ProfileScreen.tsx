@@ -1,10 +1,9 @@
 import { Ionicons } from '@expo/vector-icons';
-import React from 'react';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import React, { useCallback } from 'react';
+import { Alert, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Cell, Section, TableView } from 'react-native-tableview-simple';
 
-import Button from '../components/Button';
 import ProfileHeader from '../components/ProfileHeader';
 import Separator from '../components/Separator';
 import { useAuthStore, useCurrentUser } from '../state/auth';
@@ -13,6 +12,16 @@ import { IoniconsName } from '../types';
 export default function ProfileScreen() {
     const user = useCurrentUser();
     const signout = useAuthStore((state) => state.signout);
+
+    const confirmLogout = useCallback(() => {
+        Alert.alert('Confirm Logout', 'Are you sure that you want to log out?', [
+            {
+                text: 'Cancel',
+                style: 'cancel',
+            },
+            { text: 'Confirm', style: 'destructive', onPress: signout },
+        ]);
+    }, [signout]);
 
     const getCellIcon = (name: IoniconsName) => <Ionicons name={name} size={27} />;
 
@@ -52,12 +61,13 @@ export default function ProfileScreen() {
                             title="Manage Account"
                             accessory="DisclosureIndicator"
                         />
+                        <Cell
+                            image={getCellIcon('exit-outline')}
+                            title="Logout"
+                            onPress={confirmLogout}
+                        />
                     </Section>
                 </TableView>
-
-                <View style={styles.logoutContainer}>
-                    <Button text="Logout" onPress={signout} />
-                </View>
             </ScrollView>
         </SafeAreaView>
     );
