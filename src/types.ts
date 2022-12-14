@@ -9,7 +9,7 @@ export type IoniconsName = IconName<typeof Ionicons>;
 export type JSONValue = string | number | boolean | JSONObject | JSONValue[] | null;
 
 export type Props = {
-    any:any;
+    any: any;
     navigation: NavigationProp<ParamListBase>;
 };
 
