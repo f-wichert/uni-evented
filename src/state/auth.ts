@@ -93,7 +93,7 @@ export const useAuthStore = createStore<State>('auth')(
                     eventId: data.eventId,
                     lat: 0,
                     lon: 0,
-                })
+                });
 
                 set((state) => {
                     if (!state.user) {

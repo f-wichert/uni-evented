@@ -1,6 +1,5 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { DateTimePickerAndroid, DateTimePickerEvent } from '@react-native-community/datetimepicker';
-import * as Location from 'expo-location';
 import React, { useState } from 'react';
 import {
     Button,
@@ -247,7 +246,7 @@ function CreateEventScreen(props) {
                 </View>
             </View>
 
-            <Button color="orange" title="Create event!" onPress={onCreateButton}/>
+            <Button color="orange" title="Create event!" onPress={onCreateButton} />
         </View>
     );
 }

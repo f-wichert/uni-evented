@@ -49,7 +49,9 @@ function MapScreen({ navigation }: ComponentProps) {
                         name="refresh-outline"
                         size={32}
                         color="black"
-                        onPress={asyncHandler(updateEventList, { prefix: 'Failed to update media' })}
+                        onPress={asyncHandler(updateEventList, {
+                            prefix: 'Failed to update media',
+                        })}
                         style={{
                             marginRight: 10,
                         }}
