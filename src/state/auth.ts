@@ -89,6 +89,12 @@ export const useAuthStore = createStore<State>('auth')(
                 });
                 console.debug('createEvent response:', data);
 
+                await request('POST', '/event/join', getToken(), {
+                    eventId: data.eventId,
+                    lat: 0,
+                    lon: 0,
+                })
+
                 set((state) => {
                     if (!state.user) {
                         console.warn('No current user stored, cannot set event ID');
