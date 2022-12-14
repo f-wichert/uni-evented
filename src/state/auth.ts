@@ -3,7 +3,7 @@ import { LatLng } from 'react-native-maps';
 import { persist, StateStorage } from 'zustand/middleware';
 
 import { CurrentUser } from '../models';
-import { request } from '../util';
+import { handleError, request } from '../util';
 import { createStore } from './utils/createStore';
 
 interface State {
@@ -64,11 +64,8 @@ export const useAuthStore = createStore<State>('auth')(
                 });
             },
             reset: async (params) => {
-                const data = await request('POST', '/auth/reset', null, params);
-                // console.log(JSON.stringify(data));
-                // if (data.responseCode == '10') {
+                await request('POST', '/auth/reset', null, params);
 
-                // }
                 set((state) => {
                     state.token = null;
                 });
@@ -93,6 +90,12 @@ export const useAuthStore = createStore<State>('auth')(
                 });
                 console.debug('createEvent response:', data);
 
+                await request('POST', '/event/join', getToken(), {
+                    eventId: data.eventId,
+                    lat: 0,
+                    lon: 0,
+                });
+
                 set((state) => {
                     if (!state.user) {
                         console.warn('No current user stored, cannot set event ID');
@@ -105,14 +108,19 @@ export const useAuthStore = createStore<State>('auth')(
                 set((state) => {
                     if (!state.user) {
                         console.warn('No current user stored, cannot clear event ID');
+                        return;
                     }
                     state.user.currentEventId = null;
                 });
             },
             joinEvent: async (params) => {
                 console.log(JSON.stringify(params));
-                
-                const joinedEvent = await request('post', '/event/join', getToken(), { eventId: params.eventId, lon: 0, lat: 0 });
+
+                const joinedEvent = await request('post', '/event/join', getToken(), {
+                    eventId: params.eventId,
+                    lon: 0,
+                    lat: 0,
+                });
 
                 set((state) => {
                     if (!state.user) {
@@ -120,7 +128,7 @@ export const useAuthStore = createStore<State>('auth')(
                     }
                     state.user.currentEventId = params.eventId;
                 });
-            }
+            },
         }),
         {
             name: 'auth',
@@ -134,20 +142,31 @@ useAuthStore.subscribe(
     (state) => state.token,
     (token) => {
         // TODO: this might be bad practice: https://github.com/pmndrs/zustand/discussions/1363#discussioncomment-3874571
-        // TODO: error handling
+
+        // clear stored user if token changed
         useAuthStore.setState((state) => {
-            // clear stored user if token changed
             state.user = null;
-            // start fetching user data if there's a new token
-            if (token) {
-                void state.fetchUser();
-            }
         });
+
+        // start fetching user data if there's a new token
+        if (token) {
+            useAuthStore
+                .getState()
+                .fetchUser()
+                .catch((e) => {
+                    handleError(e, { prefix: 'Failed to retrieve user data' });
+                    // reset token if we failed to fetch the user data
+                    // TODO: show a 'try again' button instead
+                    useAuthStore.setState((state) => {
+                        state.token = null;
+                    });
+                });
+        }
     },
     { fireImmediately: true }
 );
 
-export function useUser() {
+export function useCurrentUser() {
     const token = useAuthStore((state) => state.token);
     if (!token) throw new Error('No token stored.');
 
