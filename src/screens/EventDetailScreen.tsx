@@ -1,20 +1,43 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { Image, StyleSheet, Text, View, Pressable, SafeAreaView, ScrollView } from 'react-native';
 import { max } from 'react-native-reanimated';
 import VideoCamera from '../components/VideoCamera';
 import {Props} from '../types'
 import { Tag } from '../components/Tag';
-import { useAuthStore } from '../state/auth';
+import { useAuthStore, getToken } from '../state/auth';
 import { Rating, AirbnbRating } from 'react-native-ratings';
+import { JSONObject } from '../types';
+import { EventManager, Event } from '../models/event';
 
-import { asyncHandler } from '../util';
+import { request, asyncHandler } from '../util';
 
 function EventDetailScreen() {
     const [cameraActive, setCameraActive] = useState(false);
 
     const eventID = useAuthStore((state) => state.user?.currentEventId) // Get event ID of current event of currently logged in user
-    console.log(eventID)
+    console.log('Event ID: ',eventID)
+
+    let loaded = false;
+
+    // let eventData = {} as Event
+
+    const [eventData, setEventData] = useState<Event | null>(null);
+
+    useEffect(() => {EventManager.fromId(eventID!).then(setEventData)}, [])
+
+    return eventData ? run(eventData) : <Text>Placeholder</Text>;
+
+
+    // useEffect(run, eventData)
+
+
+        //     return  (async () => {
+        //     eventData = EventManager.fromId(eventID!) as Event
+        //     console.log('Event:', eventData);
+        //     loaded = true;
+        //     return eventData
+        // }).then(run(eventData))
 
     function getProfilePicture() {
         return {
@@ -24,74 +47,77 @@ function EventDetailScreen() {
     }
 
     // Developement Values TODO: replace with request to real ones
-    let event = {
-        title:'Herrengarten Rave',
-        tags: [{name:'Beer', color:'orange'}, {name:'Rave', color:'green'}, {name:'Techno',color:'red'}],
-        numberOfAttendants: 5,
-        startingTime: '19:00',
-        endingTime: '23:30',
-        address: 'Schloßgartenstraße, 64289 Darmstadt',
-        musicStyle: 'Techno',
-        rating: 4,
-        description: 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum.'
-    }
-    
-    return (
-        <SafeAreaView>
-            <ScrollView>
-                <View style={[styles.container]}>
-                    <View style={styles.camera}>
-                        <Ionicons
-                            name="camera"
-                            size={64}
-                            color="orange"
-                            onPress={() => setCameraActive(true)}
-                        />
-                        <Text>Load Picture/Video of event here</Text>
-                    </View>
-                    <View style={styles.TagArea}>
-                        {
-                            event.tags.map((tag) => <Tag style={{backgroundColor:tag.color}} key={tag.name}>{tag.name}</Tag>)
-                        }
-                    </View>
-                    <View style={styles.RatingArea}>
-                        <Rating/>
-                    </View>
-                    <View style={styles.InformationArea}>
-                            <View style={styles.TitleLine}>
-                                <Text style={{fontSize:25, fontWeight:'bold', maxWidth:'70%'}}>{event.title}</Text>
-                                <View style={{display:'flex',flexDirection:'row', alignItems:'center'}}>
-                                    <Ionicons name='people' size={28}/>
-                                    <Text style={{fontSize:25, fontWeight:'bold', marginLeft:2}}>{event.numberOfAttendants}</Text>
+    function run(data: Event) {
+        let event = {
+            title: data.name,
+            tags: [{name:'Beer', color:'orange'}, {name:'Rave', color:'green'}, {name:'Techno',color:'red'}],
+            numberOfAttendants: data.users!.length,
+            startingTime: '19:00',
+            endingTime: '23:30',
+            address: 'Schloßgartenstraße, 64289 Darmstadt',
+            musicStyle: 'Techno',
+            rating: 4,
+            description: 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum.'
+        }
+        console.log('Time', data.startDate)
+        
+        return (
+            <SafeAreaView style={{display:'flex'}}>
+                <ScrollView>
+                    <View style={[styles.container]}>
+                        <View style={styles.camera}>
+                            <Ionicons
+                                name="camera"
+                                size={64}
+                                color="orange"
+                                onPress={() => setCameraActive(true)}
+                            />
+                            <Text>Load Picture/Video of event here</Text>
+                        </View>
+                        <View style={styles.TagArea}>
+                            {
+                                event.tags.map((tag) => <Tag style={{backgroundColor:tag.color}} key={tag.name}>{tag.name}</Tag>)
+                            }
+                        </View>
+                        <View style={styles.RatingArea}>
+                            <Rating/>
+                        </View>
+                        <View style={styles.InformationArea}>
+                                <View style={styles.TitleLine}>
+                                    <Text style={{fontSize:25, fontWeight:'bold', maxWidth:'70%'}}>{event.title}</Text>
+                                    <View style={{display:'flex',flexDirection:'row', alignItems:'center'}}>
+                                        <Ionicons name='people' size={28}/>
+                                        <Text style={{fontSize:25, fontWeight:'bold', marginLeft:2}}>{event.numberOfAttendants}</Text>
+                                    </View>
+                                    <Image style={styles.ProfilePicture} source={{ uri: getProfilePicture().profilePicture }}/>
                                 </View>
-                                <Image style={styles.ProfilePicture} source={{ uri: getProfilePicture().profilePicture }}/>
+                            <View style={styles.GeneralInformationArea}>
+                                <View style={{maxWidth:'60%'}}>
+                                    <Text style={{color:'grey', fontSize:16}}>{event.startingTime}-{event.endingTime}</Text>
+                                    <Text style={{fontSize:18, fontWeight:'bold'}}>{event.address}</Text>
+                                </View>
+                                <View style={{display:'flex',flexDirection:'row', alignItems:'center', marginRight:13}}>
+                                    <Ionicons name='musical-notes-sharp' size={25}></Ionicons>
+                                    <Text style={{fontSize:23, fontWeight:'900'}}>{event.musicStyle}</Text>
+                                </View>
                             </View>
-                        <View style={styles.GeneralInformationArea}>
-                            <View style={{maxWidth:'60%'}}>
-                                <Text style={{color:'grey', fontSize:16}}>{event.startingTime}-{event.endingTime}</Text>
-                                <Text style={{fontSize:18, fontWeight:'bold'}}>{event.address}</Text>
-                            </View>
-                            <View style={{display:'flex',flexDirection:'row', alignItems:'center', marginRight:13}}>
-                                <Ionicons name='musical-notes-sharp' size={25}></Ionicons>
-                                <Text style={{fontSize:23, fontWeight:'900'}}>{event.musicStyle}</Text>
+                            <View style={styles.DescriptionArea}>
+                                <Text>{event.description}</Text>
                             </View>
                         </View>
-                        <View style={styles.DescriptionArea}>
-                            <Text>{event.description}</Text>
-                        </View>
-                    </View>
-                    <View style={styles.ChatArea}>
+                        <View style={styles.ChatArea}>
 
+                        </View>
+                        <View style={styles.IMHereButtonContainer}>
+                            <Pressable style={styles.IMHereButtonArea} onPress={registerUserArrivalAtEvent}>
+                                <Text style={styles.IMHereButton}> I'm Here!</Text>
+                            </Pressable>
+                        </View>
                     </View>
-                    <View style={styles.IMHereButtonContainer}>
-                        <Pressable style={styles.IMHereButtonArea} onPress={registerUserArrivalAtEvent}>
-                            <Text style={styles.IMHereButton}> I'm Here!</Text>
-                        </Pressable>
-                    </View>
-                </View>
-            </ScrollView>
-        </SafeAreaView>
-    );
+                </ScrollView>
+            </SafeAreaView>
+        );
+    }
 }
 
     function registerUserArrivalAtEvent() {
@@ -182,7 +208,7 @@ function EventDetailScreen() {
             alignSelf: 'stretch',
             justifyContent: 'center',
             padding:6,
-            backgroundColor:'lightgrey',
+            backgroundColor:'#eaeaea',
         },
         IMHereButtonArea: {
             display: 'flex',

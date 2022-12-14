@@ -100,7 +100,7 @@ export class EventManager {
 
     static async fromId(id: string) {
         const token = getToken();
-        const data = await request('GET', '/event/info', token, { eventId: id });
+        const data = await request('GET', `event/info/${id}`, token);
         return this.fromEventResponse(data as EventResponse);
     }
 
