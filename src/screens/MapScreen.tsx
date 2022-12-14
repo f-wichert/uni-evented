@@ -69,6 +69,7 @@ function MapScreen({ navigation }: ComponentProps) {
                                 }}
                                 title={el.name}
                                 pinColor="teal"
+                                onCalloutPress={() => {navigation.navigate('Events', { eventId: el.id })}}
                             />
                         ))}
                     </>

@@ -12,10 +12,15 @@ import { EventManager, Event } from '../models/event';
 
 import { request, asyncHandler } from '../util';
 
-function EventDetailScreen() {
+function EventDetailScreen({ route }) {
+    console.log(`ROUTE: ${route.params}`);
+    const { eventId } = route.params ? route.params : { eventId: null };
+    // const { eventId } = route.params
     const [cameraActive, setCameraActive] = useState(false);
+    const joinEvent = useAuthStore((state) => state.joinEvent);
 
-    const eventID = useAuthStore((state) => state.user?.currentEventId) // Get event ID of current event of currently logged in user
+    // const eventID = useAuthStore((state) => state.user?.currentEventId) // Get event ID of current event of currently logged in user
+    const eventID = eventId
     console.log('Event ID: ',eventID)
 
     let loaded = false;
@@ -24,8 +29,13 @@ function EventDetailScreen() {
 
     const [eventData, setEventData] = useState<Event | null>(null);
 
-    useEffect(() => {EventManager.fromId(eventID!).then(setEventData)}, [])
 
+    if (!eventData) {
+        EventManager.fromId(eventID!).then((e) => {setEventData(e)});
+    }
+
+    console.log(`Data: ${JSON.stringify(eventData)}`);
+    
     return eventData ? run(eventData) : <Text>Placeholder</Text>;
 
 
@@ -38,6 +48,10 @@ function EventDetailScreen() {
         //     loaded = true;
         //     return eventData
         // }).then(run(eventData))
+    function registerUserArrivalAtEvent() {
+        console.log(`You are now checked in at the Event (Mock Message, did nothing)`);
+        joinEvent({ eventId: eventID });
+    }
 
     function getProfilePicture() {
         return {
@@ -120,9 +134,7 @@ function EventDetailScreen() {
     }
 }
 
-    function registerUserArrivalAtEvent() {
-        console.log(`You are now checked in at the Event (Mock Message, did nothing)`)
-    }
+    
 
       const styles = StyleSheet.create({
         container: {
