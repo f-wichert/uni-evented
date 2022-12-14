@@ -7,9 +7,8 @@ import React from 'react';
 import { RootNavigatorParams } from '../App';
 
 import DiscoverScreen from '../screens/DiscoverScreen';
-import EventsScreen from '../screens/EventsScreen';
-import MapScreen from '../screens/MapScreen';
 import EventDetailScreen from '../screens/EventDetailScreen';
+import MapScreen from '../screens/MapScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import ViewEventScreen from '../screens/ViewEventScreen';
 import { useAuthStore } from '../state/auth';
@@ -20,7 +19,7 @@ import CreateEventScreenStack from './CreateEventScreenStack';
 export type TabNavigatorParams = {
     Discover: undefined;
     Map: undefined;
-    Events: undefined;
+    Events: { eventId?: string };
     Profile: undefined;
     Event: undefined;
     Create: undefined;
@@ -71,7 +70,7 @@ export default function TabNavigator() {
             <Tab.Screen name="Discover" component={DiscoverScreen} />
             <Tab.Screen name="Map" component={MapScreen} />
             <Tab.Screen name="Events" component={EventDetailScreen} />
-            <Tab.Screen name="Profile" component={ProfileScreen} options={{ headerShown: false }}/>
+            <Tab.Screen name="Profile" component={ProfileScreen} options={{ headerShown: false }} />
 
             {eventId ? (
                 <Tab.Screen name="Event" component={ViewEventScreen} />
