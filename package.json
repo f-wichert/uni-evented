@@ -41,6 +41,7 @@
         "react-native-web": "^0.18.10",
         "react-navigation": "^4.4.4",
         "recursive-diff": "^1.0.8",
+        "url-join": "^5.0.0",
         "zustand": "^4.1.5"
     },
     "devDependencies": {

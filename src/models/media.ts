@@ -1,3 +1,5 @@
+import urlJoin from 'url-join';
+
 import config from '../config';
 import { JSONObject } from '../types';
 
@@ -18,8 +20,8 @@ export interface Media {
 
 export class MediaManager {
     static src(media: Media, quality?: 'high' | 'medium' | 'low'): string {
-        const file = media.type == 'image' ? quality || 'high.jpg' : 'index.m3u8';
-        const path = `${config.BASE_URL}/media/${media.type}/${media.id}/${file}`;
+        const file = media.type == 'image' ? `${quality || 'high'}.jpg` : 'index.m3u8';
+        const path = urlJoin(config.BASE_URL, 'media', media.type, media.id, file);
         return path;
     }
 

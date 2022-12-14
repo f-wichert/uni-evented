@@ -1,4 +1,5 @@
 import Constants from 'expo-constants';
+import urlJoin from 'url-join';
 
 import config from './config';
 import { JSONObject } from './types';
@@ -14,8 +15,8 @@ export async function request(
     token: string | null | undefined,
     data?: JSONObject | FormData
 ): Promise<JSONObject> {
-    // TODO: join url parts properly and fix double slashes
-    const url = `${config.BASE_URL}/api/${route}`;
+    // join given route to base url, removing leading `/` if exists
+    const url = urlJoin(config.BASE_URL, 'api', route.replace(/^\//, ''));
 
     const headers: Record<string, string> = { ...baseHeaders };
     if (token) {
