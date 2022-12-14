@@ -23,6 +23,7 @@ interface State {
         endDate?: Date;
     }) => Promise<void>;
     closeEvent: () => void;
+    joinEvent: (params: { eventId: string }) => Promise<void>;
 }
 
 // TODO: show loading state while waiting for hydration: https://github.com/pmndrs/zustand/blob/main/docs/integrations/persisting-store-data.md#hydration-and-asynchronous-storages
@@ -108,6 +109,18 @@ export const useAuthStore = createStore<State>('auth')(
                     state.user.currentEventId = null;
                 });
             },
+            joinEvent: async (params) => {
+                console.log(JSON.stringify(params));
+                
+                const joinedEvent = await request('post', '/event/join', getToken(), { eventId: params.eventId, lon: 0, lat: 0 });
+
+                set((state) => {
+                    if (!state.user) {
+                        console.warn('No current user stored, cannot clear event ID');
+                    }
+                    state.user.currentEventId = params.eventId;
+                });
+            }
         }),
         {
             name: 'auth',
