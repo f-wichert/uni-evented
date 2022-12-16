@@ -38,7 +38,7 @@ export const useAuthStore = createStore<State>('auth')(
     persist(
         (set, get) => ({
             token: null,
-            // consider using `useUser()` instead
+            // consider using `useCurrentUser()` instead
             user: null,
 
             signin: async (params) => {
@@ -90,12 +90,12 @@ export const useAuthStore = createStore<State>('auth')(
                 });
                 console.debug('createEvent response:', data);
 
+                // TODO: creating an event shouldn't automatically make the host join it
                 await request('POST', '/event/join', getToken(), {
                     eventId: data.eventId,
                     lat: 0,
                     lon: 0,
                 });
-
                 set((state) => {
                     if (!state.user) {
                         console.warn('No current user stored, cannot set event ID');
@@ -116,7 +116,7 @@ export const useAuthStore = createStore<State>('auth')(
             joinEvent: async (params) => {
                 console.log(JSON.stringify(params));
 
-                const joinedEvent = await request('post', '/event/join', getToken(), {
+                await request('post', '/event/join', getToken(), {
                     eventId: params.eventId,
                     lon: 0,
                     lat: 0,
@@ -124,7 +124,8 @@ export const useAuthStore = createStore<State>('auth')(
 
                 set((state) => {
                     if (!state.user) {
-                        console.warn('No current user stored, cannot clear event ID');
+                        console.warn('No current user stored, cannot set event ID');
+                        return;
                     }
                     state.user.currentEventId = params.eventId;
                 });
