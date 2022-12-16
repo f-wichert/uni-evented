@@ -12,7 +12,6 @@ import MapScreen from '../screens/MapScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import { useAuthStore } from '../state/auth';
 import { IoniconsName } from '../types';
-import CreateEventScreenStack from './CreateEventScreenStack';
 
 // https://reactnavigation.org/docs/typescript/
 export type TabNavigatorParams = {
@@ -20,8 +19,6 @@ export type TabNavigatorParams = {
     Map: undefined;
     Events: { eventId?: string };
     Profile: undefined;
-    Event: undefined;
-    Create: undefined;
 };
 
 // https://reactnavigation.org/docs/typescript/#combining-navigation-props
@@ -70,12 +67,6 @@ export default function TabNavigator() {
             <Tab.Screen name="Map" component={MapScreen} />
             <Tab.Screen name="Events" component={EventScreenNavigator} />
             <Tab.Screen name="Profile" component={ProfileScreen} options={{ headerShown: false }} />
-
-            {eventId ? (
-                <Tab.Screen name="Event" component={EventScreenNavigator} />
-            ) : (
-                <Tab.Screen name="Create" component={CreateEventScreenStack} />
-            )}
         </Tab.Navigator>
     ); // Temporarily changed component of 'Events' to EventDetailScreen for easy acces during developement. Previous value: 'EventsScreen'
 }

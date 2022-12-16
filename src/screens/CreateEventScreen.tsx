@@ -37,7 +37,7 @@ const tags = [
 ] as const;
 type TagValue = typeof tags[number]['value'];
 
-function CreateEventScreen(props) {
+function CreateEventScreen({ navigation }) {
     const [name, setName] = useState('');
 
     // DatePickerState
@@ -56,10 +56,8 @@ function CreateEventScreen(props) {
 
     const createEvent = useAuthStore((state) => state.createEvent);
 
-    const recieveLocation = (loc) => {
-        // console.log(`location recieved: ${JSON.stringify(loc)}`);
+    const receiveLocation = (loc) => {
         setLocation(loc);
-        // console.log(`Assigend location: ${location}`);
     };
 
     const onChange = (event: DateTimePickerEvent, selectedDate?: Date) => {
@@ -110,22 +108,21 @@ function CreateEventScreen(props) {
     };
 
     const grabLocation = async () => {
-        console.log('Location grabbed');
-
-        props.navigation.navigate('MapPicker', {
-            returnLocation: recieveLocation,
+        navigation.navigate('MapPicker', {
+            returnLocation: receiveLocation,
         });
     };
 
     const onCreateButton = async () => {
         // TODO: require these to be non-empty in the UI
-        console.log(`name: ${name}`);
-        console.log(`loc: ${JSON.stringify(location)}`);
-
         if (!location || !name) {
             throw new Error('Invalid name or location');
         }
-        await createEvent({ name: name, location: location, startDate: start });
+        await createEvent({ name: name, location: location, startDate: start }).then((data) => {
+            navigation.navigate('EventDetailScreen', {
+                eventId: data,
+            });
+        });
     };
 
     return (
