@@ -4,7 +4,6 @@ import { LocationObject } from 'expo-location';
 import React, { useEffect, useState } from 'react';
 import { Dimensions, StyleSheet, TouchableOpacity, View } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
-import EventMarker from '../components/EventMarker';
 
 import { TabPropsFor } from '../nav/TabNavigator';
 import { getToken } from '../state/auth';

@@ -31,7 +31,19 @@ function EventDetailScreen({ route }: ComponentProps) {
 
     console.log('eventData:', eventData);
     if (!eventData) {
-        return <View style={{display:'flex', justifyContent:'center',alignItems:'center', alignSelf:'stretch', flex:1}}><Text style={{fontSize:30}}>Please select an Event</Text></View>;
+        return (
+            <View
+                style={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    alignSelf: 'stretch',
+                    flex: 1,
+                }}
+            >
+                <Text style={{ fontSize: 30 }}>Please select an Event</Text>
+            </View>
+        );
     }
 
     console.log(`Data: ${JSON.stringify(eventData)}`);
