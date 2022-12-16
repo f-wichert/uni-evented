@@ -7,10 +7,9 @@ import React from 'react';
 import { RootNavigatorParams } from '../App';
 
 import DiscoverScreen from '../screens/DiscoverScreen';
-import EventDetailScreen from '../screens/EventDetailScreen';
+import EventScreenNavigator from '../screens/EventScreenNavigator';
 import MapScreen from '../screens/MapScreen';
 import ProfileScreen from '../screens/ProfileScreen';
-import ViewEventScreen from '../screens/ViewEventScreen';
 import { useAuthStore } from '../state/auth';
 import { IoniconsName } from '../types';
 import CreateEventScreenStack from './CreateEventScreenStack';
@@ -69,11 +68,11 @@ export default function TabNavigator() {
         >
             <Tab.Screen name="Discover" component={DiscoverScreen} />
             <Tab.Screen name="Map" component={MapScreen} />
-            <Tab.Screen name="Events" component={EventDetailScreen} />
+            <Tab.Screen name="Events" component={EventScreenNavigator} />
             <Tab.Screen name="Profile" component={ProfileScreen} options={{ headerShown: false }} />
 
             {eventId ? (
-                <Tab.Screen name="Event" component={ViewEventScreen} />
+                <Tab.Screen name="Event" component={EventScreenNavigator} />
             ) : (
                 <Tab.Screen name="Create" component={CreateEventScreenStack} />
             )}

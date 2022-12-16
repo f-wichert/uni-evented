@@ -1,7 +1,10 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
+import { TabPropsFor } from '../nav/TabNavigator';
 
-function EventsScreen() {
+type ComponentProps = TabPropsFor<'Events'>;
+
+function EventsScreen({ navigation }: ComponentProps) {
     return (
         <View>
             <Text>Hi</Text>

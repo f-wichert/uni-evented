@@ -2,7 +2,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import * as Location from 'expo-location';
 import { LocationObject } from 'expo-location';
 import React, { useEffect, useState } from 'react';
-import { Dimensions, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Dimensions, StyleSheet, View } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 
 import { TabPropsFor } from '../nav/TabNavigator';
@@ -108,9 +108,6 @@ function MapScreen({ navigation }: ComponentProps) {
                     </>
                 </MapView>
             ) : null}
-            <TouchableOpacity style={[styles.create]} onPress={() => navigation.navigate('Create')}>
-                <Ionicons name="add-circle-outline" size={64} color="black" />
-            </TouchableOpacity>
         </View>
     );
 }
