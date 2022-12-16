@@ -4,6 +4,7 @@ import { LocationObject } from 'expo-location';
 import React, { useEffect, useState } from 'react';
 import { Dimensions, StyleSheet, TouchableOpacity, View } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
+import EventMarker from '../components/EventMarker';
 
 import { TabPropsFor } from '../nav/TabNavigator';
 import { getToken } from '../state/auth';
@@ -93,6 +94,18 @@ function MapScreen({ navigation }: ComponentProps) {
                                 }}
                             />
                         ))}
+                        {/* {events.map((el: any) => (
+                            <EventMarker
+                                key={el.id}
+                                coordinate={{
+                                    latitude: parseFloat(el.lat),
+                                    longitude: parseFloat(el.lon),
+                                }}
+                                title={el.name}
+                                pinColor="orange"
+                                onCalloutPress={() => {console.log('Callout pressed')}}
+                            />
+                        ))} */}
                     </>
                 </MapView>
             ) : null}
