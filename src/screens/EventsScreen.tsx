@@ -1,3 +1,4 @@
+import Ionicons from '@expo/vector-icons/Ionicons';
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import EventPreview from '../components/EventPreview';
@@ -7,26 +8,36 @@ import { asyncHandler, request } from '../util';
 
 type ComponentProps = TabPropsFor<'Events'>;
 
+type EventArray = {
+    activeEvent: Event[];
+    myEvents: Event[];
+    followedEvents: Event[];
+    followerEvents: Event[];
+};
+
 function EventsScreen({ navigation }: ComponentProps) {
-    const [events, setEvents] = useState([]);
+    const [events, setEvents] = useState<EventArray>([]);
     const [eventsFetched, setEventsFetched] = useState(false);
 
     useEffect(
         asyncHandler(async () => {
-            await request('get', 'event/relevantEvents', getToken()).then((data) => {
-                console.log(data);
-                setEvents(data);
-                setEventsFetched(true);
-            });
+            await fetchData();
         }),
         []
     );
+
+    const fetchData = async () => {
+        await request('get', 'event/relevantEvents', getToken()).then((data) => {
+            setEvents(data);
+            setEventsFetched(true);
+        });
+    };
 
     return (
         <View style={[styles.container]}>
             <Text style={[styles.headerTitle]}>Active event</Text>
             {eventsFetched &&
-                events.activeEvent.map((el) => {
+                events.activeEvent.map((el: Event) => {
                     return (
                         <EventPreview
                             key={el.id}
@@ -38,7 +49,7 @@ function EventsScreen({ navigation }: ComponentProps) {
                 })}
             <Text style={[styles.headerTitle]}>Your Events</Text>
             {eventsFetched &&
-                events.myEvents.map((el) => {
+                events.myEvents.map((el: Event) => {
                     return (
                         <EventPreview
                             key={el.id}
@@ -50,7 +61,7 @@ function EventsScreen({ navigation }: ComponentProps) {
                 })}
             <Text style={[styles.headerTitle]}>Followed Events</Text>
             {eventsFetched &&
-                events.followedEvents.map((el) => {
+                events.followedEvents.map((el: Event) => {
                     return (
                         <EventPreview
                             key={el.id}
@@ -60,6 +71,19 @@ function EventsScreen({ navigation }: ComponentProps) {
                         />
                     );
                 })}
+            <Ionicons
+                name="refresh-outline"
+                size={32}
+                color="black"
+                onPress={asyncHandler(fetchData, {
+                    prefix: 'Failed to update events',
+                })}
+                style={{
+                    marginTop: 'auto',
+                    alignSelf: 'center',
+                    marginBottom: 10,
+                }}
+            />
         </View>
     );
 }
