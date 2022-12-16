@@ -2,11 +2,10 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { NavigationProp, ParamListBase } from '@react-navigation/native';
 import { ResizeMode, Video } from 'expo-av';
 import React from 'react';
-import { StyleSheet, View } from 'react-native';
-import { TouchableHighlight } from 'react-native-gesture-handler';
+import { StyleSheet, Text, View } from 'react-native';
 
 import { getToken } from '../state/auth';
-import { asyncHandler, request } from '../util';
+import { asyncHandler, baseHeaders, request } from '../util';
 
 declare type Props = {
     discoverData: { src: string; id: string };
@@ -36,49 +35,41 @@ function VideoDiscover({ discoverData, navigation }: Props) {
         });
     };
 
-    const onPress = () => {
-        navigation.navigate('');
-    };
-
     return (
         <View style={styles.container}>
-            <TouchableHighlight onPress={onPress}>
-                <Video
-                    ref={video}
-                    style={styles.video}
-                    source={{
-                        uri: discoverData.src,
-                    }}
-                    useNativeControls
-                    resizeMode={ResizeMode.CONTAIN}
-                    isLooping
-                    onPlaybackStatusUpdate={(status) => setStatus(() => status)}
-                />
-                <View style={{ ...styles.votingArea }}>
-                    <Ionicons
-                        style={styles.voteIcon}
-                        name="chevron-up"
-                        size={36}
-                        onPress={upvote}
-                    />
-                    <View>
-                        <Text
-                            style={{
-                                fontWeight: 'bold',
-                                color: '#c2c2c2',
-                            }}
-                        >
-                            {score}
-                        </Text>
-                    </View>
-                    <Ionicons
-                        style={styles.voteIcon}
-                        name="chevron-down"
-                        size={36}
-                        onPress={downvote}
-                    />
+            <Video
+                ref={video}
+                style={styles.video}
+                source={{
+                    uri: discoverData.src,
+                    headers: {
+                        ...baseHeaders,
+                    },
+                }}
+                useNativeControls
+                resizeMode={ResizeMode.CONTAIN}
+                isLooping
+                onPlaybackStatusUpdate={(status) => setStatus(() => status)}
+            />
+            <View style={{ ...styles.votingArea }}>
+                <Ionicons style={styles.voteIcon} name="chevron-up" size={36} onPress={upvote} />
+                <View>
+                    <Text
+                        style={{
+                            fontWeight: 'bold',
+                            color: '#c2c2c2',
+                        }}
+                    >
+                        {score}
+                    </Text>
                 </View>
-            </TouchableHighlight>
+                <Ionicons
+                    style={styles.voteIcon}
+                    name="chevron-down"
+                    size={36}
+                    onPress={downvote}
+                />
+            </View>
         </View>
     );
 }
