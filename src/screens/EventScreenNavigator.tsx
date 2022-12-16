@@ -2,7 +2,6 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import React, { useEffect } from 'react';
 import MapPicker from '../components/MapPicker';
-import { TabPropsFor } from '../nav/TabNavigator';
 import CreateEventScreen from '../screens/CreateEventScreen';
 import EventDetailScreen from '../screens/EventDetailScreen';
 import EventsScreen from '../screens/EventsScreen';
@@ -15,11 +14,9 @@ export type RootNavigatorParams = {
     EventDetailScreen: undefined;
 };
 
-type ComponentProps = TabPropsFor<'EventStack'>;
-
 const Stack = createNativeStackNavigator<RootNavigatorParams>();
 
-function EventScreenNavigator({ navigation }: ComponentProps) {
+function EventScreenNavigator({ navigation }) {
     useEffect(
         asyncHandler(async () => {
             navigation.setOptions({
