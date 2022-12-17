@@ -1,9 +1,8 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import * as Location from 'expo-location';
-import { LocationObject } from 'expo-location';
 import React, { useEffect, useState } from 'react';
 import { Dimensions, StyleSheet, View } from 'react-native';
-import MapView, { Marker } from 'react-native-maps';
+import MapView, { LatLng, Marker } from 'react-native-maps';
 
 import { TabPropsFor } from '../nav/TabNavigator';
 import { getToken } from '../state/auth';
@@ -13,11 +12,9 @@ type ComponentProps = TabPropsFor<'Map'>;
 
 function MapScreen({ navigation }: ComponentProps) {
     const mapRef = React.useRef<MapView>(null);
-    const [location, setLocation] = useState<LocationObject | null>({
-        coords: {
-            latitude: 48.877616,
-            longitude: 8.652653,
-        },
+    const [location, setLocation] = useState<LatLng | null>({
+        latitude: 48.877616,
+        longitude: 8.652653,
     });
     // todo: fix types
     const [events, setEvents] = useState<any>([]);
@@ -29,10 +26,11 @@ function MapScreen({ navigation }: ComponentProps) {
         }
 
         const location = await Location.getCurrentPositionAsync();
-        setLocation(location);
+        const latlng = { latitude: location.coords.latitude, longitude: location.coords.longitude };
+        setLocation(latlng);
 
         mapRef.current?.animateCamera({
-            center: { latitude: location.coords.latitude, longitude: location.coords.longitude },
+            center: latlng,
         });
     };
 
@@ -69,8 +67,8 @@ function MapScreen({ navigation }: ComponentProps) {
             {location ? (
                 <MapView
                     initialRegion={{
-                        latitude: location.coords.latitude,
-                        longitude: location.coords.longitude,
+                        latitude: location.latitude,
+                        longitude: location.longitude,
                         latitudeDelta: 0.01,
                         longitudeDelta: 0.01,
                     }}
