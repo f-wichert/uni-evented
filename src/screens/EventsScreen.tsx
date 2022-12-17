@@ -10,7 +10,7 @@ import { EventStackNavProps } from './EventScreenNavigator';
 
 type Props = EventStackNavProps<'EventsList'>;
 
-type EventArray = {
+type EventsData = {
     activeEvent: Event[];
     myEvents: Event[];
     followedEvents: Event[];
@@ -18,22 +18,14 @@ type EventArray = {
 };
 
 function EventsScreen({ navigation }: Props) {
-    const [events, setEvents] = useState<EventArray>([]);
-    const [eventsFetched, setEventsFetched] = useState(false);
+    const [events, setEvents] = useState<EventsData | null>(null);
 
-    useEffect(
-        asyncHandler(async () => {
-            await fetchData();
-        }),
-        []
-    );
+    const fetchData = useCallback(async () => {
+        const data = await request('get', 'event/relevantEvents', getToken());
+        setEvents(data as unknown as EventsData);
+    }, []);
 
-    const fetchData = async () => {
-        await request('get', 'event/relevantEvents', getToken()).then((data) => {
-            setEvents(data);
-            setEventsFetched(true);
-        });
-    };
+    useEffect(asyncHandler(fetchData), []);
 
     const navigateDetail = useCallback(
         (id: string) => navigation.navigate('EventDetail', { eventId: id }),
@@ -43,41 +35,38 @@ function EventsScreen({ navigation }: Props) {
     return (
         <View style={[styles.container]}>
             <Text style={[styles.headerTitle]}>Active event</Text>
-            {eventsFetched &&
-                events.activeEvent.map((el: Event) => {
-                    return (
-                        <EventPreview
-                            key={el.id}
-                            name={el.name}
-                            id={el.id}
-                            navigateDetail={navigateDetail}
-                        />
-                    );
-                })}
+            {events?.activeEvent.map((el: Event) => {
+                return (
+                    <EventPreview
+                        key={el.id}
+                        name={el.name}
+                        id={el.id}
+                        navigateDetail={navigateDetail}
+                    />
+                );
+            })}
             <Text style={[styles.headerTitle]}>Your Events</Text>
-            {eventsFetched &&
-                events.myEvents.map((el: Event) => {
-                    return (
-                        <EventPreview
-                            key={el.id}
-                            name={el.name}
-                            id={el.id}
-                            navigateDetail={navigateDetail}
-                        />
-                    );
-                })}
+            {events?.myEvents.map((el: Event) => {
+                return (
+                    <EventPreview
+                        key={el.id}
+                        name={el.name}
+                        id={el.id}
+                        navigateDetail={navigateDetail}
+                    />
+                );
+            })}
             <Text style={[styles.headerTitle]}>Followed Events</Text>
-            {eventsFetched &&
-                events.followedEvents.map((el: Event) => {
-                    return (
-                        <EventPreview
-                            key={el.id}
-                            name={el.name}
-                            id={el.id}
-                            navigateDetail={navigateDetail}
-                        />
-                    );
-                })}
+            {events?.followedEvents.map((el: Event) => {
+                return (
+                    <EventPreview
+                        key={el.id}
+                        name={el.name}
+                        id={el.id}
+                        navigateDetail={navigateDetail}
+                    />
+                );
+            })}
             <Ionicons
                 name="refresh-outline"
                 size={32}

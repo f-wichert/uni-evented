@@ -59,10 +59,6 @@ function CreateEventScreen({ navigation }: Props) {
 
     const createEvent = useAuthStore((state) => state.createEvent);
 
-    const receiveLocation = (loc) => {
-        setLocation(loc);
-    };
-
     const onChange = (event: DateTimePickerEvent, selectedDate?: Date) => {
         if (!selectedDate) {
             return;
@@ -110,9 +106,9 @@ function CreateEventScreen({ navigation }: Props) {
         return `${day}.${month}.${year}`;
     };
 
-    const grabLocation = async () => {
+    const grabLocation = () => {
         navigation.navigate('MapPicker', {
-            returnLocation: receiveLocation,
+            returnLocation: setLocation,
         });
     };
 
@@ -152,10 +148,10 @@ function CreateEventScreen({ navigation }: Props) {
 
                 <View style={styles.sectionBody}>
                     {location ? (
-                        <TouchableOpacity onPressIn={console.log('hi')}>
+                        <TouchableOpacity>
                             <MapView
                                 style={styles.locationPreviewMap}
-                                onPress={(e) => console.log('E')}
+                                // TODO: do something on press, or disable touch event instead?
                                 zoomEnabled={false}
                                 scrollEnabled={false}
                                 initialRegion={{

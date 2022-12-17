@@ -1,9 +1,10 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import * as Location from 'expo-location';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Dimensions, StyleSheet, View } from 'react-native';
 import MapView, { LatLng, Marker } from 'react-native-maps';
 
+import { Event } from '../models';
 import { TabNavProps } from '../nav/TabNavigator';
 import { getToken } from '../state/auth';
 import { asyncHandler, request } from '../util';
@@ -16,8 +17,7 @@ function MapScreen({ navigation }: Props) {
         latitude: 48.877616,
         longitude: 8.652653,
     });
-    // todo: fix types
-    const [events, setEvents] = useState<any>([]);
+    const [events, setEvents] = useState<Event[]>([]);
 
     const getCurrentPosition = async () => {
         const { status } = await Location.requestForegroundPermissionsAsync();
@@ -36,7 +36,7 @@ function MapScreen({ navigation }: Props) {
 
     const updateEventList = async () => {
         const eventList = await request('get', 'event/find', getToken());
-        setEvents(eventList.events);
+        setEvents(eventList.events as unknown as Event[]);
     };
 
     useEffect(
@@ -48,7 +48,7 @@ function MapScreen({ navigation }: Props) {
                         size={32}
                         color="black"
                         onPress={asyncHandler(updateEventList, {
-                            prefix: 'Failed to update media',
+                            prefix: 'Failed to update events',
                         })}
                         style={{
                             marginRight: 10,
@@ -56,9 +56,17 @@ function MapScreen({ navigation }: Props) {
                     />
                 ),
             });
-            updateEventList();
-            await getCurrentPosition();
+            await Promise.all([updateEventList(), getCurrentPosition()]);
         }),
+        [navigation]
+    );
+
+    const navigateDetail = useCallback(
+        (id: string) => {
+            // TODO
+            console.warn('TODO: navigating to detail view from here does not work yet');
+            // navigation.navigate('EventDetail', { eventId: id })
+        },
         [navigation]
     );
 
@@ -77,17 +85,19 @@ function MapScreen({ navigation }: Props) {
                     style={styles.map}
                 >
                     <>
-                        {events.map((el: any) => (
+                        {events.map((el) => (
                             <Marker
                                 key={el.id}
                                 coordinate={{
-                                    latitude: parseFloat(el.lat),
-                                    longitude: parseFloat(el.lon),
+                                    latitude: el.lat,
+                                    longitude: el.lon,
                                 }}
                                 title={el.name}
                                 pinColor="teal"
+                                // TODO: this might re-render every time since the
+                                // callback isn't memoized, not sure
                                 onCalloutPress={() => {
-                                    navigation.navigate('Events', { eventId: el.id });
+                                    navigateDetail(el.id);
                                 }}
                             />
                         ))}
