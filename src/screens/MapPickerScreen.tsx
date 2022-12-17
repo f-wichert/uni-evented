@@ -6,7 +6,10 @@ import MapView, { LatLng, Marker } from 'react-native-maps';
 import { EventListStackNavProps } from '../nav/types';
 import { asyncHandler } from '../util';
 
-export default function MapPicker({ route, navigation }: EventListStackNavProps<'MapPicker'>) {
+export default function MapPickerScreen({
+    route,
+    navigation,
+}: EventListStackNavProps<'MapPicker'>) {
     const { returnLocation } = route.params;
     const mapRef = React.useRef<MapView>(null);
     // TODO: remove placeholder values

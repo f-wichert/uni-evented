@@ -1,10 +1,10 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import React from 'react';
 
-import MapPicker from '../components/MapPicker';
 import CreateEventScreen from '../screens/CreateEventScreen';
 import EventDetailScreen from '../screens/EventDetailScreen';
 import EventListScreen from '../screens/EventListScreen';
+import MapPickerScreen from '../screens/MapPickerScreen';
 import { EventListStackNavParams } from './types';
 
 const Stack = createNativeStackNavigator<EventListStackNavParams>();
@@ -30,7 +30,7 @@ function EventListStack() {
             />
             <Stack.Screen
                 name="MapPicker"
-                component={MapPicker}
+                component={MapPickerScreen}
                 options={{ title: 'Pick a Location!' }}
             />
         </Stack.Navigator>
