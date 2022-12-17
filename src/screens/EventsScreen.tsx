@@ -8,8 +8,6 @@ import { getToken } from '../state/auth';
 import { asyncHandler, request } from '../util';
 import { EventStackNavProps } from './EventScreenNavigator';
 
-type Props = EventStackNavProps<'EventsList'>;
-
 type EventsData = {
     activeEvent: Event[];
     myEvents: Event[];
@@ -17,7 +15,7 @@ type EventsData = {
     followerEvents: Event[];
 };
 
-function EventsScreen({ navigation }: Props) {
+function EventsScreen({ navigation }: EventStackNavProps<'EventsList'>) {
     const [events, setEvents] = useState<EventsData | null>(null);
 
     const fetchData = useCallback(async () => {

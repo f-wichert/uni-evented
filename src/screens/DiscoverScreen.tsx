@@ -12,9 +12,7 @@ import { getToken } from '../state/auth';
 import { ExtendedMedia, Media } from '../types';
 import { asyncHandler, request } from '../util';
 
-type Props = TabNavProps<'Discover'>;
-
-function DiscoverScreen({ navigation }: Props) {
+function DiscoverScreen({ navigation }: TabNavProps<'Discover'>) {
     const [media, setMedia] = useState<ExtendedMedia[]>([]);
 
     async function updateMedia() {

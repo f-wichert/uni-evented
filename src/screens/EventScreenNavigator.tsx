@@ -25,9 +25,7 @@ export type EventStackNavProps<T extends keyof NavigatorParams = keyof Navigator
 
 const Stack = createNativeStackNavigator<NavigatorParams>();
 
-type Props = NativeStackScreenProps<NavigatorParams>;
-
-function EventScreenNavigator({ navigation }: Props) {
+function EventScreenNavigator({ navigation }: NativeStackScreenProps<NavigatorParams>) {
     useEffect(
         asyncHandler(async () => {
             navigation.setOptions({

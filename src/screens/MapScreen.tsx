@@ -9,9 +9,7 @@ import { TabNavProps } from '../nav/TabNavigator';
 import { getToken } from '../state/auth';
 import { asyncHandler, request } from '../util';
 
-type Props = TabNavProps<'Map'>;
-
-function MapScreen({ navigation }: Props) {
+function MapScreen({ navigation }: TabNavProps<'Map'>) {
     const mapRef = React.useRef<MapView>(null);
     const [location, setLocation] = useState<LatLng | null>({
         latitude: 48.877616,

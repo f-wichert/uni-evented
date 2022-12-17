@@ -38,9 +38,7 @@ const tags = [
 ] as const;
 type TagValue = typeof tags[number]['value'];
 
-type Props = EventStackNavProps<'CreateEvent'>;
-
-function CreateEventScreen({ navigation }: Props) {
+function CreateEventScreen({ navigation }: EventStackNavProps<'CreateEvent'>) {
     const [name, setName] = useState('');
 
     // DatePickerState

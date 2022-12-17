@@ -1,11 +1,11 @@
 import { View, ViewStyle } from 'react-native';
 
-interface ComponentProps {
+interface Props {
     color?: ViewStyle['backgroundColor'];
     width?: ViewStyle['width'];
 }
 
-export default function Separator({ color, width }: ComponentProps) {
+export default function Separator({ color, width }: Props) {
     return (
         <View
             style={{

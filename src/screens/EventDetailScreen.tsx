@@ -9,9 +9,7 @@ import { useAuthStore } from '../state/auth';
 import { asyncHandler } from '../util';
 import { EventStackNavProps } from './EventScreenNavigator';
 
-type Props = EventStackNavProps<'EventDetail'>;
-
-function EventDetailScreen({ route }: Props) {
+function EventDetailScreen({ route }: EventStackNavProps<'EventDetail'>) {
     const eventId = route.params?.eventId ?? null;
     console.log('Event ID: ', eventId);
 
