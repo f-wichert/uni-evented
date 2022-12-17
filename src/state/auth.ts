@@ -88,14 +88,16 @@ export const useAuthStore = createStore<State>('auth')(
                     startDateTime: params.startDate?.toJSON() ?? null,
                     endDateTime: params.endDate?.toJSON() ?? null,
                 });
+                const eventId = data.eventId as string;
+
                 set((state) => {
                     if (!state.user) {
                         console.warn('No current user stored, cannot set event ID');
                         return;
                     }
-                    state.user.currentEventId = data.eventId as string;
+                    state.user.currentEventId = eventId;
                 });
-                return data.eventId;
+                return eventId;
             },
             closeEvent: () => {
                 set((state) => {
