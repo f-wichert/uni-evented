@@ -145,6 +145,8 @@ function CreateEventScreen({ navigation, route }: EventListStackNavProps<'Create
                 <View style={{ flexDirection: 'row' }}>
                     <Text style={styles.sectionTitle}>Location</Text>
                     <Ionicons
+                        // TODO: this always opens the map picker to the default location,
+                        // even if the user already picked a location
                         onPress={() => navigation.navigate('MapPicker')}
                         name={iconName}
                         size={26}
@@ -154,13 +156,16 @@ function CreateEventScreen({ navigation, route }: EventListStackNavProps<'Create
 
                 <View style={styles.sectionBody}>
                     {location ? (
+                        // TODO: no event handler, pressing this does nothing
                         <TouchableOpacity>
                             <MapView
                                 style={styles.locationPreviewMap}
                                 // TODO: do something on press, or disable touch event instead?
                                 zoomEnabled={false}
                                 scrollEnabled={false}
-                                initialRegion={{
+                                pitchEnabled={false}
+                                rotateEnabled={false}
+                                region={{
                                     latitude: location.latitude,
                                     longitude: location.longitude,
                                     latitudeDelta: 0.001,
