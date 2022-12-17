@@ -1,14 +1,14 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useState } from 'react';
 
-import { UnauthRootNavigatorParams } from '../App';
+import { UnauthRootNavParams } from '../nav/types';
 import { useAuthStore } from '../state/auth';
 import { asyncHandler } from '../util';
 import BaseLoginScreen from './base/BaseLoginScreen';
 
 export default function LoginScreen({
     navigation,
-}: NativeStackScreenProps<UnauthRootNavigatorParams, 'LoginScreen'>) {
+}: NativeStackScreenProps<UnauthRootNavParams, 'LoginScreen'>) {
     async function submitLogin() {
         // this automatically navigates to the main screen when the token gets set
         // TODO: require these to be non-empty in the UI

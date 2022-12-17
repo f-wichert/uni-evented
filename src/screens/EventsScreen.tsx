@@ -4,7 +4,7 @@ import { StyleSheet, Text, View } from 'react-native';
 
 import EventPreview from '../components/EventPreview';
 import { Event } from '../models/event';
-import { EventStackNavProps } from '../nav/EventsStackNavigator';
+import { EventListStackNavProps } from '../nav/types';
 import { getToken } from '../state/auth';
 import { asyncHandler, request } from '../util';
 
@@ -15,7 +15,7 @@ type EventsData = {
     followerEvents: Event[];
 };
 
-function EventsScreen({ navigation }: EventStackNavProps<'EventsList'>) {
+function EventsScreen({ navigation }: EventListStackNavProps<'EventList'>) {
     const [events, setEvents] = useState<EventsData | null>(null);
 
     const fetchData = useCallback(async () => {

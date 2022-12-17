@@ -7,7 +7,7 @@ import Carousel from 'react-native-reanimated-carousel';
 import ImageDiscover from '../components/ImageDiscover';
 import VideoDiscover from '../components/VideoDiscover';
 import { MediaManager } from '../models';
-import { TabNavProps } from '../nav/TabNavigator';
+import { TabNavProps } from '../nav/types';
 import { getToken } from '../state/auth';
 import { ExtendedMedia, Media } from '../types';
 import { asyncHandler, request } from '../util';

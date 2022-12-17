@@ -5,7 +5,7 @@ import { Dimensions, StyleSheet, View } from 'react-native';
 import MapView, { LatLng, Marker } from 'react-native-maps';
 
 import { Event } from '../models';
-import { TabNavProps } from '../nav/TabNavigator';
+import { TabNavProps } from '../nav/types';
 import { getToken } from '../state/auth';
 import { asyncHandler, request } from '../util';
 

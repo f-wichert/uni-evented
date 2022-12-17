@@ -6,36 +6,14 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import ToastRoot from './components/ToastRoot';
 import TabNavigator from './nav/TabNavigator';
+import { AnyRootNavParams } from './nav/types';
 import LoadingScreen from './screens/LoadingScreen';
 import LoginScreen from './screens/LoginScreen';
 import RegisterScreen from './screens/RegisterScreen';
 import ResetPasswordScreen from './screens/ResetPasswordScreen';
 import { useAuthStore } from './state/auth';
 
-// https://reactnavigation.org/docs/typescript/
-// instead of `undefined`, props passed to these screens would be defined here if applicable
-
-// screens in stack, with token and user
-export type RootNavigatorParams = {
-    TabScreen: undefined;
-    CreateEventScreen: undefined;
-};
-
-// screens in stack, with token but no user
-export type LoadingRootNavigatorParams = {
-    LoadingScreen: undefined;
-};
-
-// screens in stack, without token
-export type UnauthRootNavigatorParams = {
-    LoginScreen: undefined;
-    RegisterScreen: undefined;
-    ResetPasswordScreen: undefined;
-};
-
-const Stack = createNativeStackNavigator<
-    RootNavigatorParams & LoadingRootNavigatorParams & UnauthRootNavigatorParams
->();
+const Stack = createNativeStackNavigator<AnyRootNavParams>();
 
 function App() {
     const token = useAuthStore((state) => state.token);

@@ -5,11 +5,11 @@ import { Rating } from 'react-native-ratings';
 
 import { Tag } from '../components/Tag';
 import { Event, EventManager } from '../models/event';
-import { EventStackNavProps } from '../nav/EventsStackNavigator';
+import { EventListStackNavProps } from '../nav/types';
 import { useAuthStore } from '../state/auth';
 import { asyncHandler } from '../util';
 
-function EventDetailScreen({ route }: EventStackNavProps<'EventDetail'>) {
+function EventDetailScreen({ route }: EventListStackNavProps<'EventDetail'>) {
     const eventId = route.params?.eventId ?? null;
     console.log('Event ID: ', eventId);
 

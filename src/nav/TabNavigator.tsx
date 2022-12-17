@@ -1,10 +1,6 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { BottomTabScreenProps, createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { CompositeScreenProps } from '@react-navigation/native';
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import React from 'react';
-
-import { RootNavigatorParams } from '../App';
 
 import DiscoverScreen from '../screens/DiscoverScreen';
 import MapScreen from '../screens/MapScreen';
@@ -12,30 +8,15 @@ import ProfileScreen from '../screens/ProfileScreen';
 import { useAuthStore } from '../state/auth';
 import { IoniconsName } from '../types';
 import EventsStackNavigator from './EventsStackNavigator';
+import { TabNavParams } from './types';
 
-// https://reactnavigation.org/docs/typescript/
-type TabNavigatorParams = {
-    Discover: undefined;
-    Map: undefined;
-    Events: undefined;
-    Profile: undefined;
-};
-
-// https://reactnavigation.org/docs/typescript/#combining-navigation-props
-export type TabNavProps<T extends keyof TabNavigatorParams = keyof TabNavigatorParams> =
-    CompositeScreenProps<
-        BottomTabScreenProps<TabNavigatorParams, T>,
-        NativeStackScreenProps<RootNavigatorParams>
-    >;
-
-export const Tab = createBottomTabNavigator<TabNavigatorParams>();
+export const Tab = createBottomTabNavigator<TabNavParams>();
 
 export default function TabNavigator() {
     const eventId = useAuthStore((state) => state.user?.currentEventId);
 
     return (
         <Tab.Navigator
-            // tabBar={props => <BottomTabBar {...props} state={{...props.state, routes: props.state.routes.slice(0,4)}}></BottomTabBar>}
             screenOptions={({ route }) => ({
                 tabBarIcon: ({ focused, color, size }) => {
                     let iconName: IoniconsName;
@@ -52,7 +33,6 @@ export default function TabNavigator() {
                         throw new Error(`Unknown route '${route.name}'`);
                     }
 
-                    // You can return any component that you like here!
                     return <Ionicons name={iconName} size={size} color={color} />;
                 },
                 tabBarActiveTintColor: 'tomato',
