@@ -1,6 +1,6 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { DateTimePickerAndroid, DateTimePickerEvent } from '@react-native-community/datetimepicker';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     Button,
     Dimensions,
@@ -38,7 +38,16 @@ const tags = [
 ] as const;
 type TagValue = typeof tags[number]['value'];
 
-function CreateEventScreen({ navigation }: EventListStackNavProps<'CreateEvent'>) {
+function CreateEventScreen({ navigation, route }: EventListStackNavProps<'CreateEvent'>) {
+    // This is passed back from the map picker (https://reactnavigation.org/docs/params#passing-params-to-a-previous-screen).
+    // If `params.location` changed, we call `setLocation` with the new value.
+    const locationParam = route.params?.location;
+    useEffect(() => {
+        if (locationParam) {
+            setLocation(locationParam);
+        }
+    }, [locationParam]);
+
     const [name, setName] = useState('');
 
     // DatePickerState
@@ -104,12 +113,6 @@ function CreateEventScreen({ navigation }: EventListStackNavProps<'CreateEvent'>
         return `${day}.${month}.${year}`;
     };
 
-    const grabLocation = () => {
-        navigation.navigate('MapPicker', {
-            returnLocation: setLocation,
-        });
-    };
-
     const onCreateButton = async () => {
         // TODO: require these to be non-empty in the UI
         if (!location || !name) {
@@ -141,7 +144,12 @@ function CreateEventScreen({ navigation }: EventListStackNavProps<'CreateEvent'>
             <View style={styles.section}>
                 <View style={{ flexDirection: 'row' }}>
                     <Text style={styles.sectionTitle}>Location</Text>
-                    <Ionicons onPress={grabLocation} name={iconName} size={26} color={'orange'} />
+                    <Ionicons
+                        onPress={() => navigation.navigate('MapPicker')}
+                        name={iconName}
+                        size={26}
+                        color={'orange'}
+                    />
                 </View>
 
                 <View style={styles.sectionBody}>

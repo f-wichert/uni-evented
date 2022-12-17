@@ -6,11 +6,7 @@ import MapView, { LatLng, Marker } from 'react-native-maps';
 import { EventListStackNavProps } from '../nav/types';
 import { asyncHandler } from '../util';
 
-export default function MapPickerScreen({
-    route,
-    navigation,
-}: EventListStackNavProps<'MapPicker'>) {
-    const { returnLocation } = route.params;
+export default function MapPickerScreen({ navigation }: EventListStackNavProps<'MapPicker'>) {
     const mapRef = React.useRef<MapView>(null);
     // TODO: remove placeholder values
     const [location, setLocation] = useState<LatLng>({
@@ -52,8 +48,8 @@ export default function MapPickerScreen({
     };
 
     const pickLocation = () => {
-        returnLocation(pickedLocation);
-        navigation.goBack();
+        // pass picked location back to create event screen
+        navigation.navigate('CreateEvent', { location: pickedLocation });
     };
 
     return (
@@ -80,7 +76,6 @@ export default function MapPickerScreen({
                     pinColor="orange"
                     draggable
                     onDragEnd={(e) => {
-                        console.log('dragEnd', e.nativeEvent.coordinate);
                         setPickedLocation(e.nativeEvent.coordinate);
                     }}
                 />

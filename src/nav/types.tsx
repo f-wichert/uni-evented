@@ -59,9 +59,8 @@ export type TabNavProps<ScreenName extends keyof TabNavParams = keyof TabNavPara
 export type EventListStackNavParams = {
     EventList: undefined;
     EventDetail: { eventId?: string };
-    CreateEvent: undefined;
-    // TODO: navigation params should be JSON-serializable
-    MapPicker: { returnLocation: (loc: LatLng) => void };
+    CreateEvent: { location?: LatLng } | undefined;
+    MapPicker: undefined;
 };
 
 export type EventListStackNavProps<
