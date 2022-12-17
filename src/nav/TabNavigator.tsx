@@ -7,11 +7,11 @@ import React from 'react';
 import { RootNavigatorParams } from '../App';
 
 import DiscoverScreen from '../screens/DiscoverScreen';
-import EventScreenNavigator from '../screens/EventScreenNavigator';
 import MapScreen from '../screens/MapScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import { useAuthStore } from '../state/auth';
 import { IoniconsName } from '../types';
+import EventsStackNavigator from './EventsStackNavigator';
 
 // https://reactnavigation.org/docs/typescript/
 type TabNavigatorParams = {
@@ -62,7 +62,7 @@ export default function TabNavigator() {
         >
             <Tab.Screen name="Discover" component={DiscoverScreen} />
             <Tab.Screen name="Map" component={MapScreen} />
-            <Tab.Screen name="Events" component={EventScreenNavigator} />
+            <Tab.Screen name="Events" component={EventsStackNavigator} />
             <Tab.Screen name="Profile" component={ProfileScreen} options={{ headerShown: false }} />
         </Tab.Navigator>
     ); // Temporarily changed component of 'Events' to EventDetailScreen for easy acces during developement. Previous value: 'EventsScreen'

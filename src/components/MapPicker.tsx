@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import MapView, { LatLng, Marker } from 'react-native-maps';
 
-import { EventStackNavProps } from '../screens/EventScreenNavigator';
+import { EventStackNavProps } from '../nav/EventsStackNavigator';
 import { asyncHandler } from '../util';
 
 export default function MapPicker({ route, navigation }: EventStackNavProps<'MapPicker'>) {

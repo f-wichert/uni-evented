@@ -4,9 +4,9 @@ import { StyleSheet, Text, View } from 'react-native';
 
 import EventPreview from '../components/EventPreview';
 import { Event } from '../models/event';
+import { EventStackNavProps } from '../nav/EventsStackNavigator';
 import { getToken } from '../state/auth';
 import { asyncHandler, request } from '../util';
-import { EventStackNavProps } from './EventScreenNavigator';
 
 type EventsData = {
     activeEvent: Event[];

@@ -15,9 +15,9 @@ import DropDownPicker from 'react-native-dropdown-picker';
 import MapView, { LatLng, Marker } from 'react-native-maps';
 
 import { INPUT_BACKGR_COLOR } from '../const';
+import { EventStackNavProps } from '../nav/EventsStackNavigator';
 import { useAuthStore } from '../state/auth';
 import { IoniconsName } from '../types';
-import { EventStackNavProps } from './EventScreenNavigator';
 
 const width = Dimensions.get('window').width;
 // const height = Dimensions.get('window').height;

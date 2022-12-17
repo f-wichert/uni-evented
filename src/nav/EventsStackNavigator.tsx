@@ -5,11 +5,11 @@ import React, { useEffect } from 'react';
 import { LatLng } from 'react-native-maps';
 
 import MapPicker from '../components/MapPicker';
-import { TabNavProps } from '../nav/TabNavigator';
 import CreateEventScreen from '../screens/CreateEventScreen';
 import EventDetailScreen from '../screens/EventDetailScreen';
 import EventsScreen from '../screens/EventsScreen';
 import { asyncHandler } from '../util';
+import { TabNavProps } from './TabNavigator';
 
 type NavigatorParams = {
     EventsList: undefined;
@@ -25,7 +25,7 @@ export type EventStackNavProps<T extends keyof NavigatorParams = keyof Navigator
 
 const Stack = createNativeStackNavigator<NavigatorParams>();
 
-function EventScreenNavigator({ navigation }: NativeStackScreenProps<NavigatorParams>) {
+function EventsStackNavigator({ navigation }: NativeStackScreenProps<NavigatorParams>) {
     useEffect(
         asyncHandler(async () => {
             navigation.setOptions({
@@ -67,4 +67,4 @@ function EventScreenNavigator({ navigation }: NativeStackScreenProps<NavigatorPa
     );
 }
 
-export default EventScreenNavigator;
+export default EventsStackNavigator;
