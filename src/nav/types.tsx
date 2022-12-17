@@ -58,28 +58,12 @@ export type TabNavProps<ScreenName extends keyof TabNavParams = keyof TabNavPara
 
 export type EventListStackNavParams = {
     EventList: undefined;
-    CreateEvent: undefined;
     EventDetail: { eventId?: string };
-};
-
-export type EventListStackNavProps<
-    T extends keyof EventListStackNavParams = keyof EventListStackNavParams
-> = CompositeScreenProps<NativeStackScreenProps<EventListStackNavParams, T>, TabNavProps>;
-
-// ==========
-// event creation stack
-// ==========
-
-export type CreateEventStackNavParams = {
     CreateEvent: undefined;
     // TODO: navigation params should be JSON-serializable
     MapPicker: { returnLocation: (loc: LatLng) => void };
 };
 
-// FIXME: this assumes the CreateEvent screen is always called from the list view, not the map
-export type CreateEventStackNavProps<
-    T extends keyof CreateEventStackNavParams = keyof CreateEventStackNavParams
-> = CompositeScreenProps<
-    NativeStackScreenProps<CreateEventStackNavParams, T>,
-    EventListStackNavProps
->;
+export type EventListStackNavProps<
+    T extends keyof EventListStackNavParams = keyof EventListStackNavParams
+> = CompositeScreenProps<NativeStackScreenProps<EventListStackNavParams, T>, TabNavProps>;

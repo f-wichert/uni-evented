@@ -1,6 +1,7 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import React from 'react';
 
+import MapPicker from '../components/MapPicker';
 import CreateEventScreen from '../screens/CreateEventScreen';
 import EventDetailScreen from '../screens/EventDetailScreen';
 import EventListScreen from '../screens/EventListScreen';
@@ -17,15 +18,20 @@ function EventListStack() {
                 options={{ title: 'Events' }}
             />
             <Stack.Screen
+                name="EventDetail"
+                component={EventDetailScreen}
+                // TODO: consider showing event title here (see https://reactnavigation.org/docs/headers/#using-params-in-the-title)
+                options={{ title: 'Detail' }}
+            />
+            <Stack.Screen
                 name="CreateEvent"
                 component={CreateEventScreen}
                 options={{ title: 'Create Event' }}
             />
             <Stack.Screen
-                name="EventDetail"
-                component={EventDetailScreen}
-                // TODO: consider showing event title here (see https://reactnavigation.org/docs/headers/#using-params-in-the-title)
-                options={{ title: 'Detail' }}
+                name="MapPicker"
+                component={MapPicker}
+                options={{ title: 'Pick a Location!' }}
             />
         </Stack.Navigator>
     );

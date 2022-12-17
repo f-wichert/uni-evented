@@ -3,10 +3,10 @@ import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import MapView, { LatLng, Marker } from 'react-native-maps';
 
-import { CreateEventStackNavProps } from '../nav/types';
+import { EventListStackNavProps } from '../nav/types';
 import { asyncHandler } from '../util';
 
-export default function MapPicker({ route, navigation }: CreateEventStackNavProps<'MapPicker'>) {
+export default function MapPicker({ route, navigation }: EventListStackNavProps<'MapPicker'>) {
     const { returnLocation } = route.params;
     const mapRef = React.useRef<MapView>(null);
     // TODO: remove placeholder values
@@ -50,7 +50,7 @@ export default function MapPicker({ route, navigation }: CreateEventStackNavProp
 
     const pickLocation = () => {
         returnLocation(pickedLocation);
-        navigation.navigate('CreateEvent');
+        navigation.goBack();
     };
 
     return (
