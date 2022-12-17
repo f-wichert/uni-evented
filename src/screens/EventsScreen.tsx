@@ -1,12 +1,14 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
+
 import EventPreview from '../components/EventPreview';
-import { TabPropsFor } from '../nav/TabNavigator';
+import { Event } from '../models/event';
 import { getToken } from '../state/auth';
 import { asyncHandler, request } from '../util';
+import { EventStackNavProps } from './EventScreenNavigator';
 
-type ComponentProps = TabPropsFor<'Events'>;
+type Props = EventStackNavProps<'EventsList'>;
 
 type EventArray = {
     activeEvent: Event[];
@@ -15,7 +17,7 @@ type EventArray = {
     followerEvents: Event[];
 };
 
-function EventsScreen({ navigation }: ComponentProps) {
+function EventsScreen({ navigation }: Props) {
     const [events, setEvents] = useState<EventArray>([]);
     const [eventsFetched, setEventsFetched] = useState(false);
 
@@ -33,6 +35,11 @@ function EventsScreen({ navigation }: ComponentProps) {
         });
     };
 
+    const navigateDetail = useCallback(
+        (id: string) => navigation.navigate('EventDetail', { eventId: id }),
+        [navigation]
+    );
+
     return (
         <View style={[styles.container]}>
             <Text style={[styles.headerTitle]}>Active event</Text>
@@ -43,7 +50,7 @@ function EventsScreen({ navigation }: ComponentProps) {
                             key={el.id}
                             name={el.name}
                             id={el.id}
-                            navigation={navigation}
+                            navigateDetail={navigateDetail}
                         />
                     );
                 })}
@@ -55,7 +62,7 @@ function EventsScreen({ navigation }: ComponentProps) {
                             key={el.id}
                             name={el.name}
                             id={el.id}
-                            navigation={navigation}
+                            navigateDetail={navigateDetail}
                         />
                     );
                 })}
@@ -67,7 +74,7 @@ function EventsScreen({ navigation }: ComponentProps) {
                             key={el.id}
                             name={el.name}
                             id={el.id}
-                            navigation={navigation}
+                            navigateDetail={navigateDetail}
                         />
                     );
                 })}

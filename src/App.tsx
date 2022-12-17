@@ -15,12 +15,13 @@ import { useAuthStore } from './state/auth';
 // https://reactnavigation.org/docs/typescript/
 // instead of `undefined`, props passed to these screens would be defined here if applicable
 
-// screens in stack, with token
+// screens in stack, with token and user
 export type RootNavigatorParams = {
     TabScreen: undefined;
     CreateEventScreen: undefined;
 };
 
+// screens in stack, with token but no user
 export type LoadingRootNavigatorParams = {
     LoadingScreen: undefined;
 };

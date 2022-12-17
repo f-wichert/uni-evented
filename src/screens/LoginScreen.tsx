@@ -6,9 +6,9 @@ import { useAuthStore } from '../state/auth';
 import { asyncHandler } from '../util';
 import BaseLoginScreen from './base/BaseLoginScreen';
 
-type ComponentProps = NativeStackScreenProps<UnauthRootNavigatorParams, 'LoginScreen'>;
+type Props = NativeStackScreenProps<UnauthRootNavigatorParams, 'LoginScreen'>;
 
-export default function LoginScreen({ navigation }: ComponentProps) {
+export default function LoginScreen({ navigation }: Props) {
     async function submitLogin() {
         // this automatically navigates to the main screen when the token gets set
         // TODO: require these to be non-empty in the UI

@@ -1,12 +1,19 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import React from 'react';
+import { LatLng } from 'react-native-maps';
 
 import MapPicker from '../components/MapPicker';
 import CreateEventScreen from '../screens/CreateEventScreen';
 
-const Stack = createNativeStackNavigator<RootNavigatorParams>();
+type NavigatorParams = {
+    CreateEvent: undefined;
+    // TODO: navigation params should be JSON-serializable
+    MapPicker: { returnLocation: (loc: LatLng) => void };
+};
 
-function CreateEventScreenStack(props) {
+const Stack = createNativeStackNavigator<NavigatorParams>();
+
+function CreateEventScreenStack() {
     return (
         <Stack.Navigator>
             <Stack.Screen

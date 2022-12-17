@@ -12,11 +12,12 @@ import {
 } from 'react-native';
 import DropDownPicker from 'react-native-dropdown-picker';
 // import DateTimePicker from '@react-native-community/datetimepicker';
-
 import MapView, { LatLng, Marker } from 'react-native-maps';
+
 import { INPUT_BACKGR_COLOR } from '../const';
 import { useAuthStore } from '../state/auth';
 import { IoniconsName } from '../types';
+import { EventStackNavProps } from './EventScreenNavigator';
 
 const width = Dimensions.get('window').width;
 // const height = Dimensions.get('window').height;
@@ -37,7 +38,9 @@ const tags = [
 ] as const;
 type TagValue = typeof tags[number]['value'];
 
-function CreateEventScreen({ navigation }) {
+type Props = EventStackNavProps<'CreateEvent'>;
+
+function CreateEventScreen({ navigation }: Props) {
     const [name, setName] = useState('');
 
     // DatePickerState
@@ -119,7 +122,7 @@ function CreateEventScreen({ navigation }) {
             throw new Error('Invalid name or location');
         }
         await createEvent({ name: name, location: location, startDate: start }).then((data) => {
-            navigation.navigate('EventDetailScreen', {
+            navigation.navigate('EventDetail', {
                 eventId: data,
             });
         });

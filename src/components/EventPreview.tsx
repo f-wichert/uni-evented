@@ -1,21 +1,16 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
-
-import { NavigationProp, ParamListBase } from '@react-navigation/native';
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 declare type Props = {
     name: string;
-    navigation: NavigationProp<ParamListBase>;
     id: string;
+    navigateDetail: (id: string) => void;
 };
 
-function EventPreview({ name, id, navigation }: Props) {
+function EventPreview({ name, id, navigateDetail }: Props) {
     return (
-        <TouchableOpacity
-            style={[styles.container]}
-            onPress={() => navigation.navigate('EventDetailScreen', { eventId: id })}
-        >
+        <TouchableOpacity style={[styles.container]} onPress={() => navigateDetail(id)}>
             <Ionicons style={[styles.icon]} name="rocket-outline" color="#000" size={32} />
             <View style={[styles.innerContainer]}>
                 <Text style={[styles.title]}>{name}</Text>

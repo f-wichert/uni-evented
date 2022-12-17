@@ -4,13 +4,13 @@ import React, { useEffect, useState } from 'react';
 import { Dimensions, StyleSheet, View } from 'react-native';
 import MapView, { LatLng, Marker } from 'react-native-maps';
 
-import { TabPropsFor } from '../nav/TabNavigator';
+import { TabNavProps } from '../nav/TabNavigator';
 import { getToken } from '../state/auth';
 import { asyncHandler, request } from '../util';
 
-type ComponentProps = TabPropsFor<'Map'>;
+type Props = TabNavProps<'Map'>;
 
-function MapScreen({ navigation }: ComponentProps) {
+function MapScreen({ navigation }: Props) {
     const mapRef = React.useRef<MapView>(null);
     const [location, setLocation] = useState<LatLng | null>({
         latitude: 48.877616,

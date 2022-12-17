@@ -2,11 +2,13 @@ import * as Location from 'expo-location';
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import MapView, { LatLng, Marker } from 'react-native-maps';
+import { EventStackNavProps } from '../screens/EventScreenNavigator';
+
 import { asyncHandler } from '../util';
 
-MapPicker.propTypes = {};
+type Props = EventStackNavProps<'MapPicker'>;
 
-export default function MapPicker({ route, navigation }) {
+export default function MapPicker({ route, navigation }: Props) {
     const { returnLocation } = route.params;
     const mapRef = React.useRef<MapView>(null);
     // TODO: remove placeholder values

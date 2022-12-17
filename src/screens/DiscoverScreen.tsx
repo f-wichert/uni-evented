@@ -1,6 +1,5 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { NavigationProp, ParamListBase } from '@react-navigation/native';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Dimensions, StyleSheet, Text, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import Carousel from 'react-native-reanimated-carousel';
@@ -8,13 +7,12 @@ import Carousel from 'react-native-reanimated-carousel';
 import ImageDiscover from '../components/ImageDiscover';
 import VideoDiscover from '../components/VideoDiscover';
 import { MediaManager } from '../models';
+import { TabNavProps } from '../nav/TabNavigator';
 import { getToken } from '../state/auth';
 import { ExtendedMedia, Media } from '../types';
 import { asyncHandler, request } from '../util';
 
-declare type Props = {
-    navigation: NavigationProp<ParamListBase>;
-};
+type Props = TabNavProps<'Discover'>;
 
 function DiscoverScreen({ navigation }: Props) {
     const [media, setMedia] = useState<ExtendedMedia[]>([]);
@@ -53,6 +51,15 @@ function DiscoverScreen({ navigation }: Props) {
         height = Dimensions.get('window').height;
     }, [navigation, height]);
 
+    const navigateDetail = useCallback(
+        (id: string) => {
+            // TODO
+            console.warn('TODO: navigating to detail view from here does not work yet');
+            // navigation.navigate('EventDetail', { eventId: id })
+        },
+        [navigation]
+    );
+
     return (
         <View style={styles.container}>
             {media.length == 0 ? (
@@ -75,12 +82,12 @@ function DiscoverScreen({ navigation }: Props) {
                                 {item.type === 'video' ? (
                                     <VideoDiscover
                                         discoverData={media[index]}
-                                        navigation={navigation}
+                                        navigateDetail={navigateDetail}
                                     />
                                 ) : (
                                     <ImageDiscover
                                         discoverData={media[index]}
-                                        navigation={navigation}
+                                        navigateDetail={navigateDetail}
                                     />
                                 )}
                             </>

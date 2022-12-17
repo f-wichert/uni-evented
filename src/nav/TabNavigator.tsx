@@ -14,18 +14,19 @@ import { useAuthStore } from '../state/auth';
 import { IoniconsName } from '../types';
 
 // https://reactnavigation.org/docs/typescript/
-export type TabNavigatorParams = {
+type TabNavigatorParams = {
     Discover: undefined;
     Map: undefined;
-    Events: { eventId?: string };
+    Events: undefined;
     Profile: undefined;
 };
 
 // https://reactnavigation.org/docs/typescript/#combining-navigation-props
-export type TabPropsFor<T extends keyof TabNavigatorParams> = CompositeScreenProps<
-    BottomTabScreenProps<TabNavigatorParams, T>,
-    NativeStackScreenProps<RootNavigatorParams>
->;
+export type TabNavProps<T extends keyof TabNavigatorParams = keyof TabNavigatorParams> =
+    CompositeScreenProps<
+        BottomTabScreenProps<TabNavigatorParams, T>,
+        NativeStackScreenProps<RootNavigatorParams>
+    >;
 
 export const Tab = createBottomTabNavigator<TabNavigatorParams>();
 
@@ -45,11 +46,7 @@ export default function TabNavigator() {
                         iconName = focused ? 'map' : 'map-outline';
                     } else if (route.name === 'Profile') {
                         iconName = focused ? 'person' : 'person-outline';
-                    } else if (route.name === 'Create') {
-                        iconName = focused ? 'add' : 'add-outline';
                     } else if (route.name === 'Events') {
-                        iconName = focused ? 'rocket' : 'rocket-outline';
-                    } else if (route.name === 'Event') {
                         iconName = focused ? 'rocket' : 'rocket-outline';
                     } else {
                         throw new Error(`Unknown route '${route.name}'`);

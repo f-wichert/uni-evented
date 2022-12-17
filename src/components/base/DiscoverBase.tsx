@@ -1,4 +1,3 @@
-import { NavigationProp, ParamListBase } from '@react-navigation/native';
 import { ResizeMode, Video } from 'expo-av';
 import React from 'react';
 import { Image, StyleSheet, View } from 'react-native';
@@ -7,11 +6,11 @@ import { baseHeaders } from '../../util';
 
 declare type Props = {
     discoverData: { src: string };
-    navigation: NavigationProp<ParamListBase>;
+    navigateDetail: (id: string) => void;
     type: 'video' | 'image';
 };
 
-function DiscoverBase({ discoverData, navigation, type }: Props) {
+function DiscoverBase({ discoverData, navigateDetail, type }: Props) {
     const video = React.useRef(null);
     const [status, setStatus] = React.useState({});
 

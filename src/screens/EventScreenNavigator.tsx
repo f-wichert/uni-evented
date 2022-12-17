@@ -1,22 +1,33 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { CompositeScreenProps } from '@react-navigation/native';
+import { createNativeStackNavigator, NativeStackScreenProps } from '@react-navigation/native-stack';
 import React, { useEffect } from 'react';
+import { LatLng } from 'react-native-maps';
+
 import MapPicker from '../components/MapPicker';
+import { TabNavProps } from '../nav/TabNavigator';
 import CreateEventScreen from '../screens/CreateEventScreen';
 import EventDetailScreen from '../screens/EventDetailScreen';
 import EventsScreen from '../screens/EventsScreen';
 import { asyncHandler } from '../util';
 
-export type RootNavigatorParams = {
-    EventsScreen: undefined;
-    CreateEventScreen: undefined;
-    MapPicker: undefined;
-    EventDetailScreen: undefined;
+type NavigatorParams = {
+    EventsList: undefined;
+    CreateEvent: undefined;
+    // TODO: navigation params should be JSON-serializable
+    MapPicker: { returnLocation: (loc: LatLng) => void };
+    EventDetail: { eventId?: string };
 };
 
-const Stack = createNativeStackNavigator<RootNavigatorParams>();
+// https://reactnavigation.org/docs/typescript/#combining-navigation-props
+export type EventStackNavProps<T extends keyof NavigatorParams = keyof NavigatorParams> =
+    CompositeScreenProps<NativeStackScreenProps<NavigatorParams, T>, TabNavProps>;
 
-function EventScreenNavigator({ navigation }) {
+const Stack = createNativeStackNavigator<NavigatorParams>();
+
+type Props = NativeStackScreenProps<NavigatorParams>;
+
+function EventScreenNavigator({ navigation }: Props) {
     useEffect(
         asyncHandler(async () => {
             navigation.setOptions({
@@ -39,7 +50,7 @@ function EventScreenNavigator({ navigation }) {
     return (
         <Stack.Navigator>
             <Stack.Screen
-                name="EventsScreen"
+                name="EventsList"
                 component={EventsScreen}
                 options={{ headerShown: false, animation: 'fade' }}
             />
@@ -50,7 +61,7 @@ function EventScreenNavigator({ navigation }) {
             />
             <Stack.Screen name="MapPicker" component={MapPicker} options={{ headerShown: false }} />
             <Stack.Screen
-                name="EventDetailScreen"
+                name="EventDetail"
                 component={EventDetailScreen}
                 options={{ headerShown: false }}
             />
