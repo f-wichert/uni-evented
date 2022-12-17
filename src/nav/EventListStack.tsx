@@ -8,7 +8,7 @@ import { EventListStackNavParams } from './types';
 
 const Stack = createNativeStackNavigator<EventListStackNavParams>();
 
-function EventsStackNavigator() {
+function EventListStack() {
     return (
         <Stack.Navigator>
             <Stack.Screen
@@ -31,4 +31,4 @@ function EventsStackNavigator() {
     );
 }
 
-export default EventsStackNavigator;
+export default EventListStack;

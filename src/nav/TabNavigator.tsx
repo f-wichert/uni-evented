@@ -7,7 +7,7 @@ import MapScreen from '../screens/MapScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import { useAuthStore } from '../state/auth';
 import { IoniconsName } from '../types';
-import EventsStackNavigator from './EventsStackNavigator';
+import EventListStack from './EventListStack';
 import { TabNavParams } from './types';
 
 export const Tab = createBottomTabNavigator<TabNavParams>();
@@ -42,11 +42,7 @@ export default function TabNavigator() {
         >
             <Tab.Screen name="Discover" component={DiscoverScreen} />
             <Tab.Screen name="Map" component={MapScreen} />
-            <Tab.Screen
-                name="Events"
-                component={EventsStackNavigator}
-                options={{ headerShown: false }}
-            />
+            <Tab.Screen name="Events" component={EventListStack} options={{ headerShown: false }} />
             <Tab.Screen name="Profile" component={ProfileScreen} options={{ headerShown: false }} />
         </Tab.Navigator>
     );
