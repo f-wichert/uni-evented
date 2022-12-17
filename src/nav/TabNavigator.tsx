@@ -45,5 +45,5 @@ export default function TabNavigator() {
             <Tab.Screen name="Events" component={EventsStackNavigator} />
             <Tab.Screen name="Profile" component={ProfileScreen} options={{ headerShown: false }} />
         </Tab.Navigator>
-    ); // Temporarily changed component of 'Events' to EventDetailScreen for easy acces during developement. Previous value: 'EventsScreen'
+    );
 }

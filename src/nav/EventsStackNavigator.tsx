@@ -4,7 +4,7 @@ import React, { useEffect } from 'react';
 
 import CreateEventScreen from '../screens/CreateEventScreen';
 import EventDetailScreen from '../screens/EventDetailScreen';
-import EventsScreen from '../screens/EventsScreen';
+import EventListScreen from '../screens/EventListScreen';
 import { asyncHandler } from '../util';
 import { EventListStackNavParams, TabNavProps } from './types';
 
@@ -35,7 +35,7 @@ function EventsStackNavigator({ navigation }: TabNavProps<'Events'>) {
         <Stack.Navigator>
             <Stack.Screen
                 name="EventList"
-                component={EventsScreen}
+                component={EventListScreen}
                 options={{ headerShown: false, animation: 'fade' }}
             />
             <Stack.Screen

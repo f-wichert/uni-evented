@@ -15,7 +15,7 @@ type EventsData = {
     followerEvents: Event[];
 };
 
-function EventsScreen({ navigation }: EventListStackNavProps<'EventList'>) {
+export default function EventListScreen({ navigation }: EventListStackNavProps<'EventList'>) {
     const [events, setEvents] = useState<EventsData | null>(null);
 
     const fetchData = useCallback(async () => {
@@ -97,5 +97,3 @@ const styles = StyleSheet.create({
         borderBottomWidth: 2,
     },
 });
-
-export default EventsScreen;
