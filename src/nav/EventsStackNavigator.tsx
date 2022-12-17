@@ -1,52 +1,31 @@
-import Ionicons from '@expo/vector-icons/Ionicons';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import React, { useEffect } from 'react';
+import React from 'react';
 
 import CreateEventScreen from '../screens/CreateEventScreen';
 import EventDetailScreen from '../screens/EventDetailScreen';
 import EventListScreen from '../screens/EventListScreen';
-import { asyncHandler } from '../util';
-import { EventListStackNavParams, TabNavProps } from './types';
+import { EventListStackNavParams } from './types';
 
 const Stack = createNativeStackNavigator<EventListStackNavParams>();
 
-function EventsStackNavigator({ navigation }: TabNavProps<'Events'>) {
-    useEffect(
-        asyncHandler(async () => {
-            navigation.setOptions({
-                headerRight: () => (
-                    <Ionicons
-                        name="add-outline"
-                        size={32}
-                        color="black"
-                        // TODO: use nested navigator? this works but it's technically wrong
-                        onPress={() => navigation.navigate('CreateEvent')}
-                        style={{
-                            marginRight: 15,
-                        }}
-                    />
-                ),
-            });
-        }),
-        [navigation]
-    );
-
+function EventsStackNavigator() {
     return (
         <Stack.Navigator>
             <Stack.Screen
                 name="EventList"
                 component={EventListScreen}
-                options={{ headerShown: false, animation: 'fade' }}
+                options={{ title: 'Events' }}
             />
             <Stack.Screen
                 name="CreateEvent"
                 component={CreateEventScreen}
-                options={{ headerShown: false }}
+                options={{ title: 'Create Event' }}
             />
             <Stack.Screen
                 name="EventDetail"
                 component={EventDetailScreen}
-                options={{ headerShown: false }}
+                // TODO: consider showing event title here (see https://reactnavigation.org/docs/headers/#using-params-in-the-title)
+                options={{ title: 'Detail' }}
             />
         </Stack.Navigator>
     );

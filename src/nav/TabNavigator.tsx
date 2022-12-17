@@ -42,7 +42,11 @@ export default function TabNavigator() {
         >
             <Tab.Screen name="Discover" component={DiscoverScreen} />
             <Tab.Screen name="Map" component={MapScreen} />
-            <Tab.Screen name="Events" component={EventsStackNavigator} />
+            <Tab.Screen
+                name="Events"
+                component={EventsStackNavigator}
+                options={{ headerShown: false }}
+            />
             <Tab.Screen name="Profile" component={ProfileScreen} options={{ headerShown: false }} />
         </Tab.Navigator>
     );
