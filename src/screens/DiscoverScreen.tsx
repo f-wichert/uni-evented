@@ -1,11 +1,10 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import React, { useCallback, useEffect, useState } from 'react';
-import { Dimensions, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import Carousel from 'react-native-reanimated-carousel';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
-import ImageDiscover from '../components/ImageDiscover';
-import VideoDiscover from '../components/VideoDiscover';
+import MediaCarousel from '../components/MediaCarousel';
 import { MediaManager } from '../models';
 import { TabNavProps } from '../nav/types';
 import { getToken } from '../state/auth';
@@ -13,21 +12,6 @@ import { ExtendedMedia, Media } from '../types';
 import { asyncHandler, request } from '../util';
 
 function DiscoverScreen({ navigation }: TabNavProps<'Discover'>) {
-    const [media, setMedia] = useState<ExtendedMedia[]>([]);
-
-    async function updateMedia() {
-        const responseData = await request('GET', 'info/all_media', getToken());
-        const data = responseData.media as Media[];
-        const media: ExtendedMedia[] = data
-            .filter((el) => el.fileAvailable)
-            .map((el) => ({ ...el, src: MediaManager.src(el, 'high') }));
-        setMedia(media);
-    }
-
-    const width = Dimensions.get('window').width;
-    // var height = Dimensions.get('window').height;
-    var height = 700;
-
     useEffect(() => {
         // Use `setOptions` to update the button that we previously specified
         // Now the button includes an `onPress` handler to update the discoverData
@@ -44,10 +28,18 @@ function DiscoverScreen({ navigation }: TabNavProps<'Discover'>) {
                 />
             ),
         });
+    }, [navigation]);
 
-        // Get appropriate height for carousel
-        height = Dimensions.get('window').height;
-    }, [navigation, height]);
+    const [media, setMedia] = useState<ExtendedMedia[]>([]);
+
+    async function updateMedia() {
+        const responseData = await request('GET', 'info/all_media', getToken());
+        const data = responseData.media as Media[];
+        const media: ExtendedMedia[] = data
+            .filter((el) => el.fileAvailable)
+            .map((el) => ({ ...el, src: MediaManager.src(el, 'high') }));
+        setMedia(media);
+    }
 
     const navigateDetail = useCallback(
         (id: string) => {
@@ -66,32 +58,13 @@ function DiscoverScreen({ navigation }: TabNavProps<'Discover'>) {
                     <Text style={styles.sadText}>Seems like there are no clips right now...</Text>
                 </View>
             ) : (
-                <GestureHandlerRootView>
-                    <Carousel
-                        vertical={true}
-                        width={width}
-                        height={400}
-                        autoPlay={false}
-                        loop={false}
-                        data={media}
-                        scrollAnimationDuration={450}
-                        renderItem={({ item, index }) => (
-                            <>
-                                {item.type === 'video' ? (
-                                    <VideoDiscover
-                                        discoverData={media[index]}
-                                        navigateDetail={navigateDetail}
-                                    />
-                                ) : (
-                                    <ImageDiscover
-                                        discoverData={media[index]}
-                                        navigateDetail={navigateDetail}
-                                    />
-                                )}
-                            </>
-                        )}
-                    />
-                </GestureHandlerRootView>
+                // wrap carousel in another safearea provider since the carousel
+                // needs a pixel height and doesn't support `height: '100%'`
+                <SafeAreaProvider>
+                    <GestureHandlerRootView>
+                        <MediaCarousel media={media} navigateDetail={navigateDetail} />
+                    </GestureHandlerRootView>
+                </SafeAreaProvider>
             )}
         </View>
     );
@@ -103,6 +76,8 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
         alignItems: 'center',
         justifyContent: 'center',
+        height: '100%',
+        width: '100%',
     },
     sadContainer: {
         justifyContent: 'center',
