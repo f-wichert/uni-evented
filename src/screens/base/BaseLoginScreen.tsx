@@ -5,7 +5,7 @@ import yellowSplash from '../../../assets/yellow_splash.png';
 import Button from '../../components/Button';
 import { IoniconsName } from '../../types';
 
-interface ComponentProps {
+interface Props {
     fields: {
         icon?: IoniconsName;
         onChange: (text: string) => void;
@@ -16,7 +16,7 @@ interface ComponentProps {
     footer: { text: string; buttonText: string; callback: () => void }[];
 }
 
-export default function BaseLoginScreen({ fields, submitButton, header, footer }: ComponentProps) {
+export default function BaseLoginScreen({ fields, submitButton, header, footer }: Props) {
     return (
         <View style={styles.container}>
             <Image style={styles.art} source={yellowSplash} />

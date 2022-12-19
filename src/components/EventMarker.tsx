@@ -1,11 +1,16 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import { Callout, Marker } from 'react-native-maps';
+import { Callout, LatLng, Marker } from 'react-native-maps';
 import WebView from 'react-native-webview';
 
-// TODO: kann mir jemand zeigen wie mann hier ein interface oder so für die props definiert? habe da schon unterschiedliche sachen gesehen - Fred
+interface Props {
+    coordinate: LatLng;
+    title: string;
+    pinColor: string;
+    onCalloutPress: () => void;
+}
 
-function EventMarker({ coordinate, title, pinColor, onCalloutPress }) {
+function EventMarker({ coordinate, title, pinColor, onCalloutPress }: Props) {
     return (
         <Marker
             coordinate={coordinate}
@@ -19,8 +24,8 @@ function EventMarker({ coordinate, title, pinColor, onCalloutPress }) {
                         style={{ height: 200, width: 200 }}
                         source={{ uri: 'https://reactnative.dev/' }}
                     />
-                    {/* <View style={styles.viewOrEnterDispensaryButtonContainer}> 
-                        <Text style={styles.viewOrEnterDispensaryButtonText}> {strings.dispensariesList.enterDispensary}</Text> 
+                    {/* <View style={styles.viewOrEnterDispensaryButtonContainer}>
+                        <Text style={styles.viewOrEnterDispensaryButtonText}> {strings.dispensariesList.enterDispensary}</Text>
                     </View> */}
                 </View>
             </Callout>

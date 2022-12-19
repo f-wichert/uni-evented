@@ -1,4 +1,3 @@
-import { NavigationProp, ParamListBase } from '@react-navigation/native';
 import React from 'react';
 import { Image, StyleSheet, View } from 'react-native';
 
@@ -6,10 +5,10 @@ import { baseHeaders } from '../util';
 
 declare type Props = {
     discoverData: { src: string };
-    navigation: NavigationProp<ParamListBase>;
+    navigateDetail: (id: string) => void;
 };
 
-function ImageDiscover({ discoverData, navigation }: Props) {
+function ImageDiscover({ discoverData, navigateDetail }: Props) {
     return (
         <View style={styles.container}>
             <Image

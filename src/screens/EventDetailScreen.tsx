@@ -2,15 +2,14 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import React, { useEffect, useState } from 'react';
 import { Image, Pressable, SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Rating } from 'react-native-ratings';
+
 import { Tag } from '../components/Tag';
 import { Event, EventManager } from '../models/event';
-import { TabPropsFor } from '../nav/TabNavigator';
+import { EventListStackNavProps } from '../nav/types';
 import { useAuthStore } from '../state/auth';
 import { asyncHandler } from '../util';
 
-type ComponentProps = TabPropsFor<'Events'>;
-
-function EventDetailScreen({ route }: ComponentProps) {
+function EventDetailScreen({ route }: EventListStackNavProps<'EventDetail'>) {
     const eventId = route.params?.eventId ?? null;
     console.log('Event ID: ', eventId);
 

@@ -1,5 +1,4 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { NavigationProp, ParamListBase } from '@react-navigation/native';
 import { ResizeMode, Video } from 'expo-av';
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
@@ -9,10 +8,10 @@ import { asyncHandler, baseHeaders, request } from '../util';
 
 declare type Props = {
     discoverData: { src: string; id: string };
-    navigation: NavigationProp<ParamListBase>;
+    navigateDetail: (id: string) => void;
 };
 
-function VideoDiscover({ discoverData, navigation }: Props) {
+function VideoDiscover({ discoverData, navigateDetail }: Props) {
     const video = React.useRef(null);
     const [status, setStatus] = React.useState({});
     const [score, setScore] = React.useState(Math.floor(Math.random() * 25));

@@ -1,12 +1,12 @@
 import { Image, StyleSheet, Text, View } from 'react-native';
 
-interface ComponentProps {
+interface Props {
     imageUri: string;
     displayName: string | null;
     username: string;
 }
 
-export default function ProfileHeader({ imageUri, displayName, username }: ComponentProps) {
+export default function ProfileHeader({ imageUri, displayName, username }: Props) {
     const usernameFmt = `@${username}`;
     return (
         <View style={styles.container}>

@@ -1,26 +1,21 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import * as Location from 'expo-location';
-import { LocationObject } from 'expo-location';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Dimensions, StyleSheet, View } from 'react-native';
-import MapView, { Marker } from 'react-native-maps';
+import MapView, { LatLng, Marker } from 'react-native-maps';
 
-import { TabPropsFor } from '../nav/TabNavigator';
+import { Event } from '../models';
+import { TabNavProps } from '../nav/types';
 import { getToken } from '../state/auth';
 import { asyncHandler, request } from '../util';
 
-type ComponentProps = TabPropsFor<'Map'>;
-
-function MapScreen({ navigation }: ComponentProps) {
+function MapScreen({ navigation }: TabNavProps<'Map'>) {
     const mapRef = React.useRef<MapView>(null);
-    const [location, setLocation] = useState<LocationObject | null>({
-        coords: {
-            latitude: 48.877616,
-            longitude: 8.652653,
-        },
+    const [location, setLocation] = useState<LatLng | null>({
+        latitude: 48.877616,
+        longitude: 8.652653,
     });
-    // todo: fix types
-    const [events, setEvents] = useState<any>([]);
+    const [events, setEvents] = useState<Event[]>([]);
 
     const getCurrentPosition = async () => {
         const { status } = await Location.requestForegroundPermissionsAsync();
@@ -29,16 +24,17 @@ function MapScreen({ navigation }: ComponentProps) {
         }
 
         const location = await Location.getCurrentPositionAsync();
-        setLocation(location);
+        const latlng = { latitude: location.coords.latitude, longitude: location.coords.longitude };
+        setLocation(latlng);
 
         mapRef.current?.animateCamera({
-            center: { latitude: location.coords.latitude, longitude: location.coords.longitude },
+            center: latlng,
         });
     };
 
     const updateEventList = async () => {
         const eventList = await request('get', 'event/find', getToken());
-        setEvents(eventList.events);
+        setEvents(eventList.events as unknown as Event[]);
     };
 
     useEffect(
@@ -50,7 +46,7 @@ function MapScreen({ navigation }: ComponentProps) {
                         size={32}
                         color="black"
                         onPress={asyncHandler(updateEventList, {
-                            prefix: 'Failed to update media',
+                            prefix: 'Failed to update events',
                         })}
                         style={{
                             marginRight: 10,
@@ -58,9 +54,17 @@ function MapScreen({ navigation }: ComponentProps) {
                     />
                 ),
             });
-            updateEventList();
-            await getCurrentPosition();
+            await Promise.all([updateEventList(), getCurrentPosition()]);
         }),
+        [navigation]
+    );
+
+    const navigateDetail = useCallback(
+        (id: string) => {
+            // TODO
+            console.warn('TODO: navigating to detail view from here does not work yet');
+            // navigation.navigate('EventDetail', { eventId: id })
+        },
         [navigation]
     );
 
@@ -69,8 +73,8 @@ function MapScreen({ navigation }: ComponentProps) {
             {location ? (
                 <MapView
                     initialRegion={{
-                        latitude: location.coords.latitude,
-                        longitude: location.coords.longitude,
+                        latitude: location.latitude,
+                        longitude: location.longitude,
                         latitudeDelta: 0.01,
                         longitudeDelta: 0.01,
                     }}
@@ -79,17 +83,19 @@ function MapScreen({ navigation }: ComponentProps) {
                     style={styles.map}
                 >
                     <>
-                        {events.map((el: any) => (
+                        {events.map((el) => (
                             <Marker
                                 key={el.id}
                                 coordinate={{
-                                    latitude: parseFloat(el.lat),
-                                    longitude: parseFloat(el.lon),
+                                    latitude: el.lat,
+                                    longitude: el.lon,
                                 }}
                                 title={el.name}
                                 pinColor="teal"
+                                // TODO: this might re-render every time since the
+                                // callback isn't memoized, not sure
                                 onCalloutPress={() => {
-                                    navigation.navigate('Events', { eventId: el.id });
+                                    navigateDetail(el.id);
                                 }}
                             />
                         ))}

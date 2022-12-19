@@ -1,6 +1,6 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { DateTimePickerAndroid, DateTimePickerEvent } from '@react-native-community/datetimepicker';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     Button,
     Dimensions,
@@ -12,9 +12,10 @@ import {
 } from 'react-native';
 import DropDownPicker from 'react-native-dropdown-picker';
 // import DateTimePicker from '@react-native-community/datetimepicker';
-
 import MapView, { LatLng, Marker } from 'react-native-maps';
+
 import { INPUT_BACKGR_COLOR } from '../const';
+import { EventListStackNavProps } from '../nav/types';
 import { useAuthStore } from '../state/auth';
 import { IoniconsName } from '../types';
 
@@ -37,7 +38,16 @@ const tags = [
 ] as const;
 type TagValue = typeof tags[number]['value'];
 
-function CreateEventScreen({ navigation }) {
+function CreateEventScreen({ navigation, route }: EventListStackNavProps<'CreateEvent'>) {
+    // This is passed back from the map picker (https://reactnavigation.org/docs/params#passing-params-to-a-previous-screen).
+    // If `params.location` changed, we call `setLocation` with the new value.
+    const locationParam = route.params?.location;
+    useEffect(() => {
+        if (locationParam) {
+            setLocation(locationParam);
+        }
+    }, [locationParam]);
+
     const [name, setName] = useState('');
 
     // DatePickerState
@@ -55,10 +65,6 @@ function CreateEventScreen({ navigation }) {
     const [iconName, setIconName] = useState<IoniconsName>('location-outline');
 
     const createEvent = useAuthStore((state) => state.createEvent);
-
-    const receiveLocation = (loc) => {
-        setLocation(loc);
-    };
 
     const onChange = (event: DateTimePickerEvent, selectedDate?: Date) => {
         if (!selectedDate) {
@@ -107,19 +113,13 @@ function CreateEventScreen({ navigation }) {
         return `${day}.${month}.${year}`;
     };
 
-    const grabLocation = async () => {
-        navigation.navigate('MapPicker', {
-            returnLocation: receiveLocation,
-        });
-    };
-
     const onCreateButton = async () => {
         // TODO: require these to be non-empty in the UI
         if (!location || !name) {
             throw new Error('Invalid name or location');
         }
         await createEvent({ name: name, location: location, startDate: start }).then((data) => {
-            navigation.navigate('EventDetailScreen', {
+            navigation.navigate('EventDetail', {
                 eventId: data,
             });
         });
@@ -144,18 +144,28 @@ function CreateEventScreen({ navigation }) {
             <View style={styles.section}>
                 <View style={{ flexDirection: 'row' }}>
                     <Text style={styles.sectionTitle}>Location</Text>
-                    <Ionicons onPress={grabLocation} name={iconName} size={26} color={'orange'} />
+                    <Ionicons
+                        // TODO: this always opens the map picker to the default location,
+                        // even if the user already picked a location
+                        onPress={() => navigation.navigate('MapPicker')}
+                        name={iconName}
+                        size={26}
+                        color={'orange'}
+                    />
                 </View>
 
                 <View style={styles.sectionBody}>
                     {location ? (
-                        <TouchableOpacity onPressIn={console.log('hi')}>
+                        // TODO: no event handler, pressing this does nothing
+                        <TouchableOpacity>
                             <MapView
                                 style={styles.locationPreviewMap}
-                                onPress={(e) => console.log('E')}
+                                // TODO: do something on press, or disable touch event instead?
                                 zoomEnabled={false}
                                 scrollEnabled={false}
-                                initialRegion={{
+                                pitchEnabled={false}
+                                rotateEnabled={false}
+                                region={{
                                     latitude: location.latitude,
                                     longitude: location.longitude,
                                     latitudeDelta: 0.001,
