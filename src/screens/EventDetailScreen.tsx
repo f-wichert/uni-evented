@@ -31,7 +31,7 @@ function EventDetailScreen({ route }: ComponentProps) {
 
     console.log('eventData:', eventData);
     if (!eventData) {
-        return (
+        return ( 
             <View
                 style={{
                     display: 'flex',
