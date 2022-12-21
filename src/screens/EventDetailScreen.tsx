@@ -1,7 +1,9 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import React, { useEffect, useState } from 'react';
 import { Image, Pressable, SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Rating } from 'react-native-ratings';
+import { AnyRootNavParams } from '../nav/types';
 
 import { Tag } from '../components/Tag';
 import { Event, EventManager } from '../models/event';
@@ -9,7 +11,7 @@ import { EventListStackNavProps } from '../nav/types';
 import { useAuthStore } from '../state/auth';
 import { asyncHandler } from '../util';
 
-function EventDetailScreen({ route }: EventListStackNavProps<'EventDetail'>) {
+function EventDetailScreen({ route, navigation }: EventListStackNavProps<'EventDetail'>) {
     const eventId = route.params?.eventId ?? null;
     console.log('Event ID: ', eventId);
 
@@ -30,7 +32,7 @@ function EventDetailScreen({ route }: EventListStackNavProps<'EventDetail'>) {
 
     console.log('eventData:', eventData);
     if (!eventData) {
-        return ( 
+        return (
             <View
                 style={{
                     display: 'flex',
@@ -84,6 +86,8 @@ function EventDetailScreen({ route }: EventListStackNavProps<'EventDetail'>) {
     };
     console.log('Time', eventData.startDate);
 
+    const Stack = createNativeStackNavigator<AnyRootNavParams>();
+
     return (
         <SafeAreaView style={{ display: 'flex' }}>
             <ScrollView>
@@ -93,7 +97,9 @@ function EventDetailScreen({ route }: EventListStackNavProps<'EventDetail'>) {
                             name="camera"
                             size={64}
                             color="orange"
-                            onPress={() => setCameraActive(true)}
+                            onPress={() => {
+                                navigation.navigate('MediaCapture', { eventID: eventId });
+                            }}
                         />
                         <Text>Load Picture/Video of event here</Text>
                     </View>

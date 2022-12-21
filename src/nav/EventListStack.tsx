@@ -1,6 +1,7 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import React from 'react';
 
+import CameraScreen from '../screens/CameraScreen';
 import CreateEventScreen from '../screens/CreateEventScreen';
 import EventDetailScreen from '../screens/EventDetailScreen';
 import EventListScreen from '../screens/EventListScreen';
@@ -32,6 +33,11 @@ function EventListStack() {
                 name="MapPicker"
                 component={MapPickerScreen}
                 options={{ title: 'Pick a Location!' }}
+            />
+            <Stack.Screen
+                name="MediaCapture"
+                component={CameraScreen}
+                options={{ title: 'Upload your Content' }}
             />
         </Stack.Navigator>
     );
