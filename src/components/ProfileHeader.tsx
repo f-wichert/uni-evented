@@ -1,4 +1,5 @@
 import { Image, StyleSheet, Text, View } from 'react-native';
+import yellowSplash from '../../assets/yellow_splash.png';
 
 interface Props {
     imageUri: string;
@@ -11,7 +12,12 @@ export default function ProfileHeader({ imageUri, displayName, username }: Props
     return (
         <View style={styles.container}>
             {/* TODO: profile pictures */}
-            <Image style={styles.profilePicture} source={{ uri: imageUri }} />
+            <Image
+                style={styles.profilePicture}
+                source={{ uri: imageUri }}
+                // TODO: better placeholder
+                defaultSource={yellowSplash}
+            />
             <View style={styles.nameContainer}>
                 {/* Show display name first, if set */}
                 <Text style={styles.titleText}>{displayName || usernameFmt}</Text>

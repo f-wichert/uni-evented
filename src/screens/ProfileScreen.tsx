@@ -3,15 +3,19 @@ import React, { useCallback } from 'react';
 import { Alert, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Cell, Section, TableView } from 'react-native-tableview-simple';
+import urlJoin from 'url-join';
 
 import ProfileHeader from '../components/ProfileHeader';
 import Separator from '../components/Separator';
+import config from '../config';
 import { useAuthStore, useCurrentUser } from '../state/auth';
 import { IoniconsName } from '../types';
 
 export default function ProfileScreen() {
     const user = useCurrentUser();
     const signout = useAuthStore((state) => state.signout);
+
+    const avatarUrl = urlJoin(config.BASE_URL, 'media', 'avatar', user.id, 'high.jpg');
 
     const confirmLogout = useCallback(() => {
         Alert.alert('Confirm Logout', 'Are you sure that you want to log out?', [
@@ -29,7 +33,7 @@ export default function ProfileScreen() {
         <SafeAreaView>
             <View style={styles.profileHeader}>
                 <ProfileHeader
-                    imageUri="https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=745&q=80"
+                    imageUri={avatarUrl}
                     displayName={user.displayName}
                     username={user.username}
                 />
