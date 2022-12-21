@@ -1,15 +1,18 @@
 import { Ionicons } from '@expo/vector-icons';
+import * as ImagePicker from 'expo-image-picker';
 import React, { useCallback } from 'react';
 import { Alert, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Cell, Section, TableView } from 'react-native-tableview-simple';
 import urlJoin from 'url-join';
 
+import yellowSplash from '../../assets/yellow_splash.png';
 import ProfileHeader from '../components/ProfileHeader';
 import Separator from '../components/Separator';
 import config from '../config';
-import { useAuthStore, useCurrentUser } from '../state/auth';
+import { getToken, useAuthStore, useCurrentUser } from '../state/auth';
 import { IoniconsName } from '../types';
+import { asyncHandler, request } from '../util';
 
 export default function ProfileScreen() {
     const user = useCurrentUser();
@@ -36,6 +39,31 @@ export default function ProfileScreen() {
                     imageUri={avatarUrl}
                     displayName={user.displayName}
                     username={user.username}
+                    // TODO: better fallback image
+                    fallbackImage={yellowSplash}
+                    onAvatarPress={asyncHandler(async () => {
+                        const result = await ImagePicker.launchImageLibraryAsync({
+                            allowsEditing: true,
+                            aspect: [1, 1],
+                        });
+
+                        const asset = result.assets?.pop();
+                        if (!asset) {
+                            return;
+                        }
+
+                        const { uri, fileName } = asset;
+
+                        const form = new FormData();
+                        form.append('File', {
+                            name: fileName ?? 'sample.dat',
+                            uri: uri,
+                        });
+
+                        await request('POST', '/upload/avatar', getToken(), form);
+
+                        // TODO: somehow force-update the avatar in the header
+                    })}
                 />
             </View>
 

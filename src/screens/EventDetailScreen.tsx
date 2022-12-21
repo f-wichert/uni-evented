@@ -30,7 +30,7 @@ function EventDetailScreen({ route }: EventListStackNavProps<'EventDetail'>) {
 
     console.log('eventData:', eventData);
     if (!eventData) {
-        return ( 
+        return (
             <View
                 style={{
                     display: 'flex',

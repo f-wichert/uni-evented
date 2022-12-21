@@ -1,23 +1,32 @@
 import { Image, StyleSheet, Text, View } from 'react-native';
-import yellowSplash from '../../assets/yellow_splash.png';
+import { TouchableHighlight } from 'react-native-gesture-handler';
 
 interface Props {
     imageUri: string;
     displayName: string | null;
     username: string;
+    fallbackImage?: number;
+    onAvatarPress?: () => void;
 }
 
-export default function ProfileHeader({ imageUri, displayName, username }: Props) {
+export default function ProfileHeader({
+    imageUri,
+    displayName,
+    username,
+    fallbackImage,
+    onAvatarPress,
+}: Props) {
     const usernameFmt = `@${username}`;
     return (
         <View style={styles.container}>
             {/* TODO: profile pictures */}
-            <Image
-                style={styles.profilePicture}
-                source={{ uri: imageUri }}
-                // TODO: better placeholder
-                defaultSource={yellowSplash}
-            />
+            <TouchableHighlight style={styles.profilePicture} onPress={onAvatarPress}>
+                <Image
+                    style={styles.profilePicture}
+                    source={{ uri: imageUri }}
+                    defaultSource={fallbackImage}
+                />
+            </TouchableHighlight>
             <View style={styles.nameContainer}>
                 {/* Show display name first, if set */}
                 <Text style={styles.titleText}>{displayName || usernameFmt}</Text>
