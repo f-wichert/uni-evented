@@ -1,22 +1,19 @@
 import * as Location from 'expo-location';
-import { LocationObject } from 'expo-location';
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import MapView, { LatLng, Marker } from 'react-native-maps';
+
+import { EventListStackNavProps } from '../nav/types';
 import { asyncHandler } from '../util';
 
-MapPicker.propTypes = {};
-
-export default function MapPicker({ route, navigation }) {
-    const { returnLocation } = route.params;
+export default function MapPickerScreen({ navigation }: EventListStackNavProps<'MapPicker'>) {
     const mapRef = React.useRef<MapView>(null);
-    const [location, setLocation] = useState<LocationObject | null>({
-        coords: {
-            latitude: 48.877616,
-            longitude: 8.652653,
-        },
+    // TODO: remove placeholder values
+    const [location, setLocation] = useState<LatLng>({
+        latitude: 48.877616,
+        longitude: 8.652653,
     });
-    const [pickedLocation, setPickedLocation] = useState<LatLng | null>({
+    const [pickedLocation, setPickedLocation] = useState<LatLng>({
         latitude: 48.877616,
         longitude: 8.652653,
     });
@@ -42,16 +39,17 @@ export default function MapPicker({ route, navigation }) {
         }
 
         const location = await Location.getCurrentPositionAsync();
-        setLocation(location);
+        const latlng = { latitude: location.coords.latitude, longitude: location.coords.longitude };
+        setLocation(latlng);
 
         mapRef.current?.animateCamera({
-            center: { latitude: location.coords.latitude, longitude: location.coords.longitude },
+            center: latlng,
         });
     };
 
     const pickLocation = () => {
-        returnLocation(pickedLocation);
-        navigation.navigate('CreateEvent');
+        // pass picked location back to create event screen
+        navigation.navigate('CreateEvent', { location: pickedLocation });
     };
 
     return (
@@ -62,8 +60,8 @@ export default function MapPicker({ route, navigation }) {
                 ref={mapRef}
                 showsUserLocation={true}
                 initialRegion={{
-                    latitude: location.coords.latitude,
-                    longitude: location.coords.longitude,
+                    latitude: location.latitude,
+                    longitude: location.longitude,
                     latitudeDelta: 0.01,
                     longitudeDelta: 0.01,
                 }}
@@ -71,14 +69,13 @@ export default function MapPicker({ route, navigation }) {
                 <Marker
                     key={1}
                     coordinate={{
-                        latitude: location.coords.latitude,
-                        longitude: location.coords.longitude,
+                        latitude: location.latitude,
+                        longitude: location.longitude,
                     }}
                     title="Your party location"
                     pinColor="orange"
                     draggable
                     onDragEnd={(e) => {
-                        console.log('dragEnd', e.nativeEvent.coordinate);
                         setPickedLocation(e.nativeEvent.coordinate);
                     }}
                 />

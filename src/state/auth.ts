@@ -21,7 +21,7 @@ interface State {
         location: LatLng;
         startDate?: Date;
         endDate?: Date;
-    }) => Promise<void>;
+    }) => Promise<string>;
     closeEvent: () => void;
     joinEvent: (params: { eventId: string }) => Promise<void>;
 }
@@ -88,21 +88,16 @@ export const useAuthStore = createStore<State>('auth')(
                     startDateTime: params.startDate?.toJSON() ?? null,
                     endDateTime: params.endDate?.toJSON() ?? null,
                 });
-                console.debug('createEvent response:', data);
+                const eventId = data.eventId as string;
 
-                // TODO: creating an event shouldn't automatically make the host join it
-                await request('POST', '/event/join', getToken(), {
-                    eventId: data.eventId,
-                    lat: 0,
-                    lon: 0,
-                });
                 set((state) => {
                     if (!state.user) {
                         console.warn('No current user stored, cannot set event ID');
                         return;
                     }
-                    state.user.currentEventId = data.eventId as string;
+                    state.user.currentEventId = eventId;
                 });
+                return eventId;
             },
             closeEvent: () => {
                 set((state) => {

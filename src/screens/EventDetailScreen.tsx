@@ -7,13 +7,11 @@ import Carousel from 'react-native-reanimated-carousel';
 
 import { Tag } from '../components/Tag';
 import { Event, EventManager } from '../models/event';
-import { TabPropsFor } from '../nav/TabNavigator';
+import { EventListStackNavProps } from '../nav/types';
 import { useAuthStore } from '../state/auth';
 import { asyncHandler } from '../util';
 
-type ComponentProps = TabPropsFor<'Events'>;
-
-function EventDetailScreen({ route }: ComponentProps) {
+function EventDetailScreen({ route }: EventListStackNavProps<'EventDetail'>) {
     const eventId = route.params?.eventId ?? null;
     console.log('Event ID: ', eventId);
 
