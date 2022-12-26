@@ -1,4 +1,5 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { HeaderBackButton } from '@react-navigation/elements';
 import React, { useEffect, useState } from 'react';
 import { Image, Pressable, SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Rating } from 'react-native-ratings';
@@ -9,9 +10,11 @@ import { EventListStackNavProps } from '../nav/types';
 import { useAuthStore } from '../state/auth';
 import { asyncHandler } from '../util';
 
-function EventDetailScreen({ route }: EventListStackNavProps<'EventDetail'>) {
+function EventDetailScreen({ route, navigation }: EventListStackNavProps<'EventDetail'>) {
     const eventId = route.params?.eventId ?? null;
-    console.log('Event ID: ', eventId);
+    const origin = route.params?.origin ?? null;
+    // console.log('Event ID: ', eventId);
+    // console.log('Origin: ', origin);
 
     const [eventData, setEventData] = useState<Event | null>(null);
 
@@ -20,6 +23,17 @@ function EventDetailScreen({ route }: EventListStackNavProps<'EventDetail'>) {
 
     useEffect(
         asyncHandler(async () => {
+            // overwrite back button functionality on this component to depend on where it came from (nested screens)
+            navigation.setOptions({
+                headerLeft: () => (
+                    <HeaderBackButton
+                        onPress={() => {
+                            navigateToOrigin();
+                        }}
+                    />
+                ),
+            });
+
             if (!eventId) return;
             setEventData(await EventManager.fromId(eventId));
         }),
@@ -28,7 +42,7 @@ function EventDetailScreen({ route }: EventListStackNavProps<'EventDetail'>) {
 
     // const eventID = useAuthStore((state) => state.user?.currentEventId) // Get event ID of current event of currently logged in user
 
-    console.log('eventData:', eventData);
+    // console.log('eventData:', eventData);
     if (!eventData) {
         return (
             <View
@@ -45,7 +59,7 @@ function EventDetailScreen({ route }: EventListStackNavProps<'EventDetail'>) {
         );
     }
 
-    console.log(`Data: ${JSON.stringify(eventData)}`);
+    // console.log(`Data: ${JSON.stringify(eventData)}`);
     //     return  (async () => {
     //     eventData = EventManager.fromId(eventID!) as Event
     //     console.log('Event:', eventData);
@@ -54,7 +68,7 @@ function EventDetailScreen({ route }: EventListStackNavProps<'EventDetail'>) {
     // }).then(run(eventData))
     async function registerUserArrivalAtEvent() {
         if (!eventId) return;
-        console.log(`You are now checked in at the Event (Mock Message, did nothing)`);
+        // console.log(`You are now checked in at the Event (Mock Message, did nothing)`);
         await joinEvent({ eventId });
     }
 
@@ -63,6 +77,23 @@ function EventDetailScreen({ route }: EventListStackNavProps<'EventDetail'>) {
             profilePicture:
                 'https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=745&q=80',
         };
+    }
+
+    function navigateToOrigin() {
+        // probably same TS error as in MapScreen (link there)
+        switch (origin) {
+            case 'EventDetail':
+                navigation.navigate('EventList');
+                break;
+            case 'Map':
+                navigation.navigate('TabScreen', { screen: 'Map' });
+                break;
+            case 'Discover':
+                navigation.navigate('TabScreen', { screen: 'Discover' });
+                break;
+            default:
+                navigation.navigate('EventList');
+        }
     }
 
     // Developement Values TODO: replace with request to real ones
@@ -82,7 +113,7 @@ function EventDetailScreen({ route }: EventListStackNavProps<'EventDetail'>) {
         description:
             'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum.',
     };
-    console.log('Time', eventData.startDate);
+    // console.log('Time', eventData.startDate);
 
     return (
         <SafeAreaView style={{ display: 'flex' }}>
