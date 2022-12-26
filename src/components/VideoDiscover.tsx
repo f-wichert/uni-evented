@@ -1,7 +1,7 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { NavigationProp, ParamListBase } from '@react-navigation/native';
 import { ResizeMode, Video } from 'expo-av';
-import React from 'react';
+import React, { useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 import { getToken } from '../state/auth';
@@ -16,6 +16,7 @@ function VideoDiscover({ discoverData, navigation }: Props) {
     const video = React.useRef(null);
     const [status, setStatus] = React.useState({});
     const [score, setScore] = React.useState(Math.floor(Math.random() * 25));
+    const [dimensions, setDimensions] = useState({ height: 200, width: 350, });
 
     const upvote = () => {
         setScore(score + 1);
@@ -27,6 +28,13 @@ function VideoDiscover({ discoverData, navigation }: Props) {
         updateScore('-');
     };
 
+    const upddateDimensions = (height: number, width: number) => {
+        setDimensions({
+            height: height,
+            width: width,
+        })
+    };
+
     const updateScore = (vote: '+' | '-') => {
         // TODO: update score and send it to server on vote
         return;
@@ -36,10 +44,13 @@ function VideoDiscover({ discoverData, navigation }: Props) {
     };
 
     return (
-        <View style={styles.container}>
+        <View 
+            style={styles.container}
+            onLayout={(e) => {upddateDimensions(e.nativeEvent.layout.height, e.nativeEvent.layout.width)}}
+        >
             <Video
                 ref={video}
-                style={styles.video}
+                style={{ ...styles.video, width: dimensions.width, height: dimensions.height}}
                 source={{
                     uri: discoverData.src,
                     headers: {
@@ -79,14 +90,9 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        borderWidth: 2,
-        borderRadius: 8,
-        margin: 5,
         backgroundColor: 'green',
     },
     video: {
-        width: 300,
-        height: 450,
         flex: 1,
     },
     votingArea: {
@@ -96,7 +102,6 @@ const styles = StyleSheet.create({
         right: 0,
         justifyContent: 'center',
         alignItems: 'center',
-        // backgroundColor: 'red'
     },
     voteIcon: {
         color: '#7d7d7d',

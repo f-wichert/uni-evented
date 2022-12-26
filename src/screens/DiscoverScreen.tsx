@@ -18,6 +18,8 @@ declare type Props = {
 
 function DiscoverScreen({ navigation }: Props) {
     const [media, setMedia] = useState<ExtendedMedia[]>([]);
+    const width = Dimensions.get('window').width;
+    const [height, setHeight] = useState<number>(300);
 
     async function updateMedia() {
         const responseData = await request('GET', 'info/all_media', getToken());
@@ -26,11 +28,13 @@ function DiscoverScreen({ navigation }: Props) {
             .filter((el) => el.fileAvailable)
             .map((el) => ({ ...el, src: MediaManager.src(el, 'high') }));
         setMedia(media);
-    }
+    };
 
-    const width = Dimensions.get('window').width;
-    // var height = Dimensions.get('window').height;
-    var height = 700;
+    const updateHeigth = (h: number) => {
+        console.log(`Layout changed`); 
+        // height = h;
+        setHeight(h)
+    };
 
     useEffect(() => {
         // Use `setOptions` to update the button that we previously specified
@@ -50,12 +54,15 @@ function DiscoverScreen({ navigation }: Props) {
         });
 
         // Get appropriate height for carousel
-        height = Dimensions.get('window').height;
-    }, [navigation, height]);
-
+        // height = Dimensions.get('window').height;
+    }, [navigation]);
+    
     return (
-        <View style={styles.container}>
-            {media.length == 0 ? (
+        <View 
+            style={styles.container}
+            onLayout={(e) => { updateHeigth(e.nativeEvent.layout.height) }}
+        >
+            {(media.length == 0) ? (
                 <View style={styles.sadContainer}>
                     <Ionicons name="sad-outline" size={50} color="black" style={styles.sadIcon} />
                     <Text style={styles.sadText}>Seems like there are no clips right now...</Text>
@@ -65,7 +72,7 @@ function DiscoverScreen({ navigation }: Props) {
                     <Carousel
                         vertical={true}
                         width={width}
-                        height={400}
+                        height={height}
                         autoPlay={false}
                         loop={false}
                         data={media}

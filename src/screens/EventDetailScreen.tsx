@@ -2,6 +2,9 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import React, { useEffect, useState } from 'react';
 import { Image, Pressable, SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Rating } from 'react-native-ratings';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import Carousel from 'react-native-reanimated-carousel';
+
 import { Tag } from '../components/Tag';
 import { Event, EventManager } from '../models/event';
 import { TabPropsFor } from '../nav/TabNavigator';
@@ -81,15 +84,41 @@ function EventDetailScreen({ route }: ComponentProps) {
         musicStyle: 'Techno',
         rating: 4,
         description:
-            'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum.',
+            'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum.Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum.Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum.Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum.Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum.Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum.Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum.',
     };
     console.log('Time', eventData.startDate);
 
     return (
         <SafeAreaView style={{ display: 'flex' }}>
             <ScrollView>
-                <View style={[styles.container]}>
+                <View style={styles.section}>
                     <View style={styles.camera}>
+                        <GestureHandlerRootView>
+                            <Carousel 
+                                vertical={true}
+                                width={width}
+                                height={height}
+                                autoPlay={false}
+                                loop={false}
+                                data={media}
+                                scrollAnimationDuration={450}
+                                renderItem={({ item, index }) => (
+                                    <>
+                                        {item.type === 'video' ? (
+                                            <VideoDiscover
+                                                discoverData={media[index]}
+                                                navigation={navigation}
+                                            />
+                                        ) : (
+                                            <ImageDiscover
+                                                discoverData={media[index]}
+                                                navigation={navigation}
+                                            />
+                                        )}
+                                    </>
+                                )}
+                            />
+                        </GestureHandlerRootView>
                         <Ionicons
                             name="camera"
                             size={64}
@@ -157,7 +186,9 @@ function EventDetailScreen({ route }: ComponentProps) {
                             <Text>{event.description}</Text>
                         </View>
                     </View>
-                    <View style={styles.ChatArea}></View>
+                    <View style={styles.ChatArea}>
+
+                    </View>
                     <View style={styles.IMHereButtonContainer}>
                         <Pressable
                             style={styles.IMHereButtonArea}
@@ -175,6 +206,12 @@ function EventDetailScreen({ route }: ComponentProps) {
 const styles = StyleSheet.create({
     container: {
         alignItems: 'center',
+    },
+    section: {
+
+    },
+    sectionBody: {
+
     },
     column: {
         flex: 1,
