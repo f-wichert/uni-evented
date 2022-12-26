@@ -61,9 +61,17 @@ function MapScreen({ navigation }: TabNavProps<'Map'>) {
 
     const navigateDetail = useCallback(
         (id: string) => {
-            // TODO
-            console.warn('TODO: navigating to detail view from here does not work yet');
-            // navigation.navigate('EventDetail', { eventId: id })
+            // TODO: pretty sure this error can be fixed using this? https://javascript.plainenglish.io/react-navigation-v6-with-typescript-nested-navigation-part-2-87844f643e37
+            // this shit is confusing af, send help
+
+            // need to transition to another navigator here
+            navigation.navigate('Events', {
+                // captain, we're going deep
+                screen: 'EventDetail',
+                params: {
+                    eventId: id,
+                },
+            });
         },
         [navigation]
     );
