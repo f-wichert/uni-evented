@@ -1,7 +1,17 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { HeaderBackButton } from '@react-navigation/elements';
+import { useFocusEffect } from '@react-navigation/native';
 import React, { useEffect, useState } from 'react';
-import { Image, Pressable, SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native';
+import {
+    BackHandler,
+    Image,
+    Pressable,
+    SafeAreaView,
+    ScrollView,
+    StyleSheet,
+    Text,
+    View,
+} from 'react-native';
 import { Rating } from 'react-native-ratings';
 
 import { Tag } from '../components/Tag';
@@ -38,6 +48,12 @@ function EventDetailScreen({ route, navigation }: EventListStackNavProps<'EventD
             setEventData(await EventManager.fromId(eventId));
         }),
         [eventId]
+    );
+
+    useFocusEffect(
+        asyncHandler(async () => {
+            BackHandler.addEventListener('hardwareBackPress', navigateToOrigin);
+        })
     );
 
     // const eventID = useAuthStore((state) => state.user?.currentEventId) // Get event ID of current event of currently logged in user
@@ -94,6 +110,7 @@ function EventDetailScreen({ route, navigation }: EventListStackNavProps<'EventD
             default:
                 navigation.navigate('EventList');
         }
+        return true;
     }
 
     // Developement Values TODO: replace with request to real ones
