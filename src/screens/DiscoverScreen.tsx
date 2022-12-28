@@ -5,10 +5,9 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import MediaCarousel from '../components/MediaCarousel';
-import { MediaManager } from '../models';
 import { TabNavProps } from '../nav/types';
 import { getToken } from '../state/auth';
-import { ExtendedMedia, Media } from '../types';
+import { ExtendedMedia } from '../types';
 import { asyncHandler, request } from '../util';
 
 function DiscoverScreen({ navigation }: TabNavProps<'Discover'>) {
@@ -28,17 +27,20 @@ function DiscoverScreen({ navigation }: TabNavProps<'Discover'>) {
                 />
             ),
         });
+        // updateMedia();
     }, [navigation]);
 
     const [media, setMedia] = useState<ExtendedMedia[]>([]);
 
     async function updateMedia() {
-        const responseData = await request('GET', 'info/all_media', getToken());
-        const data = responseData.media as Media[];
-        const media: ExtendedMedia[] = data
-            .filter((el) => el.fileAvailable)
-            .map((el) => ({ ...el, src: MediaManager.src(el, 'high') }));
-        setMedia(media);
+        const responseData = await request('GET', 'discover/', getToken());
+        console.log(responseData);
+        // const data = responseData.media as Media[];
+        // const media: ExtendedMedia[] = data
+        //     .filter((el) => el.fileAvailable)
+        //     .map((el) => ({ ...el, src: MediaManager.src(el, 'high') }));
+        // console.log(media);
+        // setMedia(media);
     }
 
     const navigateDetail = useCallback(
