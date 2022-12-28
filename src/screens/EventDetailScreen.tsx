@@ -1,6 +1,6 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { HeaderBackButton } from '@react-navigation/elements';
-import { useFocusEffect } from '@react-navigation/native';
+import { StackActions, useFocusEffect } from '@react-navigation/native';
 import React, { useEffect, useState } from 'react';
 import {
     BackHandler,
@@ -102,10 +102,14 @@ function EventDetailScreen({ route, navigation }: EventListStackNavProps<'EventD
                 navigation.navigate('EventList');
                 break;
             case 'Map':
-                navigation.navigate('TabScreen', { screen: 'Map' });
+                // this is needed here to also remove the EventDetailsScreen from the stack
+                // otherwise the following happens:
+                // 1. Open Event from Map Screen & go back to Map Screen using Back functionality
+                // 2. if you click 'Events' it will still show the Event from before and not the list
+                navigation.dispatch(StackActions.replace('TabScreen', { screen: 'Map' }));
                 break;
             case 'Discover':
-                navigation.navigate('TabScreen', { screen: 'Discover' });
+                navigation.dispatch(StackActions.replace('TabScreen', { screen: 'Discover' }));
                 break;
             default:
                 navigation.navigate('EventList');
