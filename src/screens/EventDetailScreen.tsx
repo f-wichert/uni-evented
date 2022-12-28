@@ -1,6 +1,7 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { HeaderBackButton } from '@react-navigation/elements';
 import { StackActions, useFocusEffect } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import React, { useEffect, useState } from 'react';
 import {
     BackHandler,
@@ -13,6 +14,7 @@ import {
     View,
 } from 'react-native';
 import { Rating } from 'react-native-ratings';
+import { AnyRootNavParams } from '../nav/types';
 
 import { Tag } from '../components/Tag';
 import { Event, EventManager } from '../models/event';
@@ -136,6 +138,8 @@ function EventDetailScreen({ route, navigation }: EventListStackNavProps<'EventD
     };
     // console.log('Time', eventData.startDate);
 
+    const Stack = createNativeStackNavigator<AnyRootNavParams>();
+
     return (
         <SafeAreaView style={{ display: 'flex' }}>
             <ScrollView>
@@ -145,7 +149,9 @@ function EventDetailScreen({ route, navigation }: EventListStackNavProps<'EventD
                             name="camera"
                             size={64}
                             color="orange"
-                            onPress={() => setCameraActive(true)}
+                            onPress={() => {
+                                navigation.navigate('MediaCapture', { eventID: eventId });
+                            }}
                         />
                         <Text>Load Picture/Video of event here</Text>
                     </View>
