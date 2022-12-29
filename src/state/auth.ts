@@ -1,9 +1,7 @@
 import * as SecureStore from 'expo-secure-store';
 import { persist, StateStorage } from 'zustand/middleware';
 
-import { AuthInfoData } from '../models';
 import { handleError, request } from '../util';
-import { useEventStore } from './event';
 import { useUserStore } from './user';
 import { createStore, resetAllStores } from './utils/createStore';
 
@@ -15,7 +13,6 @@ interface State {
     signout: () => void;
 
     reset: (params: { email: string }) => Promise<void>;
-    fetchUser: () => Promise<void>;
 
     // Once persisted data was rehydrated, we set this to true:
     // https://github.com/pmndrs/zustand/blob/main/docs/integrations/persisting-store-data.md#hydration-and-asynchronous-storages
@@ -64,19 +61,6 @@ export const useAuthStore = createStore<State>('auth', { skipReset: true })(
                 });
             },
 
-            fetchUser: async () => {
-                // TODO: validate types
-                const { user, currentEventId } = (await request(
-                    'GET',
-                    '/auth/info'
-                )) as unknown as AuthInfoData;
-
-                useEventStore.setState((state) => {
-                    state.currentEventId = currentEventId;
-                });
-                useUserStore.getState().setCurrentUser(user);
-            },
-
             _hasHydrated: false,
         }),
         {
@@ -105,9 +89,9 @@ useAuthStore.subscribe(
 
         // start fetching user data if there's a new token
         if (token) {
-            useAuthStore
+            useUserStore
                 .getState()
-                .fetchUser()
+                .fetchCurrentUser()
                 .catch((e) => {
                     handleError(e, { prefix: 'Failed to retrieve user data' });
                     // reset token if we failed to fetch the user data

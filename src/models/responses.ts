@@ -1,6 +1,5 @@
 import { CurrentUser } from './user';
 
-export interface AuthInfoData {
-    readonly user: CurrentUser;
+export interface CurrentUserResponse extends CurrentUser {
     readonly currentEventId: string | null;
 }

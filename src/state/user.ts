@@ -1,24 +1,41 @@
-import { CurrentUser, User } from '../models';
+import { CurrentUser, CurrentUserResponse, User } from '../models';
+import { request } from '../util';
+import { useEventStore } from './event';
 import { createStore } from './utils/createStore';
 
 interface State {
     users: { [id: string]: User | CurrentUser };
     currentUserId: string | null;
 
-    setCurrentUser: (user: CurrentUser | null) => void;
+    fetchUser: (id: string) => Promise<User>;
+    fetchCurrentUser: () => Promise<CurrentUser>;
 }
 
-export const useUserStore = createStore<State>('user')((set) => ({
+export const useUserStore = createStore<State>('user')((set, get) => ({
     users: {},
     currentUserId: null,
 
-    setCurrentUser: (user) => {
+    fetchUser: async (id: string | '@me') => {
+        // TODO: validate types
+        const user = (await request('GET', `/user/${id}`)) as unknown as User;
+
         set((state) => {
-            state.currentUserId = user?.id ?? null;
-            if (user) {
-                state.users[user.id] = user;
-            }
+            state.users[user.id] = user;
         });
+
+        return user;
+    },
+    fetchCurrentUser: async () => {
+        const user = (await get().fetchUser('@me')) as CurrentUserResponse;
+
+        set((state) => {
+            state.currentUserId = user.id;
+        });
+        useEventStore.setState((state) => {
+            state.currentEventId = user.currentEventId;
+        });
+
+        return user;
     },
 }));
 
