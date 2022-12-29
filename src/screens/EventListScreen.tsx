@@ -5,7 +5,6 @@ import { RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native
 import EventPreview from '../components/EventPreview';
 import { Event } from '../models/event';
 import { EventListStackNavProps } from '../nav/types';
-import { getToken } from '../state/auth';
 import { asyncHandler, request } from '../util';
 
 type EventsData = {
@@ -40,7 +39,7 @@ export default function EventListScreen({ navigation }: EventListStackNavProps<'
 
     const fetchData = useCallback(async () => {
         setRefreshing(true);
-        const data = await request('get', 'event/relevantEvents', getToken());
+        const data = await request('get', 'event/relevantEvents');
         setEvents(data as unknown as EventsData);
         setRefreshing(false);
     }, [navigation]);

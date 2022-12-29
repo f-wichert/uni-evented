@@ -12,15 +12,30 @@ export const baseHeaders = Object.freeze({
 export async function request(
     method: string,
     route: string,
-    token: string | null | undefined,
-    data?: JSONObject | FormData
+    data?: JSONObject | FormData | null,
+    options?: {
+        // Whether to not send an auth token.
+        // (by default, all requests are sent with the token)
+        noAuth?: true;
+    }
 ): Promise<JSONObject> {
     // join given route to base url, removing leading `/` if exists
     const url = urlJoin(config.BASE_URL, 'api', route.replace(/^\//, ''));
 
     const headers: Record<string, string> = { ...baseHeaders };
-    if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
+
+    // add token header of `noAuth` isn't specified
+    if (options?.noAuth !== true) {
+        // nested import to avoid cycle
+        const { getToken } = await import('./state/auth');
+        const token = getToken();
+
+        if (!token) {
+            // If this happens, either something went very wrong,
+            // or the method call should use `noAuth: true`.
+            console.warn(`Expected token to be set for '${method} ${route}'`);
+        }
+        headers['Authorization'] = `Bearer ${getToken()}`;
     }
 
     let body: FormData | string | null = null;

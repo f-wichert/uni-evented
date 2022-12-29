@@ -6,7 +6,6 @@ import MapView, { LatLng, Marker } from 'react-native-maps';
 
 import { Event } from '../models';
 import { TabNavProps } from '../nav/types';
-import { getToken } from '../state/auth';
 import { asyncHandler, request } from '../util';
 
 function MapScreen({ navigation }: TabNavProps<'Map'>) {
@@ -33,7 +32,7 @@ function MapScreen({ navigation }: TabNavProps<'Map'>) {
     };
 
     const updateEventList = async () => {
-        const eventList = await request('get', 'event/find', getToken());
+        const eventList = await request('get', 'event/find');
         setEvents(eventList.events as unknown as Event[]);
     };
 

@@ -3,7 +3,6 @@ import { ResizeMode, Video } from 'expo-av';
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
-import { getToken } from '../state/auth';
 import { asyncHandler, baseHeaders, request } from '../util';
 
 declare type Props = {
@@ -30,7 +29,7 @@ function VideoDiscover({ discoverData, navigateDetail }: Props) {
         // TODO: update score and send it to server on vote
         return;
         asyncHandler(async () => {
-            await request('POST', 'event/vote', getToken(), { id: discoverData.id, vote: vote });
+            await request('POST', 'event/vote', { id: discoverData.id, vote: vote });
         });
     };
 

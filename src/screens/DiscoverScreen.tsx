@@ -7,7 +7,6 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import MediaCarousel from '../components/MediaCarousel';
 import { MediaManager } from '../models';
 import { TabNavProps } from '../nav/types';
-import { getToken } from '../state/auth';
 import { ExtendedMedia, Media } from '../types';
 import { asyncHandler, request } from '../util';
 
@@ -33,7 +32,7 @@ function DiscoverScreen({ navigation }: TabNavProps<'Discover'>) {
     const [media, setMedia] = useState<ExtendedMedia[]>([]);
 
     async function updateMedia() {
-        const responseData = await request('GET', 'info/all_media', getToken());
+        const responseData = await request('GET', 'info/all_media');
         const data = responseData.media as Media[];
         const media: ExtendedMedia[] = data
             .filter((el) => el.fileAvailable)
