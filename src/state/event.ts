@@ -5,7 +5,7 @@ import { request } from '../util';
 import { createStore } from './utils/createStore';
 
 interface State {
-    events: { [id: string]: Event };
+    events: Readonly<{ [id: string]: Event }>;
     currentEventId: string | null;
 
     createEvent: (params: {

@@ -4,7 +4,7 @@ import { useEventStore } from './event';
 import { createStore } from './utils/createStore';
 
 interface State {
-    users: { [id: string]: User | CurrentUser };
+    users: Readonly<{ [id: string]: User | CurrentUser }>;
     currentUserId: string | null;
 
     fetchUser: (id: string) => Promise<User>;
