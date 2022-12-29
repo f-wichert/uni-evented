@@ -17,9 +17,12 @@ interface State {
 
     reset: (params: { email: string }) => Promise<void>;
     fetchUser: () => Promise<void>;
+
+    // Once persisted data was rehydrated, we set this to true:
+    // https://github.com/pmndrs/zustand/blob/main/docs/integrations/persisting-store-data.md#hydration-and-asynchronous-storages
+    _hasHydrated: boolean;
 }
 
-// TODO: show loading state while waiting for hydration: https://github.com/pmndrs/zustand/blob/main/docs/integrations/persisting-store-data.md#hydration-and-asynchronous-storages
 // TODO: SecureStore doesn't work on web, may be the only blocker
 const secureStoreWrapper: StateStorage = {
     getItem: SecureStore.getItemAsync.bind(SecureStore),
@@ -79,11 +82,22 @@ export const useAuthStore = createStore<State>('auth')(
                     state.userId = user.id;
                 });
             },
+
+            _hasHydrated: false,
         }),
         {
             name: 'auth',
             getStorage: () => secureStoreWrapper,
             partialize: (state) => ({ token: state.token }),
+            onRehydrateStorage: () => (state, error) => {
+                if (error) {
+                    handleError(error, { prefix: 'Failed to rehydrate persistent storage' });
+                }
+                // set `_hasHydrated` regardless of whether rehydration was successful
+                useAuthStore.setState((state) => {
+                    state._hasHydrated = true;
+                });
+            },
         }
     )
 );

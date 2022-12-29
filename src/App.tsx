@@ -16,8 +16,12 @@ import { useAuthStore } from './state/auth';
 const Stack = createNativeStackNavigator<AnyRootNavParams>();
 
 function useRootNavigationState(): 'login' | 'loading' | 'main' {
+    const hydrated = useAuthStore((state) => state._hasHydrated);
     const token = useAuthStore((state) => state.token);
     const user = useAuthStore((state) => state.userId);
+
+    // persistent storage hasn't loaded yet, we don't know yet whether to show login or main view
+    if (!hydrated) return 'loading';
 
     // no token, show login/register stack
     if (!token) return 'login';
