@@ -10,7 +10,8 @@ import yellowSplash from '../../assets/yellow_splash.png';
 import ProfileHeader from '../components/ProfileHeader';
 import Separator from '../components/Separator';
 import config from '../config';
-import { useAuthStore, useCurrentUser } from '../state/auth';
+import { useAuthStore } from '../state/auth';
+import { useCurrentUser } from '../state/user';
 import { IoniconsName } from '../types';
 import { asyncHandler, request } from '../util';
 

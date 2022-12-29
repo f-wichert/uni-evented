@@ -16,7 +16,7 @@ import MapView, { LatLng, Marker } from 'react-native-maps';
 
 import { INPUT_BACKGR_COLOR } from '../const';
 import { EventListStackNavProps } from '../nav/types';
-import { useAuthStore } from '../state/auth';
+import { useEventStore } from '../state/event';
 import { IoniconsName } from '../types';
 
 const width = Dimensions.get('window').width;
@@ -64,7 +64,7 @@ function CreateEventScreen({ navigation, route }: EventListStackNavProps<'Create
     // Location icon
     const [iconName, setIconName] = useState<IoniconsName>('location-outline');
 
-    const createEvent = useAuthStore((state) => state.createEvent);
+    const createEvent = useEventStore((state) => state.createEvent);
 
     const onChange = (event: DateTimePickerEvent, selectedDate?: Date) => {
         if (!selectedDate) {

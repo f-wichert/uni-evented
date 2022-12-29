@@ -15,14 +15,24 @@ import { useAuthStore } from './state/auth';
 
 const Stack = createNativeStackNavigator<AnyRootNavParams>();
 
-function App() {
+function useRootNavigationState(): 'login' | 'loading' | 'main' {
     const token = useAuthStore((state) => state.token);
-    const user = useAuthStore((state) => state.user);
+    const user = useAuthStore((state) => state.userId);
+
+    // no token, show login/register stack
+    if (!token) return 'login';
+    // user hasn't loaded yet, show loading screen
+    if (!user) return 'loading';
+    // otherwise, show main application
+    return 'main';
+}
+
+function App() {
+    const navState = useRootNavigationState();
 
     // https://reactnavigation.org/docs/auth-flow
     let screens;
-    if (!token) {
-        // not signed in
+    if (navState === 'login') {
         // TODO: fix signout animation using `animationTypeForReplace`
         screens = (
             <>
@@ -43,8 +53,7 @@ function App() {
                 />
             </>
         );
-    } else if (!user) {
-        // we have a token, wait for user to load
+    } else if (navState === 'loading') {
         screens = (
             <>
                 <Stack.Screen
@@ -54,8 +63,7 @@ function App() {
                 />
             </>
         );
-    } else {
-        // got token and user, show main content
+    } else if (navState === 'main') {
         screens = (
             <>
                 <Stack.Screen
@@ -65,6 +73,8 @@ function App() {
                 />
             </>
         );
+    } else {
+        throw new Error(`Unknown root navigation state: ${navState}`);
     }
 
     return <Stack.Navigator>{screens}</Stack.Navigator>;

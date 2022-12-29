@@ -1,40 +1,56 @@
 import { LatLng } from 'react-native-maps';
 
+import { Event } from '../models';
 import { request } from '../util';
-import { getToken } from './auth';
 import { createStore } from './utils/createStore';
 
 interface State {
-    eventId: string | null;
+    events: { [id: string]: Event };
+    currentEventId: string | null;
+
     createEvent: (params: {
         name: string;
         location: LatLng;
         startDate?: Date;
         endDate?: Date;
-    }) => Promise<void>;
+    }) => Promise<string>;
     closeEvent: () => void;
+    joinEvent: (params: { eventId: string }) => Promise<void>;
 }
 
 export const useEventStore = createStore<State>('event')((set) => ({
-    eventId: null,
+    events: {},
+    currentEventId: null,
 
     createEvent: async (params) => {
-        const data = await request('POST', '/event/create', getToken(), {
+        const data = await request('POST', '/event/create', {
             name: params.name,
             lat: params.location.latitude,
             lon: params.location.longitude,
             startDateTime: params.startDate?.toJSON() ?? null,
             endDateTime: params.endDate?.toJSON() ?? null,
         });
-        console.debug('createEvent response:', data);
+        const eventId = data.eventId as string;
 
         set((state) => {
-            state.eventId = data.eventId as string;
+            state.currentEventId = eventId;
         });
+        return eventId;
     },
     closeEvent: () => {
         set((state) => {
-            state.eventId = null;
+            state.currentEventId = null;
+        });
+    },
+    joinEvent: async (params) => {
+        await request('post', '/event/join', {
+            eventId: params.eventId,
+            lon: 0,
+            lat: 0,
+        });
+
+        set((state) => {
+            state.currentEventId = params.eventId;
         });
     },
 }));

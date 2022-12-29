@@ -5,7 +5,6 @@ import React from 'react';
 import DiscoverScreen from '../screens/DiscoverScreen';
 import MapScreen from '../screens/MapScreen';
 import ProfileScreen from '../screens/ProfileScreen';
-import { useAuthStore } from '../state/auth';
 import { IoniconsName } from '../types';
 import EventListStack from './EventListStack';
 import { TabNavParams } from './types';
@@ -13,8 +12,6 @@ import { TabNavParams } from './types';
 export const Tab = createBottomTabNavigator<TabNavParams>();
 
 export default function TabNavigator() {
-    const eventId = useAuthStore((state) => state.user?.currentEventId);
-
     return (
         <Tab.Navigator
             screenOptions={({ route }) => ({
@@ -38,7 +35,7 @@ export default function TabNavigator() {
                 tabBarActiveTintColor: 'tomato',
                 tabBarInactiveTintColor: 'gray',
             })}
-            initialRouteName={eventId ? 'Events' : 'Discover'}
+            initialRouteName="Discover"
         >
             <Tab.Screen name="Discover" component={DiscoverScreen} />
             <Tab.Screen name="Map" component={MapScreen} />

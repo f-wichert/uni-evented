@@ -19,7 +19,7 @@ import { AnyRootNavParams } from '../nav/types';
 import { Tag } from '../components/Tag';
 import { Event, EventManager } from '../models/event';
 import { EventListStackNavProps } from '../nav/types';
-import { useAuthStore } from '../state/auth';
+import { useEventStore } from '../state/event';
 import { asyncHandler } from '../util';
 
 function EventDetailScreen({ route, navigation }: EventListStackNavProps<'EventDetail'>) {
@@ -31,7 +31,7 @@ function EventDetailScreen({ route, navigation }: EventListStackNavProps<'EventD
     const [eventData, setEventData] = useState<Event | null>(null);
 
     const [cameraActive, setCameraActive] = useState(false);
-    const joinEvent = useAuthStore((state) => state.joinEvent);
+    const joinEvent = useEventStore((state) => state.joinEvent);
 
     useEffect(
         asyncHandler(async () => {
@@ -56,7 +56,7 @@ function EventDetailScreen({ route, navigation }: EventListStackNavProps<'EventD
         BackHandler.addEventListener('hardwareBackPress', navigateToOrigin);
     });
 
-    // const eventID = useAuthStore((state) => state.user?.currentEventId) // Get event ID of current event of currently logged in user
+    // const eventID = useEventStore((state) => state.currentEventId) // Get event ID of current event of currently logged in user
 
     // console.log('eventData:', eventData);
     if (!eventData) {
