@@ -2,6 +2,7 @@ import Constants from 'expo-constants';
 import urlJoin from 'url-join';
 
 import config from './config';
+import { getToken } from './state/auth';
 import { JSONObject } from './types';
 
 export const baseHeaders = Object.freeze({
@@ -26,10 +27,7 @@ export async function request(
 
     // add token header of `noAuth` isn't specified
     if (options?.noAuth !== true) {
-        // nested import to avoid cycle
-        const { getToken } = await import('./state/auth');
         const token = getToken();
-
         if (!token) {
             // If this happens, either something went very wrong,
             // or the method call should use `noAuth: true`.

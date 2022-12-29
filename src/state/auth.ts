@@ -36,7 +36,7 @@ const secureStoreWrapper: StateStorage = {
 
 export const useAuthStore = createStore<State>('auth')(
     persist(
-        (set, get) => ({
+        (set) => ({
             token: null,
             // consider using `useCurrentUser()` instead
             user: null,
