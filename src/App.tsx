@@ -12,6 +12,7 @@ import LoginScreen from './screens/LoginScreen';
 import RegisterScreen from './screens/RegisterScreen';
 import ResetPasswordScreen from './screens/ResetPasswordScreen';
 import { useAuthStore } from './state/auth';
+import { useEventStore } from './state/event';
 import { useUserStore } from './state/user';
 
 const Stack = createNativeStackNavigator<AnyRootNavParams>();
@@ -19,15 +20,17 @@ const Stack = createNativeStackNavigator<AnyRootNavParams>();
 function useRootNavigationState(): 'login' | 'loading' | 'main' {
     const hydrated = useAuthStore((state) => state._hasHydrated);
     const token = useAuthStore((state) => state.token);
+
     const userId = useUserStore((state) => state.currentUserId);
+    const currentEventId = useEventStore((state) => state.currentEventId);
 
     // persistent storage hasn't loaded yet, we don't know yet whether to show login or main view
     if (!hydrated) return 'loading';
 
     // no token, show login/register stack
     if (!token) return 'login';
-    // user hasn't loaded yet, show loading screen
-    if (!userId) return 'loading';
+    // user (or other data we need for initial layout) hasn't loaded yet, show loading screen
+    if (!userId || currentEventId === undefined) return 'loading';
     // otherwise, show main application
     return 'main';
 }

@@ -32,7 +32,7 @@ export const useUserStore = createStore<State>('user')((set, get) => ({
             state.currentUserId = user.id;
         });
         useEventStore.setState((state) => {
-            state.currentEventId = user.currentEventId;
+            state.currentEventId = user.currentEventId ?? null;
         });
 
         return user;

@@ -6,7 +6,8 @@ import { createStore } from './utils/createStore';
 
 interface State {
     events: Readonly<{ [id: string]: Event }>;
-    currentEventId: string | null;
+    // `undefined` means the value hasn't loaded yet, it's expected to be set by `fetchCurrentUser`
+    currentEventId: string | null | undefined;
 
     createEvent: (params: {
         name: string;
@@ -20,7 +21,7 @@ interface State {
 
 export const useEventStore = createStore<State>('event')((set) => ({
     events: {},
-    currentEventId: null,
+    currentEventId: undefined,
 
     createEvent: async (params) => {
         const data = await request('POST', '/event/create', {
