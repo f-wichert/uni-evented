@@ -9,7 +9,6 @@ import { createStore } from './utils/createStore';
 
 interface State {
     token: string | null;
-    userId: string | null;
 
     signin: (params: { username: string; password: string }) => Promise<void>;
     signup: (params: { username: string; email: string; password: string }) => Promise<void>;
@@ -75,12 +74,7 @@ export const useAuthStore = createStore<State>('auth')(
                 useEventStore.setState((state) => {
                     state.currentEventId = currentEventId;
                 });
-                useUserStore.setState((state) => {
-                    state.users[user.id] = user;
-                });
-                set((state) => {
-                    state.userId = user.id;
-                });
+                useUserStore.getState().setCurrentUser(user);
             },
 
             _hasHydrated: false,
@@ -106,13 +100,9 @@ export const useAuthStore = createStore<State>('auth')(
 useAuthStore.subscribe(
     (state) => state.token,
     (token) => {
+        // TODO: clear all stores?
         // clear stored users if token changed
-        useAuthStore.setState((state) => {
-            state.userId = null;
-        });
-        useUserStore.setState((state) => {
-            state.users = {};
-        });
+        useUserStore.getState().clear();
 
         // start fetching user data if there's a new token
         if (token) {
