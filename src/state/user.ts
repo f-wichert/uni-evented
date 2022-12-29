@@ -6,7 +6,6 @@ interface State {
     currentUserId: string | null;
 
     setCurrentUser: (user: CurrentUser | null) => void;
-    clear: () => void;
 }
 
 export const useUserStore = createStore<State>('user')((set) => ({
@@ -19,13 +18,6 @@ export const useUserStore = createStore<State>('user')((set) => ({
             if (user) {
                 state.users[user.id] = user;
             }
-        });
-    },
-    clear: () => {
-        set((state) => {
-            // TODO: maybe make this less repetitive?
-            state.users = {};
-            state.currentUserId = null;
         });
     },
 }));

@@ -5,7 +5,7 @@ import { AuthInfoData } from '../models';
 import { handleError, request } from '../util';
 import { useEventStore } from './event';
 import { useUserStore } from './user';
-import { createStore } from './utils/createStore';
+import { createStore, resetAllStores } from './utils/createStore';
 
 interface State {
     token: string | null;
@@ -29,7 +29,7 @@ const secureStoreWrapper: StateStorage = {
     removeItem: SecureStore.deleteItemAsync.bind(SecureStore),
 };
 
-export const useAuthStore = createStore<State>('auth')(
+export const useAuthStore = createStore<State>('auth', { skipReset: true })(
     persist(
         (set) => ({
             token: null,
@@ -100,9 +100,8 @@ export const useAuthStore = createStore<State>('auth')(
 useAuthStore.subscribe(
     (state) => state.token,
     (token) => {
-        // TODO: clear all stores?
-        // clear stored users if token changed
-        useUserStore.getState().clear();
+        // clear stores (except auth store, see `skipReset` above) if token changed
+        resetAllStores();
 
         // start fetching user data if there's a new token
         if (token) {
