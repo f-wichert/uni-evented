@@ -52,7 +52,7 @@ export async function request(
     });
     if (response.status !== 200) {
         // TODO: throw error with status/message/body/etc attributes
-        throw new Error(`invalid response status: ${response.status}`);
+        throw new Error(`invalid response status for '${method} ${route}': ${response.status}`);
     }
 
     return (await response.json()) as JSONObject;
