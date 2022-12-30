@@ -1,8 +1,7 @@
-import Ionicons from '@expo/vector-icons/Ionicons';
 import { AVPlaybackStatusToSet, ResizeMode } from 'expo-av';
 import VideoPlayer from 'expo-video-player';
-import { useRef, useState } from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useEffect, useRef, useState } from 'react';
+import { StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaFrame } from 'react-native-safe-area-context';
 
 import { baseHeaders } from '../util';
@@ -10,27 +9,46 @@ import { baseHeaders } from '../util';
 declare type Props = {
     discoverData: { src: string; id: string };
     navigateDetail: (id: string) => void;
-    nextItem: () => void;
-    prevItem: () => void;
+    isPlay: boolean;
+    isMute: boolean;
+    setDuration: (dur: number | undefined) => void;
+    setPosition: (pos: number | undefined) => void;
+    finishedVideo: () => void;
 };
 
-function VideoDiscover({ discoverData, navigateDetail, nextItem, prevItem }: Props) {
-    const video = useRef(null);
+function VideoDiscover({
+    discoverData,
+    navigateDetail,
+    isPlay,
+    isMute,
+    setDuration,
+    setPosition,
+    finishedVideo,
+}: Props) {
+    // I really can't manage to find the correct type for this thing -> checked the package
+    const video = useRef<any>(null);
     const [status, setStatus] = useState<AVPlaybackStatusToSet | null>(null);
-    const [isMute, setIsMute] = useState<boolean>(true);
     // const [score, setScore] = React.useState(Math.floor(Math.random() * 25));
 
     const frame = useSafeAreaFrame();
 
-    const playPauseVideo = async () => {
-        const status = await video.current.getStatusAsync();
-        video.current.setStatusAsync({
-            shouldPlay: !status.shouldPlay,
-        });
-    };
+    useEffect(() => {
+        // set play status for video
+        video.current &&
+            video.current.setStatusAsync({
+                shouldPlay: isPlay,
+            });
+        // give duration and position to parent component
+        if (!status) return;
+        setPosition(status.positionMillis);
+        // might need AVPlaybackStatusSuccess here for durationMillis
+        setDuration(status.durationMillis);
+    }, [isPlay]);
 
-    const prevVideo = () => {
-        console.log('prev Video clicked');
+    const updateStatus = (playState: AVPlaybackStatusToSet) => {
+        setStatus(playState);
+        // might need AVPlaybackStatusSuccess here for durationMillis
+        playState.didJustFinish && finishedVideo();
     };
 
     // const upvote = () => {
@@ -60,11 +78,12 @@ function VideoDiscover({ discoverData, navigateDetail, nextItem, prevItem }: Pro
                         headers: baseHeaders,
                     },
                     resizeMode: ResizeMode.CONTAIN,
-                    shouldPlay: true,
+                    shouldPlay: isPlay,
                     isMuted: isMute,
-                    isLooping: false,
+                    isLooping: true,
                     ref: video,
-                    // useNativeControls: true,
+                    useNativeControls: false,
+                    progressUpdateIntervalMillis: 1000,
                     // onPlaybackStatusUpdate: (status: AVPlaybackStatusToSet) => setStatus(() => status),
                 }}
                 header={<Text style={{ color: '#FFF' }}>Custom title</Text>}
@@ -74,25 +93,8 @@ function VideoDiscover({ discoverData, navigateDetail, nextItem, prevItem }: Pro
                     pause: <></>,
                     replay: <></>,
                 }}
+                playbackCallback={(playState: AVPlaybackStatusToSet) => updateStatus(playState)}
             />
-            <TouchableOpacity
-                activeOpacity={1}
-                style={{ ...styles.playPause, width: frame.width / 2, height: frame.height }}
-                onPress={playPauseVideo}
-            />
-            <TouchableOpacity
-                activeOpacity={1}
-                style={{ ...styles.nextVideo, width: frame.width / 4, height: frame.height }}
-                onPress={nextItem}
-            />
-            <TouchableOpacity
-                activeOpacity={1}
-                style={{ ...styles.prevVideo, width: frame.width / 4, height: frame.height }}
-                onPress={prevItem}
-            />
-            <TouchableOpacity onPress={() => setIsMute(!isMute)} style={styles.mute}>
-                <Ionicons name={isMute ? 'volume-mute' : 'volume-high'} size={36} color="white" />
-            </TouchableOpacity>
 
             {/* <View style={{ ...styles.votingArea }}>
                 <Ionicons style={styles.voteIcon} name="chevron-up" size={36} onPress={upvote} />
@@ -122,10 +124,6 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        // borderWidth: 2,
-        // borderRadius: 8,
-        // margin: 5,
-        // backgroundColor: 'green',
     },
     video: {
         flex: 1,
@@ -144,25 +142,6 @@ const styles = StyleSheet.create({
     // voteIcon: {
     //     color: '#7d7d7d',
     // },
-    playPause: {
-        position: 'absolute',
-    },
-    nextVideo: {
-        position: 'absolute',
-        right: 0,
-    },
-    prevVideo: {
-        position: 'absolute',
-        left: 0,
-    },
-    mute: {
-        position: 'absolute',
-        color: 'white',
-        right: 0,
-        bottom: 0,
-        marginRight: 15,
-        marginBottom: 15,
-    },
 });
 
 export default VideoDiscover;
