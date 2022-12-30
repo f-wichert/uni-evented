@@ -5,9 +5,9 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import MediaCarousel from '../components/MediaCarousel';
-import { MediaManager } from '../models';
+import { Event, Media, MediaManager } from '../models';
 import { TabNavProps } from '../nav/types';
-import { ExtendedMedia, Media } from '../types';
+import { getToken } from '../state/auth';
 import { asyncHandler, request } from '../util';
 
 function DiscoverScreen({ navigation }: TabNavProps<'Discover'>) {
@@ -27,31 +27,41 @@ function DiscoverScreen({ navigation }: TabNavProps<'Discover'>) {
                 />
             ),
         });
+        updateMedia();
     }, [navigation]);
 
-    const [media, setMedia] = useState<ExtendedMedia[]>([]);
+    const [eventData, setEventData] = useState<Event[]>([]);
 
     async function updateMedia() {
-        const responseData = await request('GET', 'info/all_media');
-        const data = responseData.media as Media[];
-        const media: ExtendedMedia[] = data
-            .filter((el) => el.fileAvailable)
-            .map((el) => ({ ...el, src: MediaManager.src(el, 'high') }));
-        setMedia(media);
+        const responseData = await request('GET', 'discover/', getToken());
+        const data = responseData.map((event: Event) => ({
+            ...event,
+            media: event.media?.map((el: Media) => ({ ...el, src: MediaManager.src(el, 'high') })),
+        }));
+        setEventData(data);
     }
-
     const navigateDetail = useCallback(
         (id: string) => {
-            // TODO
-            console.warn('TODO: navigating to detail view from here does not work yet');
-            // navigation.navigate('EventDetail', { eventId: id })
+            // TODO: pretty sure this error can be fixed using this? https://javascript.plainenglish.io/react-navigation-v6-with-typescript-nested-navigation-part-2-87844f643e37
+            // this shit is confusing af, send help
+            // same error in EventDetailScreen
+
+            // need to transition to another navigator here
+            navigation.navigate('Events', {
+                // captain, we're going deep
+                screen: 'EventDetail',
+                params: {
+                    eventId: id,
+                    origin: 'Discover',
+                },
+            });
         },
         [navigation]
     );
 
     return (
         <View style={styles.container}>
-            {media.length == 0 ? (
+            {eventData.length == 0 ? (
                 <View style={styles.sadContainer}>
                     <Ionicons name="sad-outline" size={50} color="black" style={styles.sadIcon} />
                     <Text style={styles.sadText}>Seems like there are no clips right now...</Text>
@@ -61,7 +71,7 @@ function DiscoverScreen({ navigation }: TabNavProps<'Discover'>) {
                 // needs a pixel height and doesn't support `height: '100%'`
                 <SafeAreaProvider>
                     <GestureHandlerRootView>
-                        <MediaCarousel media={media} navigateDetail={navigateDetail} />
+                        <MediaCarousel eventData={eventData} navigateDetail={navigateDetail} />
                     </GestureHandlerRootView>
                 </SafeAreaProvider>
             )}
