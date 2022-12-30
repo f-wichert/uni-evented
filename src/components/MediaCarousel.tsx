@@ -33,7 +33,8 @@ export default function MediaCarousel({ eventData, navigateDetail }: Props) {
     }, [eventData]);
 
     const nextInnerItem = () => {
-        // // if it's last media of event go to next outer item -> this allows the next tap to also change the event
+        // console.log(`go to next inner item: old indizes: ${innerCarousel.current[activeOuterIndex].getCurrentIndex()} | ${outerCarousel.current?.getCurrentIndex()}`);
+        // if it's last media of event go to next outer item -> this allows the next tap to also change the event
         // if (checkIfLastMedia()) {
         //     nextOuterItem();
         //     return;
@@ -42,36 +43,47 @@ export default function MediaCarousel({ eventData, navigateDetail }: Props) {
         innerCarousel.current[activeOuterIndex].next();
         // console.log(`index after next: ${innerCarousel.current[activeOuterIndex].getCurrentIndex()}`);
         setActiveInnerIndex(innerCarousel.current[activeOuterIndex].getCurrentIndex());
+        // console.log(`go to next inner item: new indizes: ${innerCarousel.current[activeOuterIndex].getCurrentIndex()} | ${outerCarousel.current?.getCurrentIndex()}`);
     };
 
     const prevInnerItem = () => {
-        // console.log(`index before prev: ${innerCarousel.current[activeOuterIndex].getCurrentIndex()}`);
         innerCarousel.current[activeOuterIndex].prev();
-        // console.log(`index after prev: ${innerCarousel.current[activeOuterIndex].getCurrentIndex()}`);
         setActiveInnerIndex(innerCarousel.current[activeOuterIndex].getCurrentIndex());
     };
 
     const nextOuterItem = () => {
-        // if current event is not last event, then reset inner carousel
-        resetInnerCarousel();
-        // current video is last video of event so we switch to next event
-        outerCarousel.current.next();
-        // set active outer index
-        setActiveOuterIndex(outerCarousel.current?.getCurrentIndex());
+        // console.log(`go to next outer item: old indizes: ${innerCarousel.current[activeOuterIndex].getCurrentIndex()} | ${outerCarousel.current?.getCurrentIndex()}`);
+        if (!checkIfLastEvent()) {
+            outerCarousel.current.next();
+            // set active outer index
+            setActiveOuterIndex(outerCarousel.current?.getCurrentIndex());
+            // if current event is not last event, then reset inner carousel
+            resetInnerCarousel();
+        } else {
+            outerCarousel.current.next();
+            // set active outer index
+            setActiveOuterIndex(outerCarousel.current?.getCurrentIndex());
+        }
+
+        // console.log(`go to next outer item: new indizes: ${innerCarousel.current[activeOuterIndex].getCurrentIndex()} | ${outerCarousel.current?.getCurrentIndex()}`);
     };
 
     const onOuterCarouselSwipe = () => {
-        resetInnerCarousel();
         // update outer index state on swipe
+        // on swipe the index is already updated by the library before we can check if the previous element was the last one
         setActiveOuterIndex(outerCarousel.current?.getCurrentIndex());
+        // if current event is not last event, then reset inner carousel
+        resetInnerCarousel();
     };
 
     const onFinishedVideo = () => {
         // if current video is not last media of event, then go to next inner item
         if (!checkIfLastMedia()) {
+            // console.log('video is finished -> next inner item');
             nextInnerItem();
             return;
         }
+        // console.log('video is finished -> next outer item');
         // current media is last media of event, so we go to the next outer item (event)
         nextOuterItem();
     };
@@ -88,14 +100,11 @@ export default function MediaCarousel({ eventData, navigateDetail }: Props) {
     };
 
     const resetInnerCarousel = () => {
-        // don't reset anything if it's the last event
-        if (checkIfLastEvent()) {
-            return;
-        }
-        // reset saved inner index in state
-        setActiveInnerIndex(0);
+        // console.log(`call reset inner carousel -> reset index of ${outerCarousel.current?.getCurrentIndex()}`);
         // set the inner carousel index to 0
         innerCarousel.current[activeOuterIndex].scrollTo({ index: 0 });
+        // reset saved inner index in state
+        setActiveInnerIndex(0);
     };
 
     return (
