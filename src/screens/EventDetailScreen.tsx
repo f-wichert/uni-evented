@@ -52,11 +52,9 @@ function EventDetailScreen({ route, navigation }: EventListStackNavProps<'EventD
         [eventId]
     );
 
-    useFocusEffect(
-        asyncHandler(async () => {
-            BackHandler.addEventListener('hardwareBackPress', navigateToOrigin);
-        })
-    );
+    useFocusEffect(() => {
+        BackHandler.addEventListener('hardwareBackPress', navigateToOrigin);
+    });
 
     // const eventID = useAuthStore((state) => state.user?.currentEventId) // Get event ID of current event of currently logged in user
 

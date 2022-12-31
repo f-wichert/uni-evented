@@ -5,7 +5,6 @@ import MapPicker from '../components/MapPicker';
 import CreateEventScreen from '../screens/CreateEventScreen';
 import EventDetailScreen from '../screens/EventDetailScreen';
 import EventsScreen from '../screens/EventsScreen';
-import { asyncHandler } from '../util';
 
 export type RootNavigatorParams = {
     EventsScreen: undefined;
@@ -17,24 +16,21 @@ export type RootNavigatorParams = {
 const Stack = createNativeStackNavigator<RootNavigatorParams>();
 
 function EventScreenNavigator({ navigation }) {
-    useEffect(
-        asyncHandler(async () => {
-            navigation.setOptions({
-                headerRight: () => (
-                    <Ionicons
-                        name="add-outline"
-                        size={32}
-                        color="black"
-                        onPress={() => navigation.navigate('CreateEvent')}
-                        style={{
-                            marginRight: 15,
-                        }}
-                    />
-                ),
-            });
-        }),
-        [navigation]
-    );
+    useEffect(() => {
+        navigation.setOptions({
+            headerRight: () => (
+                <Ionicons
+                    name="add-outline"
+                    size={32}
+                    color="black"
+                    onPress={() => navigation.navigate('CreateEvent')}
+                    style={{
+                        marginRight: 15,
+                    }}
+                />
+            ),
+        });
+    }, [navigation]);
 
     return (
         <Stack.Navigator>

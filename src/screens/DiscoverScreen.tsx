@@ -27,8 +27,9 @@ function DiscoverScreen({ navigation }: TabNavProps<'Discover'>) {
                 />
             ),
         });
-        updateMedia();
     }, [navigation]);
+
+    useEffect(asyncHandler(updateMedia), []);
 
     // TODO: change this to use ExtendedMedia[] instead of Media[]
     const [eventData, setEventData] = useState<Event[]>([]);

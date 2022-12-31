@@ -15,24 +15,21 @@ type EventsData = {
 };
 
 export default function EventListScreen({ navigation }: EventListStackNavProps<'EventList'>) {
-    useEffect(
-        asyncHandler(async () => {
-            navigation.setOptions({
-                headerRight: () => (
-                    <Ionicons
-                        name="add-outline"
-                        size={32}
-                        color="black"
-                        onPress={() => navigation.navigate('CreateEvent')}
-                        style={{
-                            marginRight: 15,
-                        }}
-                    />
-                ),
-            });
-        }),
-        [navigation]
-    );
+    useEffect(() => {
+        navigation.setOptions({
+            headerRight: () => (
+                <Ionicons
+                    name="add-outline"
+                    size={32}
+                    color="black"
+                    onPress={() => navigation.navigate('CreateEvent')}
+                    style={{
+                        marginRight: 15,
+                    }}
+                />
+            ),
+        });
+    }, [navigation]);
 
     const [refreshing, setRefreshing] = useState<boolean>(false);
     const [events, setEvents] = useState<EventsData | null>(null);
