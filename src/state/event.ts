@@ -1,7 +1,9 @@
+import { WritableDraft } from 'immer/dist/types/types-external';
 import { LatLng } from 'react-native-maps';
+import shallow from 'zustand/shallow';
 
 import { Event } from '../models';
-import { request } from '../util';
+import { notEmpty, request } from '../util';
 import { createStore } from './utils/createStore';
 
 interface State {
@@ -55,3 +57,25 @@ export const useEventStore = createStore<State>('event')((set) => ({
         });
     },
 }));
+
+/** Creates helper for adding events to state, merging new data with existing data. */
+export function addEventHelper(state: WritableDraft<State>) {
+    return (event: Event) => {
+        state.events[event.id] = {
+            // (shallow) merge old and new event data
+            // TODO: this probably causes unnecessary renders if the
+            //       data didn't actually change, maybe use tracked state thingy?
+            ...state.events[event.id],
+            ...event,
+        };
+    };
+}
+
+export function useEvent(id: string): Event | undefined {
+    return useEventStore((state) => state.events[id]);
+}
+
+export function useEvents(ids: string[]): Event[] {
+    // TODO: https://github.com/dai-shi/proxy-memoize / reselect ?
+    return useEventStore((state) => ids.map((i) => state.events[i]).filter(notEmpty), shallow);
+}

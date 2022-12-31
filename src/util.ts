@@ -1,6 +1,7 @@
 import Constants from 'expo-constants';
 import urlJoin from 'url-join';
 
+import { useCallback, useEffect, useState } from 'react';
 import config from './config';
 import { getToken } from './state/auth';
 import { JSONObject } from './types';
@@ -80,4 +81,33 @@ export function asyncHandler<Args extends unknown[]>(
     return (...args) => {
         handler(...args).catch((e) => handleError(e, opts));
     };
+}
+
+export function useAsync<T>(func: () => Promise<T>) {
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<Error | null>(null);
+    const [value, setValue] = useState<T | null>(null);
+
+    const refresh = useCallback(async () => {
+        setLoading(true);
+        setError(null);
+
+        try {
+            setValue(await func());
+        } catch (err) {
+            setError(err as Error);
+        } finally {
+            setLoading(false);
+        }
+    }, [func]) as () => void;
+
+    useEffect(() => {
+        refresh();
+    }, [refresh]);
+
+    return { loading, error, value, refresh };
+}
+
+export function notEmpty<T>(value: T | null | undefined): value is T {
+    return value !== null && value !== undefined;
 }

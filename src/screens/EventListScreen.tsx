@@ -1,18 +1,11 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import EventPreview from '../components/EventPreview';
-import { Event } from '../models/event';
+import { Event, useRelevantEvents } from '../models/event';
 import { EventListStackNavProps } from '../nav/types';
-import { asyncHandler, request } from '../util';
-
-type EventsData = {
-    activeEvent: Event[];
-    myEvents: Event[];
-    followedEvents: Event[];
-    followerEvents: Event[];
-};
+import { asyncHandler } from '../util';
 
 export default function EventListScreen({ navigation }: EventListStackNavProps<'EventList'>) {
     useEffect(() => {
@@ -31,17 +24,7 @@ export default function EventListScreen({ navigation }: EventListStackNavProps<'
         });
     }, [navigation]);
 
-    const [refreshing, setRefreshing] = useState<boolean>(false);
-    const [events, setEvents] = useState<EventsData | null>(null);
-
-    const fetchData = useCallback(async () => {
-        setRefreshing(true);
-        const data = await request('get', 'event/relevantEvents');
-        setEvents(data as unknown as EventsData);
-        setRefreshing(false);
-    }, [navigation]);
-
-    useEffect(asyncHandler(fetchData), []);
+    const { loading, value: events, refresh } = useRelevantEvents();
 
     const navigateDetail = useCallback(
         (id: string) => navigation.navigate('EventDetail', { eventId: id }),
@@ -65,7 +48,7 @@ export default function EventListScreen({ navigation }: EventListStackNavProps<'
                 }
             /> */}
             <ScrollView
-                refreshControl={<RefreshControl refreshing={refreshing} onRefresh={fetchData} />}
+                refreshControl={<RefreshControl refreshing={loading} onRefresh={refresh} />}
             >
                 <Text style={[styles.headerTitle]}>Active event</Text>
                 {events?.activeEvent.map((el: Event) => {
