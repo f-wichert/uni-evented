@@ -1,12 +1,11 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import React, { useCallback, useEffect, useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Dimensions, StyleSheet, Text, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import MediaCarousel from '../components/MediaCarousel';
 import { MediaManager } from '../models';
-import { TabNavProps } from '../nav/types';
 import { getToken } from '../state/auth';
 import { ExtendedMedia, Media } from '../types';
 import { asyncHandler, request } from '../util';
@@ -27,12 +26,12 @@ function DiscoverScreen({ navigation }: Props) {
             .filter((el) => el.fileAvailable)
             .map((el) => ({ ...el, src: MediaManager.src(el, 'high') }));
         setMedia(media);
-    };
+    }
 
     const updateHeigth = (h: number) => {
-        console.log(`Layout changed`); 
+        console.log(`Layout changed`);
         // height = h;
-        setHeight(h)
+        setHeight(h);
     };
 
     useEffect(() => {
@@ -53,17 +52,6 @@ function DiscoverScreen({ navigation }: Props) {
         });
     }, [navigation]);
 
-    const [media, setMedia] = useState<ExtendedMedia[]>([]);
-
-    async function updateMedia() {
-        const responseData = await request('GET', 'info/all_media', getToken());
-        const data = responseData.media as Media[];
-        const media: ExtendedMedia[] = data
-            .filter((el) => el.fileAvailable)
-            .map((el) => ({ ...el, src: MediaManager.src(el, 'high') }));
-        setMedia(media);
-    }
-
     const navigateDetail = useCallback(
         (id: string) => {
             // TODO
@@ -74,11 +62,13 @@ function DiscoverScreen({ navigation }: Props) {
     );
 
     return (
-        <View 
+        <View
             style={styles.container}
-            onLayout={(e) => { updateHeigth(e.nativeEvent.layout.height) }}
+            onLayout={(e) => {
+                updateHeigth(e.nativeEvent.layout.height);
+            }}
         >
-            {(media.length == 0) ? (
+            {media.length == 0 ? (
                 <View style={styles.sadContainer}>
                     <Ionicons name="sad-outline" size={50} color="black" style={styles.sadIcon} />
                     <Text style={styles.sadText}>Seems like there are no clips right now...</Text>

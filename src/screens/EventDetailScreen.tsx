@@ -1,8 +1,17 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import React, { useEffect, useState } from 'react';
-import { Image, Pressable, SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { Rating } from 'react-native-ratings';
+import {
+    Dimensions,
+    Image,
+    Pressable,
+    SafeAreaView,
+    ScrollView,
+    StyleSheet,
+    Text,
+    View,
+} from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { Rating } from 'react-native-ratings';
 import Carousel from 'react-native-reanimated-carousel';
 
 import { Tag } from '../components/Tag';
@@ -10,6 +19,20 @@ import { Event, EventManager } from '../models/event';
 import { EventListStackNavProps } from '../nav/types';
 import { useAuthStore } from '../state/auth';
 import { asyncHandler } from '../util';
+
+let media_data = [
+    {
+        name: 'One',
+        type: 'video',
+    },
+    {
+        name: 'Two',
+        type: 'video',
+    },
+    {
+        type: 'upload',
+    },
+];
 
 function EventDetailScreen({ route }: EventListStackNavProps<'EventDetail'>) {
     const eventId = route.params?.eventId ?? null;
@@ -46,6 +69,28 @@ function EventDetailScreen({ route }: EventListStackNavProps<'EventDetail'>) {
             </View>
         );
     }
+
+    const getJsx = (item) => {
+        if (item.type == 'video') {
+            return <Text>{item.name}</Text>;
+            // return (<VideoDiscover discoverData={item} navigateDetail={navigateDetail} />);
+        } else if (item.type == 'image') {
+        } else if (item.type == 'upload') {
+            return (
+                <>
+                    <Ionicons
+                        name="camera"
+                        size={64}
+                        color="orange"
+                        onPress={() => setCameraActive(true)}
+                    />
+                    <Text>Load Picture/Video of event here</Text>
+                </>
+            );
+        }
+
+        return <Text>hi</Text>;
+    };
 
     console.log(`Data: ${JSON.stringify(eventData)}`);
     //     return  (async () => {
@@ -92,42 +137,23 @@ function EventDetailScreen({ route }: EventListStackNavProps<'EventDetail'>) {
                 <View style={styles.section}>
                     <View style={styles.camera}>
                         <GestureHandlerRootView>
-                            <Carousel 
-                                vertical={true}
-                                width={width}
-                                height={height}
+                            <Carousel
+                                width={Dimensions.get('window').width}
+                                height={200}
                                 autoPlay={false}
                                 loop={false}
-                                data={media}
-                                scrollAnimationDuration={450}
-                                renderItem={({ item, index }) => (
-                                    <>
-                                        {item.type === 'video' ? (
-                                            <VideoDiscover
-                                                discoverData={media[index]}
-                                                navigation={navigation}
-                                            />
-                                        ) : (
-                                            <ImageDiscover
-                                                discoverData={media[index]}
-                                                navigation={navigation}
-                                            />
-                                        )}
-                                    </>
-                                )}
+                                data={media_data}
+                                scrollAnimationDuration={350}
+                                renderItem={({ item, index }) => getJsx(item)}
                             />
                         </GestureHandlerRootView>
-                        <Ionicons
-                            name="camera"
-                            size={64}
-                            color="orange"
-                            onPress={() => setCameraActive(true)}
-                        />
-                        <Text>Load Picture/Video of event here</Text>
                     </View>
-                    <View style={styles.TagArea}>
+                    <View style={styles.tagArea}>
                         {event.tags.map((tag) => (
-                            <Tag style={{ backgroundColor: tag.color }} key={tag.name}>
+                            <Tag
+                                style={{ ...styles.tag, backgroundColor: tag.color }}
+                                key={tag.name}
+                            >
                                 {tag.name}
                             </Tag>
                         ))}
@@ -184,9 +210,7 @@ function EventDetailScreen({ route }: EventListStackNavProps<'EventDetail'>) {
                             <Text>{event.description}</Text>
                         </View>
                     </View>
-                    <View style={styles.ChatArea}>
-
-                    </View>
+                    <View style={styles.ChatArea}></View>
                     <View style={styles.IMHereButtonContainer}>
                         <Pressable
                             style={styles.IMHereButtonArea}
@@ -205,12 +229,8 @@ const styles = StyleSheet.create({
     container: {
         alignItems: 'center',
     },
-    section: {
-
-    },
-    sectionBody: {
-
-    },
+    section: {},
+    sectionBody: {},
     column: {
         flex: 1,
         backgroundColor: 'transparent',
@@ -235,13 +255,17 @@ const styles = StyleSheet.create({
         minHeight: 200,
         borderRadius: 10,
     },
-    TagArea: {
+    tagArea: {
         display: 'flex',
         flexDirection: 'row',
         alignSelf: 'stretch', // Float elements to the left
         flexWrap: 'wrap',
         backgroundColor: 'white',
         padding: 5,
+    },
+    tag: {
+        height: 32,
+        minWidth: 82,
     },
     RatingArea: {
         display: 'flex',
