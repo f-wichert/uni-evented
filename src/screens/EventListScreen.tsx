@@ -3,7 +3,7 @@ import React, { useCallback, useEffect } from 'react';
 import { RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import EventPreview from '../components/EventPreview';
-import { Event, useRelevantEvents } from '../models/event';
+import { useRelevantEvents } from '../models/event';
 import { EventListStackNavProps } from '../nav/types';
 import { asyncHandler } from '../util';
 
@@ -51,37 +51,16 @@ export default function EventListScreen({ navigation }: EventListStackNavProps<'
                 refreshControl={<RefreshControl refreshing={loading} onRefresh={refresh} />}
             >
                 <Text style={[styles.headerTitle]}>Active event</Text>
-                {events?.activeEvent.map((el: Event) => {
-                    return (
-                        <EventPreview
-                            key={el.id}
-                            name={el.name}
-                            id={el.id}
-                            navigateDetail={navigateDetail}
-                        />
-                    );
+                {events?.activeEvent.map((id) => {
+                    return <EventPreview key={id} id={id} navigateDetail={navigateDetail} />;
                 })}
                 <Text style={[styles.headerTitle]}>Your Events</Text>
-                {events?.myEvents.map((el: Event) => {
-                    return (
-                        <EventPreview
-                            key={el.id}
-                            name={el.name}
-                            id={el.id}
-                            navigateDetail={navigateDetail}
-                        />
-                    );
+                {events?.myEvents.map((id) => {
+                    return <EventPreview key={id} id={id} navigateDetail={navigateDetail} />;
                 })}
                 <Text style={[styles.headerTitle]}>Followed Events</Text>
-                {events?.followedEvents.map((el: Event) => {
-                    return (
-                        <EventPreview
-                            key={el.id}
-                            name={el.name}
-                            id={el.id}
-                            navigateDetail={navigateDetail}
-                        />
-                    );
+                {events?.followedEvents.map((id) => {
+                    return <EventPreview key={id} id={id} navigateDetail={navigateDetail} />;
                 })}
             </ScrollView>
         </View>

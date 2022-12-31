@@ -1,9 +1,8 @@
 import { WritableDraft } from 'immer/dist/types/types-external';
 import { LatLng } from 'react-native-maps';
-import shallow from 'zustand/shallow';
 
 import { Event } from '../models';
-import { notEmpty, request } from '../util';
+import { request } from '../util';
 import { createStore } from './utils/createStore';
 
 interface State {
@@ -73,9 +72,4 @@ export function addEventHelper(state: WritableDraft<State>) {
 
 export function useEvent(id: string): Event | undefined {
     return useEventStore((state) => state.events[id]);
-}
-
-export function useEvents(ids: string[]): Event[] {
-    // TODO: https://github.com/dai-shi/proxy-memoize / reselect ?
-    return useEventStore((state) => ids.map((i) => state.events[i]).filter(notEmpty), shallow);
 }

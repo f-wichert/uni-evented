@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 
-import { addEventHelper, useEvents, useEventStore } from '../state/event';
+import { addEventHelper, useEventStore } from '../state/event';
 import { JSONObject } from '../types';
 import { request, useAsync } from '../util';
 import { Media, MediaManager, MediaResponse } from './media';
@@ -161,18 +161,14 @@ export function useRelevantEvents() {
             ].forEach(addEventHelper(state));
         });
 
-        return data;
+        // return just the IDs
+        return {
+            activeEvent: data.activeEvent.map((e) => e.id),
+            myEvents: data.myEvents.map((e) => e.id),
+            followedEvents: data.followedEvents.map((e) => e.id),
+            followerEvents: data.followerEvents.map((e) => e.id),
+        };
     }, []);
-    const { value: serverValue, ...rest } = useAsync(fetchFunc);
 
-    const useEventsFromStore = (serverEvents: Event[] | undefined) =>
-        useEvents((serverEvents ?? []).map((e) => e.id));
-    const value: RelevantEvents = {
-        activeEvent: useEventsFromStore(serverValue?.activeEvent),
-        myEvents: useEventsFromStore(serverValue?.myEvents),
-        followedEvents: useEventsFromStore(serverValue?.followedEvents),
-        followerEvents: useEventsFromStore(serverValue?.followerEvents),
-    };
-
-    return { value, ...rest };
+    return useAsync(fetchFunc);
 }
