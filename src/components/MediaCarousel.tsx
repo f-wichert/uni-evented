@@ -1,10 +1,13 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useIsFocused } from '@react-navigation/native';
 import { useEffect, useRef, useState } from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Carousel from 'react-native-reanimated-carousel';
 import { useSafeAreaFrame } from 'react-native-safe-area-context';
+import urlJoin from 'url-join';
 
+import yellowSplash from '../../assets/yellow_splash.png';
+import config from '../config';
 import { Event } from '../models';
 import ImageDiscover from './ImageDiscover';
 import VideoDiscover from './VideoDiscover';
@@ -208,13 +211,24 @@ export default function MediaCarousel({ eventData, navigateDetail }: Props) {
                             style={styles.headerContainer}
                             onPress={() => navigateDetail(item.id)}
                         >
-                            <Ionicons
+                            <Image
                                 style={styles.eventIcon}
-                                name="person"
-                                size={20}
-                                color="white"
+                                source={{
+                                    uri: urlJoin(
+                                        config.BASE_URL,
+                                        'media',
+                                        'avatar',
+                                        item.hostId,
+                                        'high.jpg'
+                                    ),
+                                }}
+                                defaultSource={yellowSplash}
                             />
-                            <Text style={styles.eventHeader}>{item.name}</Text>
+                            <Text style={styles.eventHeader}>
+                                {item.name.length >= 25
+                                    ? item.name.slice(0, 22) + '...'
+                                    : item.name}
+                            </Text>
                         </TouchableOpacity>
                         <TouchableOpacity onPress={() => setIsMute(!isMute)} style={styles.mute}>
                             <Ionicons
