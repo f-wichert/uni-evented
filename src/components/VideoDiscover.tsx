@@ -11,8 +11,8 @@ declare type Props = {
     navigateDetail: (id: string) => void;
     isPlay: boolean;
     isMute: boolean;
-    setDuration: (dur: number | undefined) => void;
-    setPosition: (pos: number | undefined) => void;
+    setDuration: (dur: number) => void;
+    setPosition: (pos: number) => void;
     finishedVideo: () => void;
 };
 
@@ -39,7 +39,7 @@ function VideoDiscover({
                 shouldPlay: isPlay,
             });
         // give duration and position to parent component
-        if (!status) return;
+        if (!status || !status.positionMillis || !status.durationMillis) return;
         setPosition(status.positionMillis);
         // might need AVPlaybackStatusSuccess here for durationMillis
         setDuration(status.durationMillis);

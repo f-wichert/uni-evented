@@ -30,6 +30,7 @@ function DiscoverScreen({ navigation }: TabNavProps<'Discover'>) {
         updateMedia();
     }, [navigation]);
 
+    // TODO: change this to use ExtendedMedia[] instead of Media[]
     const [eventData, setEventData] = useState<Event[]>([]);
 
     async function updateMedia() {
