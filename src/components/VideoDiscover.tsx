@@ -15,7 +15,7 @@ function VideoDiscover({ discoverData, navigateDetail }: Props) {
     const video = React.useRef(null);
     const [status, setStatus] = React.useState({});
     const [score, setScore] = React.useState(Math.floor(Math.random() * 25));
-    const [dimensions, setDimensions] = useState({ height: 200, width: 350, });
+    const [dimensions, setDimensions] = useState({ height: 200, width: 350 });
 
     const upvote = () => {
         setScore(score + 1);
@@ -31,7 +31,7 @@ function VideoDiscover({ discoverData, navigateDetail }: Props) {
         setDimensions({
             height: height,
             width: width,
-        })
+        });
     };
 
     const updateScore = (vote: '+' | '-') => {
@@ -43,13 +43,15 @@ function VideoDiscover({ discoverData, navigateDetail }: Props) {
     };
 
     return (
-        <View 
+        <View
             style={styles.container}
-            onLayout={(e) => {upddateDimensions(e.nativeEvent.layout.height, e.nativeEvent.layout.width)}}
+            onLayout={(e) => {
+                upddateDimensions(e.nativeEvent.layout.height, e.nativeEvent.layout.width);
+            }}
         >
             <Video
                 ref={video}
-                style={{ ...styles.video, width: dimensions.width, height: dimensions.height}}
+                style={{ ...styles.video, width: dimensions.width, height: dimensions.height }}
                 source={{
                     uri: discoverData.src,
                     headers: {
