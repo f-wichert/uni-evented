@@ -15,8 +15,9 @@ import {
 import { Rating } from 'react-native-ratings';
 
 import { Tag } from '../components/Tag';
+import { EventManager } from '../models';
 import { EventListStackNavProps } from '../nav/types';
-import { useEventFetch, useEventStore } from '../state/event';
+import { useEventFetch } from '../state/event';
 import { asyncHandler } from '../util';
 
 function EventDetailScreen({ route, navigation }: EventListStackNavProps<'EventDetail'>) {
@@ -24,8 +25,6 @@ function EventDetailScreen({ route, navigation }: EventListStackNavProps<'EventD
     const origin = route.params.origin;
 
     const { event: eventData } = useEventFetch(eventId);
-
-    const joinEvent = useEventStore((state) => state.joinEvent);
 
     useEffect(() => {
         // overwrite back button functionality on this component to depend on where it came from (nested screens)
@@ -61,10 +60,6 @@ function EventDetailScreen({ route, navigation }: EventListStackNavProps<'EventD
                 <Text style={{ fontSize: 30 }}>Please select an Event</Text>
             </View>
         );
-    }
-
-    async function registerUserArrivalAtEvent() {
-        await joinEvent({ eventId });
     }
 
     function getProfilePicture() {
@@ -192,7 +187,12 @@ function EventDetailScreen({ route, navigation }: EventListStackNavProps<'EventD
                     <View style={styles.IMHereButtonContainer}>
                         <Pressable
                             style={styles.IMHereButtonArea}
-                            onPress={asyncHandler(registerUserArrivalAtEvent)}
+                            onPress={asyncHandler(
+                                async () => {
+                                    await EventManager.join(eventId, 0, 0);
+                                },
+                                { prefix: 'Failed to join event' }
+                            )}
                         >
                             <Text style={styles.IMHereButton}>{"I'm Here!"}</Text>
                         </Pressable>

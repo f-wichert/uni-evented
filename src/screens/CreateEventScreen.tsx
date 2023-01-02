@@ -1,6 +1,6 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { DateTimePickerAndroid, DateTimePickerEvent } from '@react-native-community/datetimepicker';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
     Button,
     Dimensions,
@@ -15,9 +15,10 @@ import DropDownPicker from 'react-native-dropdown-picker';
 import MapView, { LatLng, Marker } from 'react-native-maps';
 
 import { INPUT_BACKGR_COLOR } from '../const';
+import { EventManager } from '../models';
 import { EventListStackNavProps } from '../nav/types';
-import { useEventStore } from '../state/event';
 import { IoniconsName } from '../types';
+import { asyncHandler } from '../util';
 
 const width = Dimensions.get('window').width;
 // const height = Dimensions.get('window').height;
@@ -63,8 +64,6 @@ function CreateEventScreen({ navigation, route }: EventListStackNavProps<'Create
 
     // Location icon
     const [iconName, setIconName] = useState<IoniconsName>('location-outline');
-
-    const createEvent = useEventStore((state) => state.createEvent);
 
     const onChange = (event: DateTimePickerEvent, selectedDate?: Date) => {
         if (!selectedDate) {
@@ -113,18 +112,25 @@ function CreateEventScreen({ navigation, route }: EventListStackNavProps<'Create
         return `${day}.${month}.${year}`;
     };
 
-    const onCreateButton = async () => {
+    const onCreateButton = useCallback(async () => {
         // TODO: require these to be non-empty in the UI
         if (!location || !name) {
             throw new Error('Invalid name or location');
         }
-        await createEvent({ name: name, location: location, startDate: start }).then((data) => {
-            // TODO: this should replace the current screen in the stack
-            navigation.navigate('EventDetail', {
-                eventId: data,
-            });
+
+        // TODO: include tags
+        const eventId = await EventManager.create({
+            name: name,
+            tags: [],
+            location: location,
+            startDate: start,
         });
-    };
+
+        // TODO: this should replace the current screen in the stack
+        navigation.navigate('EventDetail', {
+            eventId,
+        });
+    }, [location, name, start, navigation]);
 
     return (
         <View style={styles.container}>
@@ -254,7 +260,11 @@ function CreateEventScreen({ navigation, route }: EventListStackNavProps<'Create
                 </View>
             </View>
 
-            <Button color="orange" title="Create event!" onPress={onCreateButton} />
+            <Button
+                color="orange"
+                title="Create event!"
+                onPress={asyncHandler(onCreateButton, { prefix: 'Failed to create event' })}
+            />
         </View>
     );
 }
