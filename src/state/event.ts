@@ -1,8 +1,10 @@
 import { WritableDraft } from 'immer/dist/types/types-external';
+import { useCallback } from 'react';
 import { LatLng } from 'react-native-maps';
 
 import { Event } from '../models';
-import { request } from '../util';
+import { RelevantEvents } from '../models/event';
+import { request, useAsync } from '../util';
 import { createStore } from './utils/createStore';
 
 interface State {
@@ -72,4 +74,30 @@ export function addEventHelper(state: WritableDraft<State>) {
 
 export function useEvent(id: string): Event | undefined {
     return useEventStore((state) => state.events[id]);
+}
+
+export function useRelevantEvents() {
+    const fetchFunc = useCallback(async () => {
+        const data = (await request('GET', 'event/relevantEvents')) as unknown as RelevantEvents;
+
+        // add event objects to store
+        useEventStore.setState((state) => {
+            [
+                ...data.activeEvent,
+                ...data.myEvents,
+                ...data.followedEvents,
+                ...data.followerEvents,
+            ].forEach(addEventHelper(state));
+        });
+
+        // return just the IDs
+        return {
+            activeEvent: data.activeEvent.map((e) => e.id),
+            myEvents: data.myEvents.map((e) => e.id),
+            followedEvents: data.followedEvents.map((e) => e.id),
+            followerEvents: data.followerEvents.map((e) => e.id),
+        };
+    }, []);
+
+    return useAsync(fetchFunc);
 }

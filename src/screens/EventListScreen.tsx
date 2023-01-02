@@ -3,9 +3,8 @@ import React, { useCallback, useEffect } from 'react';
 import { RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import EventPreview from '../components/EventPreview';
-import { useRelevantEvents } from '../models/event';
+import { useRelevantEvents } from '../state/event';
 import { EventListStackNavProps } from '../nav/types';
-import { asyncHandler } from '../util';
 
 export default function EventListScreen({ navigation }: EventListStackNavProps<'EventList'>) {
     useEffect(() => {
