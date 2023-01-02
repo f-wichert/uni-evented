@@ -20,8 +20,6 @@ export default function MapPickerScreen({ navigation }: EventListStackNavProps<'
 
     useEffect(
         asyncHandler(async () => {
-            // const eventList = await request('get', 'event/find', authState.token);
-            // setEvents(eventList.events);
             await getCurrentPosition();
             // TODO: add repeating location checks and updates. This might also be implemented in MapScreen
             // Location.watchPositionAsync({

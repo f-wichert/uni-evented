@@ -1,8 +1,7 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { HeaderBackButton } from '@react-navigation/elements';
 import { StackActions, useFocusEffect } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import {
     BackHandler,
     Image,
@@ -14,43 +13,32 @@ import {
     View,
 } from 'react-native';
 import { Rating } from 'react-native-ratings';
-import { AnyRootNavParams } from '../nav/types';
 
 import { Tag } from '../components/Tag';
-import { Event, EventManager } from '../models/event';
 import { EventListStackNavProps } from '../nav/types';
-import { useEventStore } from '../state/event';
+import { useEventFetch, useEventStore } from '../state/event';
 import { asyncHandler } from '../util';
 
 function EventDetailScreen({ route, navigation }: EventListStackNavProps<'EventDetail'>) {
-    const eventId = route.params?.eventId ?? null;
-    const origin = route.params?.origin ?? null;
-    // console.log('Event ID: ', eventId);
-    // console.log('Origin: ', origin);
+    const eventId = route.params.eventId;
+    const origin = route.params.origin;
 
-    const [eventData, setEventData] = useState<Event | null>(null);
+    const { event: eventData } = useEventFetch(eventId);
 
-    const [cameraActive, setCameraActive] = useState(false);
     const joinEvent = useEventStore((state) => state.joinEvent);
 
-    useEffect(
-        asyncHandler(async () => {
-            // overwrite back button functionality on this component to depend on where it came from (nested screens)
-            navigation.setOptions({
-                headerLeft: () => (
-                    <HeaderBackButton
-                        onPress={() => {
-                            navigateToOrigin();
-                        }}
-                    />
-                ),
-            });
-
-            if (!eventId) return;
-            setEventData(await EventManager.fromId(eventId));
-        }),
-        [eventId]
-    );
+    useEffect(() => {
+        // overwrite back button functionality on this component to depend on where it came from (nested screens)
+        navigation.setOptions({
+            headerLeft: () => (
+                <HeaderBackButton
+                    onPress={() => {
+                        navigateToOrigin();
+                    }}
+                />
+            ),
+        });
+    }, [navigation]);
 
     useFocusEffect(() => {
         BackHandler.addEventListener('hardwareBackPress', navigateToOrigin);
@@ -75,16 +63,7 @@ function EventDetailScreen({ route, navigation }: EventListStackNavProps<'EventD
         );
     }
 
-    // console.log(`Data: ${JSON.stringify(eventData)}`);
-    //     return  (async () => {
-    //     eventData = EventManager.fromId(eventID!) as Event
-    //     console.log('Event:', eventData);
-    //     loaded = true;
-    //     return eventData
-    // }).then(run(eventData))
     async function registerUserArrivalAtEvent() {
-        if (!eventId) return;
-        // console.log(`You are now checked in at the Event (Mock Message, did nothing)`);
         await joinEvent({ eventId });
     }
 
@@ -134,9 +113,6 @@ function EventDetailScreen({ route, navigation }: EventListStackNavProps<'EventD
         description:
             'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum.',
     };
-    // console.log('Time', eventData.startDate);
-
-    const Stack = createNativeStackNavigator<AnyRootNavParams>();
 
     return (
         <SafeAreaView style={{ display: 'flex' }}>
@@ -218,7 +194,7 @@ function EventDetailScreen({ route, navigation }: EventListStackNavProps<'EventD
                             style={styles.IMHereButtonArea}
                             onPress={asyncHandler(registerUserArrivalAtEvent)}
                         >
-                            <Text style={styles.IMHereButton}> I'm Here!</Text>
+                            <Text style={styles.IMHereButton}>{"I'm Here!"}</Text>
                         </Pressable>
                     </View>
                 </View>

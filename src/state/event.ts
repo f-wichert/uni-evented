@@ -1,10 +1,11 @@
 import { WritableDraft } from 'immer/dist/types/types-external';
-import { useCallback } from 'react';
+import { useCallback, useEffect } from 'react';
 import { LatLng } from 'react-native-maps';
+import shallow from 'zustand/shallow';
 
 import { Event } from '../models';
 import { RelevantEvents } from '../models/event';
-import { request, useAsync } from '../util';
+import { notEmpty, request, useAsync } from '../util';
 import { createStore } from './utils/createStore';
 
 interface State {
@@ -76,6 +77,28 @@ export function useEvent(id: string): Event | undefined {
     return useEventStore((state) => state.events[id]);
 }
 
+export function useEventFetch(id: string) {
+    if (!id) throw new Error(`Invalid event ID: ${id}`);
+
+    const fetchFunc = useCallback(async () => {
+        const eventData = (await request('GET', `event/info/${id}`)) as unknown as Event;
+
+        useEventStore.setState((state) => addEventHelper(state)(eventData));
+    }, [id]);
+
+    const { refresh, loading, value: _ignored, ...rest } = useAsync(fetchFunc, false);
+
+    const event = useEvent(id);
+    useEffect(() => {
+        // if event isn't stored already, start fetching it
+        if (!event) {
+            refresh();
+        }
+    }, [event, refresh]);
+
+    return { refresh, loading, event, ...rest };
+}
+
 export function useRelevantEvents() {
     const fetchFunc = useCallback(async () => {
         const data = (await request('GET', 'event/relevantEvents')) as unknown as RelevantEvents;
@@ -100,4 +123,27 @@ export function useRelevantEvents() {
     }, []);
 
     return useAsync(fetchFunc);
+}
+
+export function useFindEvents() {
+    const fetchFunc = useCallback(async () => {
+        const eventsData = (await request('GET', 'event/find')).events as unknown as Event[];
+
+        // add event objects to store
+        useEventStore.setState((state) => {
+            eventsData.forEach(addEventHelper(state));
+        });
+
+        // return just the IDs
+        return eventsData.map((e) => e.id);
+    }, []);
+
+    const { value: eventIDs, ...rest } = useAsync(fetchFunc);
+
+    const events = useEventStore(
+        (state) => eventIDs?.map((id) => state.events[id]).filter(notEmpty) ?? [],
+        shallow
+    );
+
+    return { events, ...rest };
 }

@@ -83,7 +83,7 @@ export function asyncHandler<Args extends unknown[]>(
     };
 }
 
-export function useAsync<T>(func: () => Promise<T>) {
+export function useAsync<T>(func: () => Promise<T>, immediate = true) {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<Error | null>(null);
     const [value, setValue] = useState<T | null>(null);
@@ -102,8 +102,8 @@ export function useAsync<T>(func: () => Promise<T>) {
     }, [func]) as () => void;
 
     useEffect(() => {
-        refresh();
-    }, [refresh]);
+        if (immediate) refresh();
+    }, [refresh, immediate]);
 
     return { loading, error, value, refresh };
 }

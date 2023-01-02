@@ -3,8 +3,8 @@ import React, { useCallback, useEffect } from 'react';
 import { RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import EventPreview from '../components/EventPreview';
-import { useRelevantEvents } from '../state/event';
 import { EventListStackNavProps } from '../nav/types';
+import { useRelevantEvents } from '../state/event';
 
 export default function EventListScreen({ navigation }: EventListStackNavProps<'EventList'>) {
     useEffect(() => {
@@ -32,20 +32,6 @@ export default function EventListScreen({ navigation }: EventListStackNavProps<'
 
     return (
         <View style={[styles.container]}>
-            {/* <FlatList
-                data={events}
-                renderItem={({ item }) =>
-                    <EventPreview
-                        key={item.id}
-                        name={item.name}
-                        id={item.id}
-                        navigateDetail={navigateDetail}
-                    />}
-                keyExtractor={(item) => item.id}
-                refreshControl={
-                    <RefreshControl refreshing={refreshing} onRefresh={fetchData} />
-                }
-            /> */}
             <ScrollView
                 refreshControl={<RefreshControl refreshing={loading} onRefresh={refresh} />}
             >
