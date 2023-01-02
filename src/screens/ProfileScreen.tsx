@@ -10,7 +10,7 @@ import yellowSplash from '../../assets/yellow_splash.png';
 import ProfileHeader from '../components/ProfileHeader';
 import Separator from '../components/Separator';
 import config from '../config';
-import { getToken, useAuthStore, useCurrentUser } from '../state/auth';
+import { useAuthStore, useCurrentUser } from '../state/auth';
 import { IoniconsName } from '../types';
 import { asyncHandler, request } from '../util';
 
@@ -60,7 +60,7 @@ export default function ProfileScreen() {
                             uri: uri,
                         });
 
-                        await request('POST', '/upload/avatar', getToken(), form);
+                        await request('POST', '/upload/avatar', form);
 
                         // TODO: somehow force-update the avatar in the header
                     })}

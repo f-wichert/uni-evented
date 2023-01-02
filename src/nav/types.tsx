@@ -58,7 +58,7 @@ export type TabNavProps<ScreenName extends keyof TabNavParams = keyof TabNavPara
 
 export type EventListStackNavParams = {
     EventList: undefined;
-    EventDetail: { eventId?: string };
+    EventDetail: { eventId?: string; origin?: string };
     CreateEvent: { location?: LatLng } | undefined;
     MapPicker: undefined;
 };

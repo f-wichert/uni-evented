@@ -1,6 +1,10 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { HeaderBackButton } from '@react-navigation/elements';
+import { StackActions, useFocusEffect } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import React, { useEffect, useState } from 'react';
 import {
+    BackHandler,
     Dimensions,
     Image,
     Pressable,
@@ -10,9 +14,8 @@ import {
     Text,
     View,
 } from 'react-native';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { Rating } from 'react-native-ratings';
-import Carousel from 'react-native-reanimated-carousel';
+import { AnyRootNavParams } from '../nav/types';
 
 import { Tag } from '../components/Tag';
 import { Event, EventManager } from '../models/event';
@@ -34,9 +37,11 @@ let media_data = [
     },
 ];
 
-function EventDetailScreen({ route }: EventListStackNavProps<'EventDetail'>) {
+function EventDetailScreen({ route, navigation }: EventListStackNavProps<'EventDetail'>) {
     const eventId = route.params?.eventId ?? null;
-    console.log('Event ID: ', eventId);
+    const origin = route.params?.origin ?? null;
+    // console.log('Event ID: ', eventId);
+    // console.log('Origin: ', origin);
 
     const [eventData, setEventData] = useState<Event | null>(null);
 
@@ -45,15 +50,32 @@ function EventDetailScreen({ route }: EventListStackNavProps<'EventDetail'>) {
 
     useEffect(
         asyncHandler(async () => {
+            // overwrite back button functionality on this component to depend on where it came from (nested screens)
+            navigation.setOptions({
+                headerLeft: () => (
+                    <HeaderBackButton
+                        onPress={() => {
+                            navigateToOrigin();
+                        }}
+                    />
+                ),
+            });
+
             if (!eventId) return;
             setEventData(await EventManager.fromId(eventId));
         }),
         [eventId]
     );
 
+    useFocusEffect(
+        asyncHandler(async () => {
+            BackHandler.addEventListener('hardwareBackPress', navigateToOrigin);
+        })
+    );
+
     // const eventID = useAuthStore((state) => state.user?.currentEventId) // Get event ID of current event of currently logged in user
 
-    console.log('eventData:', eventData);
+    // console.log('eventData:', eventData);
     if (!eventData) {
         return (
             <View
@@ -101,7 +123,7 @@ function EventDetailScreen({ route }: EventListStackNavProps<'EventDetail'>) {
     // }).then(run(eventData))
     async function registerUserArrivalAtEvent() {
         if (!eventId) return;
-        console.log(`You are now checked in at the Event (Mock Message, did nothing)`);
+        // console.log(`You are now checked in at the Event (Mock Message, did nothing)`);
         await joinEvent({ eventId });
     }
 
@@ -110,6 +132,28 @@ function EventDetailScreen({ route }: EventListStackNavProps<'EventDetail'>) {
             profilePicture:
                 'https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=745&q=80',
         };
+    }
+
+    function navigateToOrigin() {
+        // probably same TS error as in MapScreen (link there)
+        switch (origin) {
+            case 'EventDetail':
+                navigation.navigate('EventList');
+                break;
+            case 'Map':
+                // this is needed here to also remove the EventDetailsScreen from the stack
+                // otherwise the following happens:
+                // 1. Open Event from Map Screen & go back to Map Screen using Back functionality
+                // 2. if you click 'Events' it will still show the Event from before and not the list
+                navigation.dispatch(StackActions.replace('TabScreen', { screen: 'Map' }));
+                break;
+            case 'Discover':
+                navigation.dispatch(StackActions.replace('TabScreen', { screen: 'Discover' }));
+                break;
+            default:
+                navigation.navigate('EventList');
+        }
+        return true;
     }
 
     // Developement Values TODO: replace with request to real ones
@@ -129,7 +173,9 @@ function EventDetailScreen({ route }: EventListStackNavProps<'EventDetail'>) {
         description:
             'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum.Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum.Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum.Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum.Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum.Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum.Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum.',
     };
-    console.log('Time', eventData.startDate);
+    // console.log('Time', eventData.startDate);
+
+    const Stack = createNativeStackNavigator<AnyRootNavParams>();
 
     return (
         <SafeAreaView style={{ display: 'flex' }}>
@@ -147,6 +193,15 @@ function EventDetailScreen({ route }: EventListStackNavProps<'EventDetail'>) {
                                 renderItem={({ item, index }) => getJsx(item)}
                             />
                         </GestureHandlerRootView>
+                        <Ionicons
+                            name="camera"
+                            size={64}
+                            color="orange"
+                            onPress={() => {
+                                navigation.navigate('MediaCapture', { eventID: eventId });
+                            }}
+                        />
+                        <Text>Load Picture/Video of event here</Text>
                     </View>
                     <View style={styles.tagArea}>
                         {event.tags.map((tag) => (

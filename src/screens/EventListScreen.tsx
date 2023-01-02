@@ -1,11 +1,10 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import React, { useCallback, useEffect, useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import EventPreview from '../components/EventPreview';
 import { Event } from '../models/event';
 import { EventListStackNavProps } from '../nav/types';
-import { getToken } from '../state/auth';
 import { asyncHandler, request } from '../util';
 
 type EventsData = {
@@ -35,12 +34,15 @@ export default function EventListScreen({ navigation }: EventListStackNavProps<'
         [navigation]
     );
 
+    const [refreshing, setRefreshing] = useState<boolean>(false);
     const [events, setEvents] = useState<EventsData | null>(null);
 
     const fetchData = useCallback(async () => {
-        const data = await request('get', 'event/relevantEvents', getToken());
+        setRefreshing(true);
+        const data = await request('get', 'event/relevantEvents');
         setEvents(data as unknown as EventsData);
-    }, []);
+        setRefreshing(false);
+    }, [navigation]);
 
     useEffect(asyncHandler(fetchData), []);
 
@@ -51,52 +53,57 @@ export default function EventListScreen({ navigation }: EventListStackNavProps<'
 
     return (
         <View style={[styles.container]}>
-            <Text style={[styles.headerTitle]}>Active event</Text>
-            {events?.activeEvent.map((el: Event) => {
-                return (
+            {/* <FlatList
+                data={events}
+                renderItem={({ item }) =>
                     <EventPreview
-                        key={el.id}
-                        name={el.name}
-                        id={el.id}
+                        key={item.id}
+                        name={item.name}
+                        id={item.id}
                         navigateDetail={navigateDetail}
-                    />
-                );
-            })}
-            <Text style={[styles.headerTitle]}>Your Events</Text>
-            {events?.myEvents.map((el: Event) => {
-                return (
-                    <EventPreview
-                        key={el.id}
-                        name={el.name}
-                        id={el.id}
-                        navigateDetail={navigateDetail}
-                    />
-                );
-            })}
-            <Text style={[styles.headerTitle]}>Followed Events</Text>
-            {events?.followedEvents.map((el: Event) => {
-                return (
-                    <EventPreview
-                        key={el.id}
-                        name={el.name}
-                        id={el.id}
-                        navigateDetail={navigateDetail}
-                    />
-                );
-            })}
-            <Ionicons
-                name="refresh-outline"
-                size={32}
-                color="black"
-                onPress={asyncHandler(fetchData, {
-                    prefix: 'Failed to update events',
+                    />}
+                keyExtractor={(item) => item.id}
+                refreshControl={
+                    <RefreshControl refreshing={refreshing} onRefresh={fetchData} />
+                }
+            /> */}
+            <ScrollView
+                refreshControl={<RefreshControl refreshing={refreshing} onRefresh={fetchData} />}
+            >
+                <Text style={[styles.headerTitle]}>Active event</Text>
+                {events?.activeEvent.map((el: Event) => {
+                    return (
+                        <EventPreview
+                            key={el.id}
+                            name={el.name}
+                            id={el.id}
+                            navigateDetail={navigateDetail}
+                        />
+                    );
                 })}
-                style={{
-                    marginTop: 'auto',
-                    alignSelf: 'center',
-                    marginBottom: 10,
-                }}
-            />
+                <Text style={[styles.headerTitle]}>Your Events</Text>
+                {events?.myEvents.map((el: Event) => {
+                    return (
+                        <EventPreview
+                            key={el.id}
+                            name={el.name}
+                            id={el.id}
+                            navigateDetail={navigateDetail}
+                        />
+                    );
+                })}
+                <Text style={[styles.headerTitle]}>Followed Events</Text>
+                {events?.followedEvents.map((el: Event) => {
+                    return (
+                        <EventPreview
+                            key={el.id}
+                            name={el.name}
+                            id={el.id}
+                            navigateDetail={navigateDetail}
+                        />
+                    );
+                })}
+            </ScrollView>
         </View>
     );
 }

@@ -5,9 +5,8 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import MediaCarousel from '../components/MediaCarousel';
-import { MediaManager } from '../models';
+import { Event, Media, MediaManager } from '../models';
 import { getToken } from '../state/auth';
-import { ExtendedMedia, Media } from '../types';
 import { asyncHandler, request } from '../util';
 
 declare type Props = {
@@ -50,25 +49,42 @@ function DiscoverScreen({ navigation }: Props) {
                 />
             ),
         });
+        updateMedia();
     }, [navigation]);
 
+    // TODO: change this to use ExtendedMedia[] instead of Media[]
+    const [eventData, setEventData] = useState<Event[]>([]);
+
+    async function updateMedia() {
+        const responseData = await request('GET', 'discover/', getToken());
+        const data = responseData.map((event: Event) => ({
+            ...event,
+            media: event.media?.map((el: Media) => ({ ...el, src: MediaManager.src(el, 'high') })),
+        }));
+        setEventData(data);
+    }
     const navigateDetail = useCallback(
         (id: string) => {
-            // TODO
-            console.warn('TODO: navigating to detail view from here does not work yet');
-            // navigation.navigate('EventDetail', { eventId: id })
+            // TODO: pretty sure this error can be fixed using this? https://javascript.plainenglish.io/react-navigation-v6-with-typescript-nested-navigation-part-2-87844f643e37
+            // this shit is confusing af, send help
+            // same error in EventDetailScreen
+
+            // need to transition to another navigator here
+            navigation.navigate('Events', {
+                // captain, we're going deep
+                screen: 'EventDetail',
+                params: {
+                    eventId: id,
+                    origin: 'Discover',
+                },
+            });
         },
         [navigation]
     );
 
     return (
-        <View
-            style={styles.container}
-            onLayout={(e) => {
-                updateHeigth(e.nativeEvent.layout.height);
-            }}
-        >
-            {media.length == 0 ? (
+        <View style={styles.container}>
+            {eventData.length == 0 ? (
                 <View style={styles.sadContainer}>
                     <Ionicons name="sad-outline" size={50} color="black" style={styles.sadIcon} />
                     <Text style={styles.sadText}>Seems like there are no clips right now...</Text>
@@ -78,7 +94,7 @@ function DiscoverScreen({ navigation }: Props) {
                 // needs a pixel height and doesn't support `height: '100%'`
                 <SafeAreaProvider>
                     <GestureHandlerRootView>
-                        <MediaCarousel media={media} navigateDetail={navigateDetail} />
+                        <MediaCarousel eventData={eventData} navigateDetail={navigateDetail} />
                     </GestureHandlerRootView>
                 </SafeAreaProvider>
             )}

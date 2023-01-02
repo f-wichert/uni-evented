@@ -119,6 +119,7 @@ function CreateEventScreen({ navigation, route }: EventListStackNavProps<'Create
             throw new Error('Invalid name or location');
         }
         await createEvent({ name: name, location: location, startDate: start }).then((data) => {
+            // TODO: this should replace the current screen in the stack
             navigation.navigate('EventDetail', {
                 eventId: data,
             });

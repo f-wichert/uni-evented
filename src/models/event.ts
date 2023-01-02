@@ -1,4 +1,3 @@
-import { getToken } from '../state/auth';
 import { JSONObject } from '../types';
 import { request } from '../util';
 import { Media, MediaManager, MediaResponse } from './media';
@@ -42,19 +41,13 @@ export class EventManager {
     }
 
     static async join(event: Event, lat: number, lon: number) {
-        const token = getToken();
-
         // TODO: client side validation
-
-        await request('POST', '/event/join', token, { eventId: event.id, lat, lon });
+        await request('POST', '/event/join', { eventId: event.id, lat, lon });
     }
 
     static async close(event: Event) {
-        const token = getToken();
-
         // TODO: client side validation
-
-        await request('POST', '/event/close', token, { eventId: event.id });
+        await request('POST', '/event/close', { eventId: event.id });
     }
 
     static fromEventResponse(response: EventResponse): Event {
@@ -99,8 +92,7 @@ export class EventManager {
     }
 
     static async fromId(id: string) {
-        const token = getToken();
-        const data = await request('GET', `event/info/${id}`, token);
+        const data = await request('GET', `event/info/${id}`);
         return this.fromEventResponse(data as EventResponse);
     }
 
@@ -119,8 +111,7 @@ export class EventManager {
         startDate?: Date | null;
         endDate?: Date | null;
     }) {
-        const token = getToken();
-        const { eventId } = await request('POST', '/event/create', token, {
+        const { eventId } = await request('POST', '/event/create', {
             name: name,
             tags: tags,
             lat: lat,
@@ -140,8 +131,7 @@ export class EventManager {
         maxResults?: number;
         maxRadius?: number;
     }) {
-        const token = getToken();
-        const data = await request('GET', '/event/find', token, options);
+        const data = await request('GET', '/event/find', options);
         const eventResponses = data.events as EventResponse[];
         return eventResponses.map((res) => this.fromEventResponse(res));
     }

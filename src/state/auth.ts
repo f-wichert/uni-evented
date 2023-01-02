@@ -43,7 +43,7 @@ export const useAuthStore = createStore<State>('auth')(
 
             signin: async (params) => {
                 console.log('SubmitSignin');
-                const data = await request('POST', '/auth/login', null, params);
+                const data = await request('POST', '/auth/login', params, { noAuth: true });
 
                 // TODO: validate types
                 set((state) => {
@@ -51,7 +51,7 @@ export const useAuthStore = createStore<State>('auth')(
                 });
             },
             signup: async (params) => {
-                const data = await request('POST', '/auth/register', null, params);
+                const data = await request('POST', '/auth/register', params, { noAuth: true });
 
                 // TODO: validate types
                 set((state) => {
@@ -64,7 +64,7 @@ export const useAuthStore = createStore<State>('auth')(
                 });
             },
             reset: async (params) => {
-                await request('POST', '/auth/reset', null, params);
+                await request('POST', '/auth/reset', params, { noAuth: true });
 
                 set((state) => {
                     state.token = null;
@@ -73,7 +73,7 @@ export const useAuthStore = createStore<State>('auth')(
 
             fetchUser: async () => {
                 // TODO: validate types
-                const user = await request('GET', '/auth/info', get().token);
+                const user = await request('GET', '/auth/info');
 
                 set((state) => {
                     state.user = user as unknown as CurrentUser;
@@ -81,7 +81,7 @@ export const useAuthStore = createStore<State>('auth')(
             },
 
             createEvent: async (params) => {
-                const data = await request('POST', '/event/create', getToken(), {
+                const data = await request('POST', '/event/create', {
                     name: params.name,
                     lat: params.location.latitude,
                     lon: params.location.longitude,
@@ -111,7 +111,7 @@ export const useAuthStore = createStore<State>('auth')(
             joinEvent: async (params) => {
                 console.log(JSON.stringify(params));
 
-                await request('post', '/event/join', getToken(), {
+                await request('post', '/event/join', {
                     eventId: params.eventId,
                     lon: 0,
                     lat: 0,
@@ -140,6 +140,7 @@ useAuthStore.subscribe(
         // TODO: this might be bad practice: https://github.com/pmndrs/zustand/discussions/1363#discussioncomment-3874571
 
         // clear stored user if token changed
+        // TODO: propagate this to other stores, should probably reset everything?
         useAuthStore.setState((state) => {
             state.user = null;
         });

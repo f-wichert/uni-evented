@@ -6,7 +6,6 @@ import MapView, { LatLng, Marker } from 'react-native-maps';
 
 import { Event } from '../models';
 import { TabNavProps } from '../nav/types';
-import { getToken } from '../state/auth';
 import { asyncHandler, request } from '../util';
 
 function MapScreen({ navigation }: TabNavProps<'Map'>) {
@@ -33,7 +32,7 @@ function MapScreen({ navigation }: TabNavProps<'Map'>) {
     };
 
     const updateEventList = async () => {
-        const eventList = await request('get', 'event/find', getToken());
+        const eventList = await request('get', 'event/find');
         setEvents(eventList.events as unknown as Event[]);
     };
 
@@ -61,9 +60,19 @@ function MapScreen({ navigation }: TabNavProps<'Map'>) {
 
     const navigateDetail = useCallback(
         (id: string) => {
-            // TODO
-            console.warn('TODO: navigating to detail view from here does not work yet');
-            // navigation.navigate('EventDetail', { eventId: id })
+            // TODO: pretty sure this error can be fixed using this? https://javascript.plainenglish.io/react-navigation-v6-with-typescript-nested-navigation-part-2-87844f643e37
+            // this shit is confusing af, send help
+            // same error in EventDetailScreen
+
+            // need to transition to another navigator here
+            navigation.navigate('Events', {
+                // captain, we're going deep
+                screen: 'EventDetail',
+                params: {
+                    eventId: id,
+                    origin: 'Map',
+                },
+            });
         },
         [navigation]
     );
