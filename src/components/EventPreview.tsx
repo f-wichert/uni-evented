@@ -1,19 +1,29 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
-import React from 'react';
+import React, { useCallback } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
+import { useEvent } from '../state/event';
+
 declare type Props = {
-    name: string;
     id: string;
     navigateDetail: (id: string) => void;
 };
 
-function EventPreview({ name, id, navigateDetail }: Props) {
+function EventPreview({ id, navigateDetail }: Props) {
+    const navigate = useCallback(() => navigateDetail(id), [navigateDetail, id]);
+    const event = useEvent(id);
+
+    if (!event) {
+        // this shouldn't happen
+        console.warn(`Tried to render unknown event ${id}`);
+        return <View />;
+    }
+
     return (
-        <TouchableOpacity style={[styles.container]} onPress={() => navigateDetail(id)}>
+        <TouchableOpacity style={[styles.container]} onPress={navigate}>
             <Ionicons style={[styles.icon]} name="rocket-outline" color="#000" size={32} />
             <View style={[styles.innerContainer]}>
-                <Text style={[styles.title]}>{name}</Text>
+                <Text style={[styles.title]}>{event.name}</Text>
                 <Text>Your description can be here!</Text>
             </View>
         </TouchableOpacity>

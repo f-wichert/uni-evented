@@ -1,32 +1,24 @@
 import * as SecureStore from 'expo-secure-store';
-import { LatLng } from 'react-native-maps';
 import { persist, StateStorage } from 'zustand/middleware';
 
-import { CurrentUser } from '../models';
 import { handleError, request } from '../util';
-import { createStore } from './utils/createStore';
+import { useUserStore } from './user';
+import { createStore, resetAllStores } from './utils/createStore';
 
 interface State {
     token: string | null;
-    user: CurrentUser | null;
+
     signin: (params: { username: string; password: string }) => Promise<void>;
     signup: (params: { username: string; email: string; password: string }) => Promise<void>;
     signout: () => void;
+
     reset: (params: { email: string }) => Promise<void>;
 
-    fetchUser: () => Promise<void>;
-
-    createEvent: (params: {
-        name: string;
-        location: LatLng;
-        startDate?: Date;
-        endDate?: Date;
-    }) => Promise<string>;
-    closeEvent: () => void;
-    joinEvent: (params: { eventId: string }) => Promise<void>;
+    // Once persisted data was rehydrated, we set this to true:
+    // https://github.com/pmndrs/zustand/blob/main/docs/integrations/persisting-store-data.md#hydration-and-asynchronous-storages
+    _hasHydrated: boolean;
 }
 
-// TODO: show loading state while waiting for hydration: https://github.com/pmndrs/zustand/blob/main/docs/integrations/persisting-store-data.md#hydration-and-asynchronous-storages
 // TODO: SecureStore doesn't work on web, may be the only blocker
 const secureStoreWrapper: StateStorage = {
     getItem: SecureStore.getItemAsync.bind(SecureStore),
@@ -34,15 +26,13 @@ const secureStoreWrapper: StateStorage = {
     removeItem: SecureStore.deleteItemAsync.bind(SecureStore),
 };
 
-export const useAuthStore = createStore<State>('auth')(
+export const useAuthStore = createStore<State>('auth', { skipReset: true })(
     persist(
         (set) => ({
             token: null,
-            // consider using `useCurrentUser()` instead
-            user: null,
+            userId: null,
 
             signin: async (params) => {
-                console.log('SubmitSignin');
                 const data = await request('POST', '/auth/login', params, { noAuth: true });
 
                 // TODO: validate types
@@ -71,85 +61,37 @@ export const useAuthStore = createStore<State>('auth')(
                 });
             },
 
-            fetchUser: async () => {
-                // TODO: validate types
-                const user = await request('GET', '/auth/info');
-
-                set((state) => {
-                    state.user = user as unknown as CurrentUser;
-                });
-            },
-
-            createEvent: async (params) => {
-                const data = await request('POST', '/event/create', {
-                    name: params.name,
-                    lat: params.location.latitude,
-                    lon: params.location.longitude,
-                    startDateTime: params.startDate?.toJSON() ?? null,
-                    endDateTime: params.endDate?.toJSON() ?? null,
-                });
-                const eventId = data.eventId as string;
-
-                set((state) => {
-                    if (!state.user) {
-                        console.warn('No current user stored, cannot set event ID');
-                        return;
-                    }
-                    state.user.currentEventId = eventId;
-                });
-                return eventId;
-            },
-            closeEvent: () => {
-                set((state) => {
-                    if (!state.user) {
-                        console.warn('No current user stored, cannot clear event ID');
-                        return;
-                    }
-                    state.user.currentEventId = null;
-                });
-            },
-            joinEvent: async (params) => {
-                console.log(JSON.stringify(params));
-
-                await request('post', '/event/join', {
-                    eventId: params.eventId,
-                    lon: 0,
-                    lat: 0,
-                });
-
-                set((state) => {
-                    if (!state.user) {
-                        console.warn('No current user stored, cannot set event ID');
-                        return;
-                    }
-                    state.user.currentEventId = params.eventId;
-                });
-            },
+            _hasHydrated: false,
         }),
         {
             name: 'auth',
             getStorage: () => secureStoreWrapper,
             partialize: (state) => ({ token: state.token }),
+            onRehydrateStorage: () => (state, error) => {
+                if (error) {
+                    handleError(error, { prefix: 'Failed to rehydrate persistent storage' });
+                }
+                // set `_hasHydrated` regardless of whether rehydration was successful
+                useAuthStore.setState((state) => {
+                    state._hasHydrated = true;
+                });
+            },
         }
     )
 );
 
+// TODO: use computed property? https://github.com/pmndrs/zustand/discussions/1363#discussioncomment-3874571
 useAuthStore.subscribe(
     (state) => state.token,
     (token) => {
-        // TODO: this might be bad practice: https://github.com/pmndrs/zustand/discussions/1363#discussioncomment-3874571
-
-        // clear stored user if token changed
-        // TODO: propagate this to other stores, should probably reset everything?
-        useAuthStore.setState((state) => {
-            state.user = null;
-        });
+        // clear stores (except auth store, see `skipReset` above) if token changed
+        resetAllStores();
 
         // start fetching user data if there's a new token
         if (token) {
-            useAuthStore
+            useUserStore
                 .getState()
-                .fetchUser()
+                .fetchCurrentUser()
                 .catch((e) => {
                     handleError(e, { prefix: 'Failed to retrieve user data' });
                     // reset token if we failed to fetch the user data
@@ -159,18 +101,8 @@ useAuthStore.subscribe(
                     });
                 });
         }
-    },
-    { fireImmediately: true }
+    }
 );
-
-export function useCurrentUser() {
-    const token = useAuthStore((state) => state.token);
-    if (!token) throw new Error('No token stored.');
-
-    const user = useAuthStore((state) => state.user);
-    if (!user) throw new Error("User is not stored, this shouldn't happen.");
-    return user;
-}
 
 // NOTE: This isn't a hook, it accesses the state directly and is not reactive.
 // For auth tokens, this is fine, but generally hooks should be used

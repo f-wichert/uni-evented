@@ -1,5 +1,6 @@
 import { Event, EventManager, EventResponse, EventStatus, EventStatuses } from './event';
 import { Media, MediaManager, MediaResponse, MediaType, MediaTypes } from './media';
+import { CurrentUserResponse } from './responses';
 import { CurrentUser, User, UserManager, UserResponse } from './user';
 
 export {
@@ -17,4 +18,5 @@ export {
     MediaType,
     MediaTypes,
     UserResponse,
+    CurrentUserResponse,
 };

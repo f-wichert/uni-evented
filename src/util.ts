@@ -1,6 +1,7 @@
 import Constants from 'expo-constants';
 import urlJoin from 'url-join';
 
+import { useCallback, useEffect, useState } from 'react';
 import config from './config';
 import { getToken } from './state/auth';
 import { JSONObject } from './types';
@@ -52,7 +53,7 @@ export async function request(
     });
     if (response.status !== 200) {
         // TODO: throw error with status/message/body/etc attributes
-        throw new Error(`invalid response status: ${response.status}`);
+        throw new Error(`invalid response status for '${method} ${route}': ${response.status}`);
     }
 
     return (await response.json()) as JSONObject;
@@ -80,4 +81,33 @@ export function asyncHandler<Args extends unknown[]>(
     return (...args) => {
         handler(...args).catch((e) => handleError(e, opts));
     };
+}
+
+export function useAsync<T>(func: () => Promise<T>, immediate = true) {
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<Error | null>(null);
+    const [value, setValue] = useState<T | null>(null);
+
+    const refresh = useCallback(async () => {
+        setLoading(true);
+        setError(null);
+
+        try {
+            setValue(await func());
+        } catch (err) {
+            setError(err as Error);
+        } finally {
+            setLoading(false);
+        }
+    }, [func]) as () => void;
+
+    useEffect(() => {
+        if (immediate) refresh();
+    }, [refresh, immediate]);
+
+    return { loading, error, value, refresh };
+}
+
+export function notEmpty<T>(value: T | null | undefined): value is T {
+    return value !== null && value !== undefined;
 }

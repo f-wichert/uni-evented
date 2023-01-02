@@ -14,7 +14,6 @@ export interface User {
 
 export interface CurrentUser extends User {
     readonly email: string;
-    readonly currentEventId: string | null;
 }
 
 export class UserManager {
