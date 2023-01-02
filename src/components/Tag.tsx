@@ -12,15 +12,16 @@ export function Tag(props: any) {
 const styles = StyleSheet.create({
     basicTagStyle: {
         backgroundColor: 'orange',
-        padding: 5,
-        margin: 2,
+        padding: 3,
+        margin: 1,
         borderRadius: 3.1,
-        paddingHorizontal: 20,
+        paddingHorizontal: 15,
+        marginHorizontal: 2,
         justifyContent: 'center',
         alignItems: 'center',
     },
     text: {
-        fontSize: 16,
+        fontSize: 14,
         fontWeight: 'bold',
     },
 });

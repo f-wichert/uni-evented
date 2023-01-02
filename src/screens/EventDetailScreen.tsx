@@ -14,7 +14,9 @@ import {
     Text,
     View,
 } from 'react-native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { Rating } from 'react-native-ratings';
+import Carousel from 'react-native-reanimated-carousel';
 import { AnyRootNavParams } from '../nav/types';
 
 import { Tag } from '../components/Tag';
@@ -104,7 +106,9 @@ function EventDetailScreen({ route, navigation }: EventListStackNavProps<'EventD
                         name="camera"
                         size={64}
                         color="orange"
-                        onPress={() => setCameraActive(true)}
+                        onPress={() => {
+                            navigation.navigate('MediaCapture', { eventID: eventId });
+                        }}
                     />
                     <Text>Load Picture/Video of event here</Text>
                 </>
@@ -178,105 +182,103 @@ function EventDetailScreen({ route, navigation }: EventListStackNavProps<'EventD
     const Stack = createNativeStackNavigator<AnyRootNavParams>();
 
     return (
-        <SafeAreaView style={{ display: 'flex' }}>
-            <ScrollView>
-                <View style={styles.section}>
-                    <View style={styles.camera}>
-                        <GestureHandlerRootView>
-                            <Carousel
-                                width={Dimensions.get('window').width}
-                                height={200}
-                                autoPlay={false}
-                                loop={false}
-                                data={media_data}
-                                scrollAnimationDuration={350}
-                                renderItem={({ item, index }) => getJsx(item)}
-                            />
-                        </GestureHandlerRootView>
-                        <Ionicons
-                            name="camera"
-                            size={64}
-                            color="orange"
-                            onPress={() => {
-                                navigation.navigate('MediaCapture', { eventID: eventId });
-                            }}
-                        />
-                        <Text>Load Picture/Video of event here</Text>
-                    </View>
-                    <View style={styles.tagArea}>
-                        {event.tags.map((tag) => (
-                            <Tag
-                                style={{ ...styles.tag, backgroundColor: tag.color }}
-                                key={tag.name}
-                            >
-                                {tag.name}
-                            </Tag>
-                        ))}
-                    </View>
-                    <View style={styles.RatingArea}>
-                        <Rating />
-                    </View>
-                    <View style={styles.InformationArea}>
-                        <View style={styles.TitleLine}>
-                            <Text style={{ fontSize: 25, fontWeight: 'bold', maxWidth: '70%' }}>
-                                {event.title}
-                            </Text>
-                            <View
-                                style={{
-                                    display: 'flex',
-                                    flexDirection: 'row',
-                                    alignItems: 'center',
-                                }}
-                            >
-                                <Ionicons name="people" size={28} />
-                                <Text style={{ fontSize: 25, fontWeight: 'bold', marginLeft: 2 }}>
-                                    {event.numberOfAttendants}
-                                </Text>
-                            </View>
-                            <Image
-                                style={styles.ProfilePicture}
-                                source={{ uri: getProfilePicture().profilePicture }}
-                            />
+        <>
+            <SafeAreaView style={{ display: 'flex' }}>
+                <ScrollView>
+                    <View style={styles.section}>
+                        <View style={styles.camera}>
+                            <GestureHandlerRootView>
+                                <Carousel
+                                    width={Dimensions.get('window').width}
+                                    height={200}
+                                    autoPlay={false}
+                                    loop={false}
+                                    data={media_data}
+                                    scrollAnimationDuration={350}
+                                    renderItem={({ item, index }) => getJsx(item)}
+                                />
+                            </GestureHandlerRootView>
                         </View>
-                        <View style={styles.GeneralInformationArea}>
-                            <View style={{ maxWidth: '60%' }}>
-                                <Text style={{ color: 'grey', fontSize: 16 }}>
-                                    {event.startingTime}-{event.endingTime}
+                        <View style={styles.tagArea}>
+                            {event.tags.map((tag) => (
+                                <Tag
+                                    style={{ ...styles.tag, backgroundColor: tag.color }}
+                                    key={tag.name}
+                                >
+                                    {tag.name}
+                                </Tag>
+                            ))}
+                        </View>
+                        <View style={styles.RatingArea}>
+                            <Rating imageSize={28} />
+                        </View>
+                        <View style={styles.InformationArea}>
+                            <View style={styles.TitleLine}>
+                                <Text style={{ fontSize: 25, fontWeight: 'bold', maxWidth: '70%' }}>
+                                    {event.title}
                                 </Text>
-                                <Text style={{ fontSize: 18, fontWeight: 'bold' }}>
-                                    {event.address}
-                                </Text>
+                                <View
+                                    style={{
+                                        display: 'flex',
+                                        flexDirection: 'row',
+                                        alignItems: 'center',
+                                    }}
+                                >
+                                    <Ionicons name="people" size={28} />
+                                    <Text
+                                        style={{ fontSize: 25, fontWeight: 'bold', marginLeft: 2 }}
+                                    >
+                                        {event.numberOfAttendants}
+                                    </Text>
+                                </View>
+                                <Image
+                                    style={styles.ProfilePicture}
+                                    source={{ uri: getProfilePicture().profilePicture }}
+                                />
                             </View>
-                            <View
-                                style={{
-                                    display: 'flex',
-                                    flexDirection: 'row',
-                                    alignItems: 'center',
-                                    marginRight: 13,
-                                }}
-                            >
-                                <Ionicons name="musical-notes-sharp" size={25}></Ionicons>
-                                <Text style={{ fontSize: 23, fontWeight: '900' }}>
-                                    {event.musicStyle}
-                                </Text>
+                            <View style={styles.GeneralInformationArea}>
+                                <View style={{ maxWidth: '60%' }}>
+                                    <Text style={{ color: 'grey', fontSize: 16 }}>
+                                        {event.startingTime}-{event.endingTime}
+                                    </Text>
+                                    <Text style={{ fontSize: 18, fontWeight: 'bold' }}>
+                                        {event.address}
+                                    </Text>
+                                </View>
+                                <View
+                                    style={{
+                                        display: 'flex',
+                                        flexDirection: 'row',
+                                        alignItems: 'center',
+                                        marginRight: 13,
+                                    }}
+                                >
+                                    <Ionicons name="musical-notes-sharp" size={25}></Ionicons>
+                                    <Text style={{ fontSize: 23, fontWeight: '900' }}>
+                                        {event.musicStyle}
+                                    </Text>
+                                </View>
+                            </View>
+                            <View style={styles.DescriptionArea}>
+                                <Text>{event.description}</Text>
                             </View>
                         </View>
-                        <View style={styles.DescriptionArea}>
-                            <Text>{event.description}</Text>
+                        <View style={styles.ChatArea}></View>
+                        <View style={styles.IMHereButtonContainer}>
+                            <Pressable
+                                style={styles.IMHereButtonArea}
+                                onPress={asyncHandler(registerUserArrivalAtEvent)}
+                            >
+                                <Text style={styles.IMHereButton}> I'm Here!</Text>
+                            </Pressable>
                         </View>
                     </View>
-                    <View style={styles.ChatArea}></View>
-                    <View style={styles.IMHereButtonContainer}>
-                        <Pressable
-                            style={styles.IMHereButtonArea}
-                            onPress={asyncHandler(registerUserArrivalAtEvent)}
-                        >
-                            <Text style={styles.IMHereButton}> I'm Here!</Text>
-                        </Pressable>
-                    </View>
-                </View>
-            </ScrollView>
-        </SafeAreaView>
+                </ScrollView>
+            </SafeAreaView>
+            <View>
+                <Text>This should be overlay text</Text>
+            </View>
+        </>
     );
 }
 
@@ -319,8 +321,9 @@ const styles = StyleSheet.create({
         padding: 5,
     },
     tag: {
-        height: 32,
-        minWidth: 82,
+        height: 25,
+        minWidth: 40,
+        // paddingHorizontal: 5
     },
     RatingArea: {
         display: 'flex',
