@@ -3,7 +3,7 @@ import { useCallback, useEffect } from 'react';
 import shallow from 'zustand/shallow';
 
 import { Event } from '../models';
-import { EventStatus, RelevantEvents } from '../models/event';
+import { EventManager, EventResponse, EventStatus, RelevantEventsResponse } from '../models/event';
 import { notEmpty, request, useAsync } from '../util';
 import { createStore } from './utils/createStore';
 
@@ -13,14 +13,16 @@ interface State {
     currentEventId: string | null | undefined;
 }
 
-export const useEventStore = createStore<State>('event')((set) => ({
+export const useEventStore = createStore<State>('event')(() => ({
     events: {},
     currentEventId: undefined,
 }));
 
 /** Creates helper for adding events to state, merging new data with existing data. */
-export function addEventHelper(state: WritableDraft<State>) {
-    return (event: Event) => {
+export function addEvents(state: WritableDraft<State>, events: Event | Event[]) {
+    if (!Array.isArray(events)) events = [events];
+
+    for (const event of events) {
         state.events[event.id] = {
             // (shallow) merge old and new event data
             // TODO: this probably causes unnecessary renders if the
@@ -28,7 +30,7 @@ export function addEventHelper(state: WritableDraft<State>) {
             ...state.events[event.id],
             ...event,
         };
-    };
+    }
 }
 
 export function useEvent(id: string): Event | undefined {
@@ -39,9 +41,11 @@ export function useEventFetch(id: string) {
     if (!id) throw new Error(`Invalid event ID: ${id}`);
 
     const fetchFunc = useCallback(async () => {
-        const eventData = (await request('GET', `event/info/${id}`)) as unknown as Event;
+        const eventData = (await request('GET', `event/info/${id}`)) as unknown as EventResponse;
 
-        useEventStore.setState((state) => addEventHelper(state)(eventData));
+        useEventStore.setState((state) =>
+            addEvents(state, EventManager.fromEventResponse(eventData))
+        );
     }, [id]);
 
     const { refresh, loading, value: _ignored, ...rest } = useAsync(fetchFunc, false);
@@ -59,16 +63,22 @@ export function useEventFetch(id: string) {
 
 export function useRelevantEvents() {
     const fetchFunc = useCallback(async () => {
-        const data = (await request('GET', 'event/relevantEvents')) as unknown as RelevantEvents;
+        const data = (await request(
+            'GET',
+            'event/relevantEvents'
+        )) as unknown as RelevantEventsResponse;
 
         // add event objects to store
         useEventStore.setState((state) => {
-            [
-                ...data.activeEvent,
-                ...data.myEvents,
-                ...data.followedEvents,
-                ...data.followerEvents,
-            ].forEach(addEventHelper(state));
+            addEvents(
+                state,
+                [
+                    ...data.activeEvent,
+                    ...data.myEvents,
+                    ...data.followedEvents,
+                    ...data.followerEvents,
+                ].map((e) => EventManager.fromEventResponse(e))
+            );
         });
 
         // return just the IDs
@@ -96,11 +106,14 @@ export function useFindEvents(options?: {
 }) {
     const fetchFunc = useCallback(async () => {
         const eventsData = (await request('GET', 'event/find', options))
-            .events as unknown as Event[];
+            .events as unknown as EventResponse[];
 
         // add event objects to store
         useEventStore.setState((state) => {
-            eventsData.forEach(addEventHelper(state));
+            addEvents(
+                state,
+                eventsData.map((e) => EventManager.fromEventResponse(e))
+            );
         });
 
         // return just the IDs

@@ -1,7 +1,6 @@
 import { LatLng } from 'react-native-maps';
 
-import { addEventHelper, useEventStore } from '../state/event';
-import { JSONObject } from '../types';
+import { addEvents, useEventStore } from '../state/event';
 import { request } from '../util';
 import { Media, MediaManager, MediaResponse } from './media';
 import { User, UserManager, UserResponse } from './user';
@@ -9,15 +8,15 @@ import { User, UserManager, UserResponse } from './user';
 export const EventStatuses = ['scheduled', 'active', 'completed'] as const;
 export type EventStatus = typeof EventStatuses[number];
 
-export interface EventResponse extends JSONObject {
+export interface EventResponse {
     readonly id: string;
     readonly name: string;
     readonly status: EventStatus;
     readonly lat: number;
     readonly lon: number;
     readonly hostId: string;
-    readonly startDate: string;
-    readonly endDate: string | null;
+    readonly startDateTime: string;
+    readonly endDateTime: string | null;
     readonly media: MediaResponse[] | null;
     readonly attendees: UserResponse[] | null;
     readonly currentAttendees: UserResponse[] | null;
@@ -38,11 +37,11 @@ export interface Event {
     readonly currentUsers?: User[] | null;
 }
 
-export interface RelevantEvents {
-    activeEvent: Event[];
-    myEvents: Event[];
-    followedEvents: Event[];
-    followerEvents: Event[];
+export interface RelevantEventsResponse {
+    activeEvent: EventResponse[];
+    myEvents: EventResponse[];
+    followedEvents: EventResponse[];
+    followerEvents: EventResponse[];
 }
 
 export class EventManager {
@@ -75,20 +74,10 @@ export class EventManager {
     }
 
     static fromEventResponse(response: EventResponse): Event {
-        const {
-            id,
-            name,
-            status,
-            lat,
-            lon,
-            hostId,
-            startDate,
-            endDate,
-            media,
-            attendees,
-            currentAttendees,
-        } = response;
+        const { media, attendees, currentAttendees, startDateTime, endDateTime, ...fields } =
+            response;
 
+        // TODO: add these to user store
         const users = attendees
             ? attendees.map((user) => UserManager.fromUserResponse(user))
             : null;
@@ -100,15 +89,10 @@ export class EventManager {
                 : null;
 
         return {
-            id,
-            name,
-            status,
-            lat,
-            lon,
+            ...fields,
             rad: 5,
-            hostId,
-            startDate: new Date(startDate),
-            endDate: endDate ? new Date(endDate) : undefined,
+            startDate: new Date(startDateTime),
+            endDate: endDateTime ? new Date(endDateTime) : undefined,
             media: media ? media.map((med) => MediaManager.fromMediaResponse(med)) : undefined,
             users,
             currentUsers,
@@ -129,10 +113,10 @@ export class EventManager {
             lon: params.location.longitude,
             startDateTime: params.startDate?.toJSON() ?? null,
             endDateTime: params.endDate?.toJSON() ?? null,
-        })) as unknown as Event;
+        })) as unknown as EventResponse;
 
         useEventStore.setState((state) => {
-            addEventHelper(state)(event);
+            addEvents(state, EventManager.fromEventResponse(event));
             state.currentEventId = event.id;
         });
         return event.id;
