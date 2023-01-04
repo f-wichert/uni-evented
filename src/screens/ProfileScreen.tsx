@@ -4,22 +4,19 @@ import React, { useCallback } from 'react';
 import { Alert, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Cell, Section, TableView } from 'react-native-tableview-simple';
-import urlJoin from 'url-join';
 
 import yellowSplash from '../../assets/yellow_splash.png';
 import ProfileHeader from '../components/ProfileHeader';
 import Separator from '../components/Separator';
-import config from '../config';
+import { UserManager } from '../models';
 import { useAuthStore } from '../state/auth';
 import { useCurrentUser } from '../state/user';
 import { IoniconsName } from '../types';
-import { asyncHandler, request } from '../util';
+import { asyncHandler } from '../util';
 
 export default function ProfileScreen() {
     const user = useCurrentUser();
     const signout = useAuthStore((state) => state.signout);
-
-    const avatarUrl = urlJoin(config.BASE_URL, 'media', 'avatar', user.id, 'high.jpg');
 
     const confirmLogout = useCallback(() => {
         Alert.alert('Confirm Logout', 'Are you sure that you want to log out?', [
@@ -37,7 +34,7 @@ export default function ProfileScreen() {
         <SafeAreaView>
             <View style={styles.profileHeader}>
                 <ProfileHeader
-                    imageUri={avatarUrl}
+                    imageUri={UserManager.getAvatarUrl(user)}
                     displayName={user.displayName}
                     username={user.username}
                     // TODO: better fallback image
@@ -46,24 +43,15 @@ export default function ProfileScreen() {
                         const result = await ImagePicker.launchImageLibraryAsync({
                             allowsEditing: true,
                             aspect: [1, 1],
+                            base64: true,
                         });
 
                         const asset = result.assets?.pop();
-                        if (!asset) {
+                        if (!asset || !asset.base64) {
                             return;
                         }
 
-                        const { uri, fileName } = asset;
-
-                        const form = new FormData();
-                        form.append('File', {
-                            name: fileName ?? 'sample.dat',
-                            uri: uri,
-                        });
-
-                        await request('POST', '/upload/avatar', form);
-
-                        // TODO: somehow force-update the avatar in the header
+                        await UserManager.editSelf({ avatar: asset.base64 });
                     })}
                 />
             </View>

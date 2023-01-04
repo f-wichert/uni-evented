@@ -1,4 +1,6 @@
-import { CurrentUser, CurrentUserResponse, User } from '../models';
+import { WritableDraft } from 'immer/dist/types/types-external';
+
+import { CurrentUser, CurrentUserResponse, User, UserResponse } from '../models';
 import { request } from '../util';
 import { useEventStore } from './event';
 import { createStore } from './utils/createStore';
@@ -17,10 +19,10 @@ export const useUserStore = createStore<State>('user')((set, get) => ({
 
     fetchUser: async (id: string | '@me') => {
         // TODO: validate types
-        const user = (await request('GET', `/user/${id}`)) as unknown as User;
+        const user = (await request('GET', `/user/${id}`)) as unknown as UserResponse;
 
         set((state) => {
-            state.users[user.id] = user;
+            addUsers(state, user);
         });
 
         return user;
@@ -38,6 +40,21 @@ export const useUserStore = createStore<State>('user')((set, get) => ({
         return user;
     },
 }));
+
+/** Helper for adding users to state, merging new data with existing data. */
+export function addUsers(state: WritableDraft<State>, users: User | User[]) {
+    if (!Array.isArray(users)) users = [users];
+
+    for (const user of users) {
+        state.users[user.id] = {
+            // (shallow) merge old and new user data
+            // TODO: this probably causes unnecessary renders if the
+            //       data didn't actually change, maybe use tracked state thingy?
+            ...state.users[user.id],
+            ...user,
+        };
+    }
+}
 
 export function useCurrentUser() {
     const userId = useUserStore((state) => state.currentUserId);

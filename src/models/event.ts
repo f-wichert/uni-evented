@@ -116,7 +116,7 @@ export class EventManager {
         })) as unknown as EventResponse;
 
         useEventStore.setState((state) => {
-            addEvents(state, EventManager.fromEventResponse(event));
+            addEvents(state, this.fromEventResponse(event));
             state.currentEventId = event.id;
         });
         return event.id;

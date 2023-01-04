@@ -18,7 +18,7 @@ export const useEventStore = createStore<State>('event')(() => ({
     currentEventId: undefined,
 }));
 
-/** Creates helper for adding events to state, merging new data with existing data. */
+/** Helper for adding events to state, merging new data with existing data. */
 export function addEvents(state: WritableDraft<State>, events: Event | Event[]) {
     if (!Array.isArray(events)) events = [events];
 
