@@ -135,9 +135,6 @@ function EventDetailScreen({
     function navigateToOrigin() {
         // probably same TS error as in MapScreen (link there)
         switch (origin) {
-            case 'EventDetail':
-                navigation.navigate('EventList');
-                break;
             case 'Map':
                 // this is needed here to also remove the EventDetailsScreen from the stack
                 // otherwise the following happens:
@@ -147,6 +144,11 @@ function EventDetailScreen({
                 break;
             case 'Discover':
                 navigation.dispatch(StackActions.replace('TabScreen', { screen: 'Discover' }));
+                break;
+            case 'MyEvents':
+                // TODO: this removes the `MyEvents` screen from the stack, navigating directly doesn't appear to work correctly;
+                //       Maybe have a separate `EventDetail` for each tab stack, so that all this isn't needed?
+                navigation.dispatch(StackActions.replace('TabScreen', { screen: 'Profile' }));
                 break;
             default:
                 navigation.navigate('EventList');

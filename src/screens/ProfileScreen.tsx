@@ -9,12 +9,13 @@ import yellowSplash from '../../assets/yellow_splash.png';
 import ProfileHeader from '../components/ProfileHeader';
 import Separator from '../components/Separator';
 import { UserManager } from '../models';
+import { ProfileStackNavProps } from '../nav/types';
 import { useAuthStore } from '../state/auth';
 import { useCurrentUser } from '../state/user';
 import { IoniconsName } from '../types';
 import { asyncHandler } from '../util';
 
-export default function ProfileScreen() {
+export default function ProfileScreen({ navigation }: ProfileStackNavProps<'ProfileView'>) {
     const user = useCurrentUser();
     const signout = useAuthStore((state) => state.signout);
 
@@ -69,6 +70,9 @@ export default function ProfileScreen() {
                             image={getCellIcon('earth-outline')}
                             title="My Events"
                             accessory="DisclosureIndicator"
+                            onPress={useCallback(() => {
+                                navigation.navigate('MyEvents');
+                            }, [navigation])}
                         />
                         <Cell
                             image={getCellIcon('time-outline')}
