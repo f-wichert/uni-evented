@@ -4,7 +4,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
-import MediaCarousel from '../components/MediaCarousel';
+import EventCarousel from '../components/EventCarousel';
 import { Event, Media, MediaManager } from '../models';
 import { TabNavProps } from '../nav/types';
 import { getToken } from '../state/auth';
@@ -73,7 +73,7 @@ function DiscoverScreen({ navigation }: TabNavProps<'Discover'>) {
                 // needs a pixel height and doesn't support `height: '100%'`
                 <SafeAreaProvider>
                     <GestureHandlerRootView>
-                        <MediaCarousel eventData={eventData} navigateDetail={navigateDetail} />
+                        <EventCarousel eventData={eventData} navigateDetail={navigateDetail} />
                     </GestureHandlerRootView>
                 </SafeAreaProvider>
             )}
