@@ -2,7 +2,7 @@ import { Image, StyleSheet, Text, View } from 'react-native';
 import { TouchableHighlight } from 'react-native-gesture-handler';
 
 interface Props {
-    imageUri: string;
+    imageUri: string | null;
     displayName: string | null;
     username: string;
     fallbackImage?: number;
@@ -23,7 +23,7 @@ export default function ProfileHeader({
             <TouchableHighlight style={styles.profilePicture} onPress={onAvatarPress}>
                 <Image
                     style={styles.profilePicture}
-                    source={{ uri: imageUri }}
+                    source={{ uri: imageUri ?? undefined }}
                     defaultSource={fallbackImage}
                 />
             </TouchableHighlight>

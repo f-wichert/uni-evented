@@ -4,7 +4,7 @@ import { Dimensions, StyleSheet, Text, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
-import MediaCarousel from '../components/MediaCarousel';
+import EventCarousel from '../components/EventCarousel';
 import { Event, Media, MediaManager } from '../models';
 import { getToken } from '../state/auth';
 import { asyncHandler, request } from '../util';
@@ -49,8 +49,9 @@ function DiscoverScreen({ navigation }: Props) {
                 />
             ),
         });
-        updateMedia();
     }, [navigation]);
+
+    useEffect(asyncHandler(updateMedia), []);
 
     // TODO: change this to use ExtendedMedia[] instead of Media[]
     const [eventData, setEventData] = useState<Event[]>([]);
@@ -94,7 +95,7 @@ function DiscoverScreen({ navigation }: Props) {
                 // needs a pixel height and doesn't support `height: '100%'`
                 <SafeAreaProvider>
                     <GestureHandlerRootView>
-                        <MediaCarousel eventData={eventData} navigateDetail={navigateDetail} />
+                        <EventCarousel eventData={eventData} navigateDetail={navigateDetail} />
                     </GestureHandlerRootView>
                 </SafeAreaProvider>
             )}

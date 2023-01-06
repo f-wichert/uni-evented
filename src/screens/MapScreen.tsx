@@ -4,9 +4,9 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { Dimensions, StyleSheet, View } from 'react-native';
 import MapView, { LatLng, Marker } from 'react-native-maps';
 
-import { Event } from '../models';
 import { TabNavProps } from '../nav/types';
-import { asyncHandler, request } from '../util';
+import { useFindEvents } from '../state/event';
+import { asyncHandler } from '../util';
 
 function MapScreen({ navigation }: TabNavProps<'Map'>) {
     const mapRef = React.useRef<MapView>(null);
@@ -14,7 +14,8 @@ function MapScreen({ navigation }: TabNavProps<'Map'>) {
         latitude: 48.877616,
         longitude: 8.652653,
     });
-    const [events, setEvents] = useState<Event[]>([]);
+
+    const { events, refresh } = useFindEvents();
 
     const getCurrentPosition = async () => {
         const { status } = await Location.requestForegroundPermissionsAsync();
@@ -31,11 +32,6 @@ function MapScreen({ navigation }: TabNavProps<'Map'>) {
         });
     };
 
-    const updateEventList = async () => {
-        const eventList = await request('get', 'event/find');
-        setEvents(eventList.events as unknown as Event[]);
-    };
-
     useEffect(
         asyncHandler(async () => {
             navigation.setOptions({
@@ -44,16 +40,14 @@ function MapScreen({ navigation }: TabNavProps<'Map'>) {
                         name="refresh-outline"
                         size={32}
                         color="black"
-                        onPress={asyncHandler(updateEventList, {
-                            prefix: 'Failed to update events',
-                        })}
+                        onPress={refresh}
                         style={{
                             marginRight: 10,
                         }}
                     />
                 ),
             });
-            await Promise.all([updateEventList(), getCurrentPosition()]);
+            await getCurrentPosition();
         }),
         [navigation]
     );

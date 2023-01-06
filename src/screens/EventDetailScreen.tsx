@@ -1,8 +1,7 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { HeaderBackButton } from '@react-navigation/elements';
 import { StackActions, useFocusEffect } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import {
     BackHandler,
     Dimensions,
@@ -17,12 +16,11 @@ import {
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { Rating } from 'react-native-ratings';
 import Carousel from 'react-native-reanimated-carousel';
-import { AnyRootNavParams } from '../nav/types';
 
 import { Tag } from '../components/Tag';
-import { Event, EventManager } from '../models/event';
+import { EventManager } from '../models';
 import { EventListStackNavProps } from '../nav/types';
-import { useAuthStore } from '../state/auth';
+import { useEventFetch } from '../state/event';
 import { asyncHandler } from '../util';
 
 let media_data = [
@@ -40,42 +38,29 @@ let media_data = [
 ];
 
 function EventDetailScreen({ route, navigation }: EventListStackNavProps<'EventDetail'>) {
-    const eventId = route.params?.eventId ?? null;
-    const origin = route.params?.origin ?? null;
-    // console.log('Event ID: ', eventId);
-    // console.log('Origin: ', origin);
+    const eventId = route.params.eventId;
+    const origin = route.params.origin;
 
-    const [eventData, setEventData] = useState<Event | null>(null);
+    const { event: eventData } = useEventFetch(eventId);
 
-    const [cameraActive, setCameraActive] = useState(false);
-    const joinEvent = useAuthStore((state) => state.joinEvent);
+    useEffect(() => {
+        // overwrite back button functionality on this component to depend on where it came from (nested screens)
+        navigation.setOptions({
+            headerLeft: () => (
+                <HeaderBackButton
+                    onPress={() => {
+                        navigateToOrigin();
+                    }}
+                />
+            ),
+        });
+    }, [navigation]);
 
-    useEffect(
-        asyncHandler(async () => {
-            // overwrite back button functionality on this component to depend on where it came from (nested screens)
-            navigation.setOptions({
-                headerLeft: () => (
-                    <HeaderBackButton
-                        onPress={() => {
-                            navigateToOrigin();
-                        }}
-                    />
-                ),
-            });
+    useFocusEffect(() => {
+        BackHandler.addEventListener('hardwareBackPress', navigateToOrigin);
+    });
 
-            if (!eventId) return;
-            setEventData(await EventManager.fromId(eventId));
-        }),
-        [eventId]
-    );
-
-    useFocusEffect(
-        asyncHandler(async () => {
-            BackHandler.addEventListener('hardwareBackPress', navigateToOrigin);
-        })
-    );
-
-    // const eventID = useAuthStore((state) => state.user?.currentEventId) // Get event ID of current event of currently logged in user
+    // const eventID = useEventStore((state) => state.currentEventId) // Get event ID of current event of currently logged in user
 
     // console.log('eventData:', eventData);
     if (!eventData) {
@@ -177,9 +162,6 @@ function EventDetailScreen({ route, navigation }: EventListStackNavProps<'EventD
         description:
             'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum.Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum.Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum.Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum.Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum.Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum.Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum.',
     };
-    // console.log('Time', eventData.startDate);
-
-    const Stack = createNativeStackNavigator<AnyRootNavParams>();
 
     return (
         <>
@@ -280,9 +262,14 @@ function EventDetailScreen({ route, navigation }: EventListStackNavProps<'EventD
                 <View style={styles.joinButtonContainer}>
                     <Pressable
                         style={styles.joinButton}
-                        onPress={asyncHandler(registerUserArrivalAtEvent)}
+                        onPress={asyncHandler(
+                            async () => {
+                                await EventManager.join(eventId, 0, 0);
+                            },
+                            { prefix: 'Failed to join event' }
+                        )}
                     >
-                        <Text style={styles.joinButtonText}>I'm here</Text>
+                        <Text style={styles.joinButtonText}>{"I'm Here!"}</Text>
                     </Pressable>
                 </View>
                 <View style={styles.chatButtonContainer}>

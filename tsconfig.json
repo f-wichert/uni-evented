@@ -2,7 +2,7 @@
     "extends": "expo/tsconfig.base",
     "compilerOptions": {
         "strict": true,
-        "module": "ESNext"
+        "noUncheckedIndexedAccess": true
     },
     "typeRoots": ["src/index.d.ts"]
 }

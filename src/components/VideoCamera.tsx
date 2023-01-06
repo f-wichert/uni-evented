@@ -24,6 +24,7 @@ function VideoCamera({ onFinish, eventID }: Props) {
             uri: uri,
             type: type,
         });
+        form.append('eventID', eventID);
         return form;
     };
 
