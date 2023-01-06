@@ -264,19 +264,35 @@ function EventDetailScreen({ route, navigation }: EventListStackNavProps<'EventD
                             </View>
                         </View>
                         <View style={styles.ChatArea}></View>
-                        <View style={styles.IMHereButtonContainer}>
-                            <Pressable
+                        {/* <View style={styles.IMHereButtonContainer}> */}
+                        <View style={{ height: 100, backgroundColor: 'white' }}>
+                            {/* <Pressable
                                 style={styles.IMHereButtonArea}
                                 onPress={asyncHandler(registerUserArrivalAtEvent)}
                             >
                                 <Text style={styles.IMHereButton}> I'm Here!</Text>
-                            </Pressable>
+                            </Pressable> */}
                         </View>
                     </View>
                 </ScrollView>
             </SafeAreaView>
-            <View>
-                <Text>This should be overlay text</Text>
+            <View style={styles.overlay}>
+                <View style={styles.joinButtonContainer}>
+                    <Pressable
+                        style={styles.joinButton}
+                        onPress={asyncHandler(registerUserArrivalAtEvent)}
+                    >
+                        <Text style={styles.joinButtonText}>I'm here</Text>
+                    </Pressable>
+                </View>
+                <View style={styles.chatButtonContainer}>
+                    <Pressable
+                        style={styles.chatButton}
+                        onPress={() => navigation.navigate('ChatScreen', { eventId: eventId })}
+                    >
+                        <Ionicons name={'chatbox-ellipses-outline'} size={37} color={'white'} />
+                    </Pressable>
+                </View>
             </View>
         </>
     );
@@ -365,28 +381,79 @@ const styles = StyleSheet.create({
     },
     ChatArea: {},
     IMHereButtonContainer: {
-        display: 'flex',
-        flexDirection: 'row',
-        alignSelf: 'stretch',
-        justifyContent: 'center',
-        padding: 6,
+        // display: 'flex',
+        // flexDirection: 'row',
+        // alignSelf: 'stretch',
+        // justifyContent: 'center',
+        // padding: 6,
         backgroundColor: '#eaeaea',
+        flex: 1,
     },
     IMHereButtonArea: {
-        display: 'flex',
-        flexDirection: 'row',
-        alignSelf: 'stretch',
-        flex: 1,
+        // display: 'flex',
+        // flexDirection: 'row',
+        // alignSelf: 'stretch',
+        // flex: 1,
         justifyContent: 'center',
         // marginHorizontal: 3,
         borderRadius: 9,
         backgroundColor: 'black',
         padding: 7,
+        height: 55,
     },
     IMHereButton: {
         color: 'white',
         fontWeight: 'bold',
         fontSize: 30,
+    },
+    overlay: {
+        position: 'absolute',
+        bottom: 0,
+        // backgroundColor: 'red',
+        width: '100%',
+        height: 70,
+        paddingVertical: 10,
+        flex: 1,
+        flexDirection: 'row',
+        display: 'flex',
+    },
+    joinButtonContainer: {
+        flex: 25,
+        // backgroundColor: 'yellow',
+        marginLeft: 10,
+        marginRight: 10,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    joinButton: {
+        backgroundColor: 'black',
+        borderRadius: 7,
+        flex: 1,
+        width: 300,
+        alignSelf: 'stretch',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    joinButtonText: {
+        color: 'white',
+        fontWeight: 'bold',
+        fontSize: 30,
+    },
+    chatButtonContainer: {
+        flex: 6,
+        // backgroundColor: 'blue',
+        marginRight: 10,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    chatButton: {
+        backgroundColor: 'black',
+        borderRadius: 7,
+        flex: 1,
+        width: 60,
+        alignSelf: 'stretch',
+        justifyContent: 'center',
+        alignItems: 'center',
     },
 });
 
