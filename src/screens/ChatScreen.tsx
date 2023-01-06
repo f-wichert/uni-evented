@@ -42,7 +42,7 @@ function ChatScreen({ route, navigation }) {
 
         // asyncHandler(async () => {
         //     const data = await request('POST', '/event/sendMessage', getToken(), {
-        //         eventId: '-',
+        //         eventId: eventId,
         //         messageContent: text
         //     });
         // });
