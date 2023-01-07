@@ -91,11 +91,11 @@ function App() {
 export default function Root() {
     return (
         <SafeAreaProvider>
+            <ToastRoot />
+
             <NavigationContainer>
                 <App />
             </NavigationContainer>
-
-            <ToastRoot />
 
             <StatusBar style="dark" />
         </SafeAreaProvider>

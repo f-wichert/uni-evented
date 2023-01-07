@@ -1,51 +1,66 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { SafeAreaView, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 import Message from '../components/Message';
+import { asyncHandler, request } from '../util';
 
 function ChatScreen({ route, navigation }) {
     const eventId = route.params?.eventId ?? null;
-    const [messages, setMessages] = useState(getMessages());
+    const [messages, setMessages] = useState();
     const [text, setText] = useState();
     const textInputRef = React.createRef();
 
+    // console.log(`User: ${useUserStore((state) => state.fetchCurrentUser())}`);
+
+    useEffect(() => {
+        setMessages(getMessages());
+    }, []);
+
     function getMessages() {
-        return [
-            {
-                message: 'Hi, wie sieht das event so aus?',
-                messageCorrespondant: 'Lorenzo',
+        console.log('Get Messages');
+        asyncHandler(
+            async () => {
+                const data = await request('POST', '/event/getMessages', {
+                    eventId: eventId,
+                });
+
+                console.log();
+                console.log(`Messages: ${JSON.stringify(data.messages)}`);
+                setMessages(data.messages);
             },
-            {
-                message: 'Cool things!',
-                messageCorrespondant: 'Fred',
-            },
-            {
-                message:
-                    'Hey, I am glad that you will join us. Wir legen so gegen 15 Uhr los denke ich? Und dann geht die Party ab. Whoop, whoop!! Lov u <3',
-                messageCorrespondant: 'Jonas',
-            },
-            {
-                message: 'Cool',
-                messageCorrespondant: 'Lorenzo',
-            },
-        ];
+            { prefix: 'Failed to load messages' }
+        )();
     }
 
     function sendMessage(text: String) {
-        setMessages([
-            ...messages,
-            {
-                message: text,
-                messageCorrespondant: 'Lorenzo',
-            },
-        ]);
+        if (messages) {
+            setMessages([
+                ...messages,
+                {
+                    message: text,
+                    id: 'Lorenzo',
+                },
+            ]);
+        } else {
+            setMessages([
+                {
+                    message: text,
+                    id: 'Lorenzo',
+                },
+            ]);
+        }
 
-        // asyncHandler(async () => {
-        //     const data = await request('POST', '/event/sendMessage', getToken(), {
-        //         eventId: eventId,
-        //         messageContent: text
-        //     });
-        // });
+        asyncHandler(
+            async () => {
+                console.log('Message sent');
+
+                const data = await request('POST', '/event/sendMessage', {
+                    eventId: eventId,
+                    messageContent: text,
+                });
+            },
+            { prefix: 'Failed to do stuff' }
+        )();
     }
 
     return (
@@ -53,9 +68,13 @@ function ChatScreen({ route, navigation }) {
             <View style={styles.chatArea}>
                 <SafeAreaView style={{ display: 'flex' }}>
                     <ScrollView>
-                        {messages.map((e, i) => (
-                            <Message key={`message-${i}`} message={messages[i]} />
-                        ))}
+                        {messages ? (
+                            messages.map((e, i) => (
+                                <Message key={`message-${i}`} message={messages[i]} />
+                            ))
+                        ) : (
+                            <></>
+                        )}
                     </ScrollView>
                 </SafeAreaView>
             </View>
@@ -72,6 +91,7 @@ function ChatScreen({ route, navigation }) {
                     <Ionicons
                         name="send-outline"
                         size={25}
+                        color={'red'}
                         onPress={() => {
                             sendMessage(text);
                             textInputRef.current.clear();
