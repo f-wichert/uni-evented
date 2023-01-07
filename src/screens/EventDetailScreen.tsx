@@ -1,7 +1,7 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { HeaderBackButton } from '@react-navigation/elements';
 import { StackActions, useFocusEffect } from '@react-navigation/native';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     BackHandler,
     Image,
@@ -23,8 +23,10 @@ import { asyncHandler } from '../util';
 function EventDetailScreen({ route, navigation }: EventListStackNavProps<'EventDetail'>) {
     const eventId = route.params.eventId;
     const origin = route.params.origin;
+    const { event: eventData, loading } = useEventFetch(eventId);
 
-    const { event: eventData } = useEventFetch(eventId);
+    const [isPlay, setIsPlay] = useState<boolean>(true);
+    const [isMute, setIsMute] = useState<boolean>(true);
 
     useEffect(() => {
         // overwrite back button functionality on this component to depend on where it came from (nested screens)
@@ -45,7 +47,6 @@ function EventDetailScreen({ route, navigation }: EventListStackNavProps<'EventD
 
     // const eventID = useEventStore((state) => state.currentEventId) // Get event ID of current event of currently logged in user
 
-    // console.log('eventData:', eventData);
     if (!eventData) {
         return (
             <View
@@ -124,6 +125,14 @@ function EventDetailScreen({ route, navigation }: EventListStackNavProps<'EventD
                         />
                         <Text>Load Picture/Video of event here</Text>
                     </View>
+                    {/* <MediaCarousel
+                        // media shouldn't be empty when this component loads
+                        item={eventData}
+                        isPlay={isPlay}
+                        isMute={isMute}
+                        setIsPlay={setIsPlay}
+                        setIsMute={setIsMute}
+                    /> */}
                     <View style={styles.TagArea}>
                         {event.tags.map((tag) => (
                             <Tag style={{ backgroundColor: tag.color }} key={tag.name}>
