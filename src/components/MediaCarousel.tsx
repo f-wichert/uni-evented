@@ -1,7 +1,7 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useIsFocused } from '@react-navigation/native';
-import { useEffect, useRef, useState } from 'react';
-import { Animated, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useRef, useState } from 'react';
+import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Carousel from 'react-native-reanimated-carousel';
 import { useSafeAreaFrame } from 'react-native-safe-area-context';
 import urlJoin from 'url-join';
@@ -40,19 +40,11 @@ export default function MediaCarousel({
 }: Props) {
     const frame = useSafeAreaFrame();
     const carousel = useRef<any>(null);
-    const growAnim = useRef(new Animated.Value(0)).current;
+    // const growAnim = useRef(new Animated.Value(0)).current;
     const [activeInnerIndex, setActiveInnerIndex] = useState<number>(0);
-    const [duration, setDuration] = useState<number>(0);
-    const [position, setPosition] = useState<number>(0);
+    // const [duration, setDuration] = useState<number>(0);
+    // const [position, setPosition] = useState<number>(0);
     const isFocused = useIsFocused();
-
-    useEffect(() => {
-        Animated.timing(growAnim, {
-            toValue: 1,
-            duration: 10000,
-            useNativeDriver: true,
-        }).start();
-    }, [growAnim]);
 
     const onFinishedVideo = () => {
         // if current video is not last media of event, then go to next inner item
@@ -78,6 +70,37 @@ export default function MediaCarousel({
         carousel.current.prev();
         setActiveInnerIndex(carousel.current.getCurrentIndex());
     };
+
+    // useEffect(
+    //     () => startAnimation(),
+    //     [growAnim, duration, position]);
+
+    // const startAnimation = () => {
+    //     Animated.timing(growAnim, {
+    //         toValue: 1,
+    //         duration: duration,
+    //         useNativeDriver: true,
+    //         easing: Easing.linear,
+    //     }).reset();
+    //     if (position && duration) {
+    //         growAnim.setValue(position / duration);
+    //     }
+    //     Animated.timing(growAnim, {
+    //         toValue: 1,
+    //         duration: duration,
+    //         useNativeDriver: true,
+    //         easing: Easing.linear,
+    //     }).start();
+    // }
+
+    // const stopAnimation = () => {
+    //     Animated.timing(growAnim, {
+    //         toValue: 1,
+    //         duration: duration,
+    //         useNativeDriver: true,
+    //         easing: Easing.linear,
+    //     }).stop();
+    // }
 
     return (
         <>
@@ -107,8 +130,8 @@ export default function MediaCarousel({
                                     navigateDetail={navigateDetail}
                                     isPlay={shouldThisSpecificVideoPlay}
                                     isMute={isMute}
-                                    setDuration={setDuration}
-                                    setPosition={setPosition}
+                                    // setDuration={setDuration}
+                                    // setPosition={setPosition}
                                     finishedVideo={onFinishedVideo}
                                 />
                             ) : (
@@ -148,9 +171,18 @@ export default function MediaCarousel({
                 style={{
                     ...styles.indicator,
                     width: frame.width / item.media!.length,
-                    left: (activeInnerIndex * frame.width) / item.media!.length,
-                    opacity: 1,
-                    transform: [{ scaleX: 0.1 },]
+                    left: ((activeInnerIndex - 0.5) * frame.width) / item.media!.length,
+                    opacity: outerIndex === activeOuterIndex ? 1 : 0,
+                    transform: [{
+                        translateX: growAnim.interpolate({
+                            inputRange: [0, 1],
+                            outputRange: [0, (frame.width / item.media!.length) / 2]
+                        })
+                    },
+                    {
+                        scaleX: growAnim,
+                    },
+                    ]
                 }}
             /> */}
             <TouchableOpacity
@@ -161,7 +193,10 @@ export default function MediaCarousel({
                     height: frame.height,
                     left: frame.width / 4,
                 }}
-                onPress={() => setIsPlay(!isPlay)}
+                onPress={() => {
+                    setIsPlay(!isPlay);
+                    // !isPlay ? startAnimation() : stopAnimation();
+                }}
             />
             <TouchableOpacity
                 activeOpacity={1}
