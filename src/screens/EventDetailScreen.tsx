@@ -120,7 +120,7 @@ function EventDetailScreen({ route, navigation }: EventListStackNavProps<'EventD
                             size={64}
                             color="orange"
                             onPress={() => {
-                                navigation.navigate('MediaCapture', { eventID: eventId });
+                                navigation.navigate('MediaCapture', { eventId: eventId });
                             }}
                         />
                         <Text>Load Picture/Video of event here</Text>
@@ -237,7 +237,7 @@ const styles = StyleSheet.create({
         alignSelf: 'stretch',
         alignItems: 'center',
         justifyContent: 'center',
-        minHeight: 200,
+        minHeight: 400,
         borderRadius: 10,
     },
     TagArea: {

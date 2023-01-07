@@ -29,14 +29,11 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        borderWidth: 2,
-        borderRadius: 8,
-        margin: 5,
     },
     image: {
         width: 350,
         height: 450,
-        // flex: 1
+        flex: 1,
     },
 });
 

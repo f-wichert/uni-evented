@@ -61,6 +61,7 @@ export type EventListStackNavParams = {
     EventDetail: { eventId: string; origin?: string };
     CreateEvent: { location?: LatLng } | undefined;
     MapPicker: undefined;
+    MediaCapture: { eventId: string };
 };
 
 export type EventListStackNavProps<

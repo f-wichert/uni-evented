@@ -144,7 +144,7 @@ export default function MediaCarousel({
                     );
                 }}
             />
-            {new Array(2).fill(0).map((el, index) => (
+            {new Array(item.media!.length).fill(0).map((el, index) => (
                 <View
                     style={{
                         ...styles.indicator,
