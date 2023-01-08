@@ -5,9 +5,8 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import EventCarousel from '../components/EventCarousel';
-import { Event, Media, MediaManager } from '../models';
+import { Event } from '../models';
 import { TabNavProps } from '../nav/types';
-import { getToken } from '../state/auth';
 import { asyncHandler, request } from '../util';
 
 function DiscoverScreen({ navigation }: TabNavProps<'Discover'>) {
@@ -35,12 +34,9 @@ function DiscoverScreen({ navigation }: TabNavProps<'Discover'>) {
     const [eventData, setEventData] = useState<Event[]>([]);
 
     async function updateMedia() {
-        const responseData = await request('GET', 'discover/', getToken());
-        const data = responseData.map((event: Event) => ({
-            ...event,
-            media: event.media?.map((el: Media) => ({ ...el, src: MediaManager.src(el, 'high') })),
-        }));
-        setEventData(data);
+        // TODO: use `EventStore.eventMedia`
+        const responseData = (await request('GET', 'discover/')) as unknown as Event[];
+        setEventData(responseData);
     }
     const navigateDetail = useCallback(
         (id: string) => {

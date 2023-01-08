@@ -4,10 +4,11 @@ import { useEffect, useRef, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaFrame } from 'react-native-safe-area-context';
 
+import { Media, MediaManager } from '../models';
 import { baseHeaders } from '../util';
 
 declare type Props = {
-    discoverData: { src: string; id: string };
+    item: Media;
     navigateDetail: (id: string) => void;
     isPlay: boolean;
     isMute: boolean;
@@ -17,7 +18,7 @@ declare type Props = {
 };
 
 function VideoDiscover({
-    discoverData,
+    item,
     navigateDetail,
     isPlay,
     isMute,
@@ -74,7 +75,7 @@ function VideoDiscover({
             <VideoPlayer
                 videoProps={{
                     source: {
-                        uri: discoverData.src,
+                        uri: MediaManager.src(item),
                         headers: baseHeaders,
                     },
                     resizeMode: ResizeMode.CONTAIN,

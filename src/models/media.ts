@@ -8,7 +8,7 @@ export type MediaType = typeof MediaTypes[number];
 
 export interface MediaResponse extends JSONObject {
     readonly id: string;
-    readonly mediaType: MediaType;
+    readonly type: MediaType;
     readonly fileAvailable: boolean;
 }
 
@@ -26,6 +26,6 @@ export class MediaManager {
     }
 
     static fromMediaResponse(response: MediaResponse): Media {
-        return { ...response, type: response.mediaType };
+        return { ...response };
     }
 }

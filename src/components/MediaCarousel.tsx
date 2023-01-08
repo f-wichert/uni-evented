@@ -1,7 +1,7 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useIsFocused } from '@react-navigation/native';
 import { useRef, useState } from 'react';
-import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Carousel from 'react-native-reanimated-carousel';
 import { useSafeAreaFrame } from 'react-native-safe-area-context';
 import urlJoin from 'url-join';
@@ -9,6 +9,7 @@ import urlJoin from 'url-join';
 import yellowSplash from '../../assets/yellow_splash.png';
 import config from '../config';
 import { Event } from '../models';
+import { useMediaFetch } from '../state/event';
 import ImageDiscover from './ImageDiscover';
 import VideoDiscover from './VideoDiscover';
 
@@ -39,12 +40,32 @@ export default function MediaCarousel({
     nextOuterItem = () => {},
 }: Props) {
     const frame = useSafeAreaFrame();
+
     const carousel = useRef<any>(null);
     // const growAnim = useRef(new Animated.Value(0)).current;
     const [activeInnerIndex, setActiveInnerIndex] = useState<number>(0);
     // const [duration, setDuration] = useState<number>(0);
     // const [position, setPosition] = useState<number>(0);
     const isFocused = useIsFocused();
+
+    // TODO: force refresh on screen focus to get newest media?
+    const { media } = useMediaFetch(item.id);
+
+    if (!media) {
+        // TODO: improve this, inline styles are bad I guess
+        return (
+            <View
+                style={{
+                    width: frame.width,
+                    height: frame.height,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                }}
+            >
+                <ActivityIndicator size="large" />
+            </View>
+        );
+    }
 
     const onFinishedVideo = () => {
         // if current video is not last media of event, then go to next inner item
@@ -58,7 +79,7 @@ export default function MediaCarousel({
     };
 
     const checkIfLastMedia = () => {
-        return carousel.current.getCurrentIndex() === item.media?.length! - 1;
+        return carousel.current.getCurrentIndex() === media.length - 1;
     };
 
     const nextInnerItem = () => {
@@ -110,7 +131,7 @@ export default function MediaCarousel({
                 height={frame.height}
                 autoPlay={false}
                 loop={false}
-                data={item.media!}
+                data={media}
                 scrollAnimationDuration={200}
                 enabled={false}
                 ref={carousel}
@@ -126,7 +147,7 @@ export default function MediaCarousel({
                         <>
                             {item.type === 'video' ? (
                                 <VideoDiscover
-                                    discoverData={item}
+                                    item={item}
                                     navigateDetail={navigateDetail}
                                     isPlay={shouldThisSpecificVideoPlay}
                                     isMute={isMute}
@@ -135,21 +156,18 @@ export default function MediaCarousel({
                                     finishedVideo={onFinishedVideo}
                                 />
                             ) : (
-                                <ImageDiscover
-                                    discoverData={item}
-                                    navigateDetail={navigateDetail}
-                                />
+                                <ImageDiscover item={item} navigateDetail={navigateDetail} />
                             )}
                         </>
                     );
                 }}
             />
-            {new Array(item.media!.length).fill(0).map((el, index) => (
+            {new Array(media.length).fill(0).map((el, index) => (
                 <View
                     style={{
                         ...styles.indicator,
-                        width: frame.width / item.media!.length,
-                        left: (index * frame.width) / item.media!.length,
+                        width: frame.width / media.length,
+                        left: (index * frame.width) / media.length,
                         opacity: index === activeInnerIndex ? 1 : 0.5,
                     }}
                     key={index}
@@ -222,6 +240,7 @@ export default function MediaCarousel({
             >
                 <Image
                     style={styles.eventIcon}
+                    // TODO: include full host user object in events, then use UserManager.getAvatarUrl here
                     source={{
                         uri: urlJoin(config.BASE_URL, 'media', 'avatar', item.hostId, 'high.jpg'),
                     }}

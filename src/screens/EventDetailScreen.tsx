@@ -14,6 +14,7 @@ import {
 } from 'react-native';
 import { Rating } from 'react-native-ratings';
 
+import MediaCarousel from '../components/MediaCarousel';
 import { Tag } from '../components/Tag';
 import { EventManager } from '../models';
 import { EventListStackNavProps } from '../nav/types';
@@ -125,14 +126,13 @@ function EventDetailScreen({ route, navigation }: EventListStackNavProps<'EventD
                         />
                         <Text>Load Picture/Video of event here</Text>
                     </View>
-                    {/* <MediaCarousel
-                        // media shouldn't be empty when this component loads
+                    <MediaCarousel
                         item={eventData}
                         isPlay={isPlay}
                         isMute={isMute}
                         setIsPlay={setIsPlay}
                         setIsMute={setIsMute}
-                    /> */}
+                    />
                     <View style={styles.TagArea}>
                         {event.tags.map((tag) => (
                             <Tag style={{ backgroundColor: tag.color }} key={tag.name}>
