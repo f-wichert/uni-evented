@@ -29,7 +29,9 @@ export default function ProfileScreen({ navigation }: ProfileStackNavProps<'Prof
         ]);
     }, [signout]);
 
-    const getCellIcon = (name: IoniconsName) => <Ionicons name={name} size={27} />;
+    const getCellIcon = (name: IoniconsName, color?: string) => (
+        <Ionicons name={name} size={27} color={color} />
+    );
 
     return (
         <SafeAreaView>
@@ -87,9 +89,10 @@ export default function ProfileScreen({ navigation }: ProfileStackNavProps<'Prof
                             accessory="DisclosureIndicator"
                         />
                         <Cell
-                            image={getCellIcon('exit-outline')}
+                            image={getCellIcon('exit-outline', 'red')}
                             title="Logout"
                             onPress={confirmLogout}
+                            titleTextColor="red"
                         />
                     </Section>
                 </TableView>
