@@ -87,6 +87,9 @@ export default function ProfileScreen({ navigation }: ProfileStackNavProps<'Prof
                             image={getCellIcon('build-outline')}
                             title="Manage Account"
                             accessory="DisclosureIndicator"
+                            onPress={useCallback(() => {
+                                navigation.navigate('ManageAccount');
+                            }, [navigation])}
                         />
                         <Cell
                             image={getCellIcon('exit-outline', 'red')}

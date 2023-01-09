@@ -10,7 +10,7 @@ export const USERNAME_VALIDATION: StringValidateOptions = {
     alphanumeric: true,
 };
 export const DISPLAYNAME_VALIDATION: StringValidateOptions = {
-    maxLength: 16,
+    maxLength: 32,
 };
 export const PASSWORD_VALIDATION: StringValidateOptions = {
     minLength: 16,
