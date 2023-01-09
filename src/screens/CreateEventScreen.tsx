@@ -14,7 +14,7 @@ import DropDownPicker from 'react-native-dropdown-picker';
 // import DateTimePicker from '@react-native-community/datetimepicker';
 import MapView, { LatLng, Marker } from 'react-native-maps';
 
-import { INPUT_BACKGR_COLOR } from '../const';
+import { INPUT_BACKGR_COLOR } from '../constants';
 import { EventManager } from '../models';
 import { EventListStackNavProps } from '../nav/types';
 import { IoniconsName } from '../types';
