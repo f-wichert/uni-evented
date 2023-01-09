@@ -3,16 +3,16 @@ import { TouchableHighlight } from 'react-native-gesture-handler';
 
 interface Props {
     imageUri: string | null;
-    displayName: string | null;
     username: string;
+    displayName: string;
     fallbackImage?: number;
     onAvatarPress?: () => void;
 }
 
 export default function ProfileHeader({
     imageUri,
-    displayName,
     username,
+    displayName,
     fallbackImage,
     onAvatarPress,
 }: Props) {

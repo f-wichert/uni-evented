@@ -7,14 +7,14 @@ import { request } from '../util';
 export interface UserResponse {
     readonly id: string;
     readonly username: string;
-    readonly displayName: string | null;
+    readonly displayName: string;
     readonly avatarHash: string | null;
 }
 
 export interface User {
     readonly id: string;
     readonly username: string;
-    readonly displayName: string | null;
+    readonly displayName: string;
     readonly avatarHash: string | null;
 }
 
