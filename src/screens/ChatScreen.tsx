@@ -2,10 +2,12 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import React, { useEffect, useState } from 'react';
 import { SafeAreaView, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 import Message from '../components/Message';
+import { useUserStore } from '../state/user';
 import { asyncHandler, request } from '../util';
 
 function ChatScreen({ route, navigation }) {
     const eventId = route.params?.eventId ?? null;
+    const userId = useUserStore((state) => state.currentUserId);
     const [messages, setMessages] = useState();
     const [text, setText] = useState();
     const textInputRef = React.createRef();
@@ -38,14 +40,14 @@ function ChatScreen({ route, navigation }) {
                 ...messages,
                 {
                     message: text,
-                    id: 'Lorenzo',
+                    messageCorrespondent: userId,
                 },
             ]);
         } else {
             setMessages([
                 {
                     message: text,
-                    id: 'Lorenzo',
+                    messageCorrespondent: userId,
                 },
             ]);
         }
@@ -89,9 +91,9 @@ function ChatScreen({ route, navigation }) {
                 />
                 <View style={styles.sendButton}>
                     <Ionicons
-                        name="send-outline"
+                        name="send"
                         size={25}
-                        color={'red'}
+                        color={'#fcba03'}
                         onPress={() => {
                             sendMessage(text);
                             textInputRef.current.clear();
@@ -106,6 +108,7 @@ function ChatScreen({ route, navigation }) {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        backgroundColor: 'white',
     },
     chatArea: {
         flex: 1,
@@ -130,7 +133,7 @@ const styles = StyleSheet.create({
     sendButton: {
         height: 40,
         width: 40,
-        borderWidth: 1,
+        // borderWidth: 1,
         borderRadius: 8,
         marginHorizontal: 10,
         justifyContent: 'center',
