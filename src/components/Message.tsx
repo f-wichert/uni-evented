@@ -16,9 +16,7 @@ function Message(props) {
                 <View style={styles.container}>
                     <View style={styles.userArea}>
                         <View style={styles.userCircle}>
-                            <Text style={styles.userText}>
-                                {message.messageCorrespondent.charAt(0)}
-                            </Text>
+                            <Text style={styles.userText}>{message.displayname.charAt(0)}</Text>
                         </View>
                     </View>
                     <View style={styles.messageArea}>
@@ -54,9 +52,7 @@ function Message(props) {
                     </View>
                     <View style={styles.userArea}>
                         <View style={styles.userCircle}>
-                            <Text style={styles.userText}>
-                                {message.messageCorrespondent.charAt(0)}
-                            </Text>
+                            <Text style={styles.userText}>{message.displayname.charAt(0)}</Text>
                         </View>
                     </View>
                 </View>
