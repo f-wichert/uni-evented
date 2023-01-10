@@ -37,13 +37,15 @@ let media_data = [
     },
 ];
 
-function EventDetailScreen({ route, navigation }: EventListStackNavProps<'EventDetail'>) {
+function EventDetailScreen({ route, navigation, media }: EventListStackNavProps<'EventDetail'>) {
     const eventId = route.params.eventId;
     const origin = route.params.origin;
     const { event: eventData, loading } = useEventFetch(eventId);
 
     const [isPlay, setIsPlay] = useState<boolean>(true);
     const [isMute, setIsMute] = useState<boolean>(true);
+
+    const showMedia = media ? media : true;
 
     useEffect(() => {
         // overwrite back button functionality on this component to depend on where it came from (nested screens)
@@ -169,19 +171,24 @@ function EventDetailScreen({ route, navigation }: EventListStackNavProps<'EventD
             <SafeAreaView style={{ display: 'flex' }}>
                 <ScrollView>
                     <View style={styles.section}>
-                        <View style={styles.camera}>
-                            <GestureHandlerRootView>
-                                <Carousel
-                                    width={Dimensions.get('window').width}
-                                    height={200}
-                                    autoPlay={false}
-                                    loop={false}
-                                    data={media_data}
-                                    scrollAnimationDuration={350}
-                                    renderItem={({ item, index }) => getJsx(item)}
-                                />
-                            </GestureHandlerRootView>
-                        </View>
+                        {/* @Jonas - please build in the media thing here. this logic is used for the map screen */}
+                        {showMedia == true ? (
+                            <View style={styles.camera}>
+                                <GestureHandlerRootView>
+                                    <Carousel
+                                        width={Dimensions.get('window').width}
+                                        height={200}
+                                        autoPlay={false}
+                                        loop={false}
+                                        data={media_data}
+                                        scrollAnimationDuration={350}
+                                        renderItem={({ item, index }) => getJsx(item)}
+                                    />
+                                </GestureHandlerRootView>
+                            </View>
+                        ) : (
+                            <></>
+                        )}
                         <View style={styles.tagArea}>
                             {event.tags.map((tag) => (
                                 <Tag
