@@ -32,9 +32,13 @@ export interface Event {
     readonly hostId: string;
     readonly startDate: Date;
     readonly endDate?: Date | null;
-    readonly media?: Media[] | null;
     readonly users?: User[] | null;
     readonly currentUsers?: User[] | null;
+}
+
+// transient type for processed API responses by `fromEventResponse`
+export interface EventExtra extends Event {
+    media?: Media[];
 }
 
 export interface RelevantEventsResponse {
@@ -73,7 +77,7 @@ export class EventManager {
         });
     }
 
-    static fromEventResponse(response: EventResponse): Event {
+    static fromEventResponse(response: EventResponse): EventExtra {
         const { media, attendees, currentAttendees, startDateTime, endDateTime, ...fields } =
             response;
 
@@ -93,9 +97,9 @@ export class EventManager {
             rad: 5,
             startDate: new Date(startDateTime),
             endDate: endDateTime ? new Date(endDateTime) : undefined,
-            media: media ? media.map((med) => MediaManager.fromMediaResponse(med)) : undefined,
             users,
             currentUsers,
+            media: media?.map((med) => MediaManager.fromMediaResponse(med)),
         };
     }
 

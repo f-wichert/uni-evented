@@ -1,7 +1,7 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useIsFocused } from '@react-navigation/native';
-import { useEffect, useRef, useState } from 'react';
-import { Animated, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useRef, useState } from 'react';
+import { ActivityIndicator, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Carousel from 'react-native-reanimated-carousel';
 import { useSafeAreaFrame } from 'react-native-safe-area-context';
 import urlJoin from 'url-join';
@@ -9,6 +9,7 @@ import urlJoin from 'url-join';
 import yellowSplash from '../../assets/yellow_splash.png';
 import config from '../config';
 import { Event } from '../models';
+import { useMediaFetch } from '../state/event';
 import ImageDiscover from './ImageDiscover';
 import VideoDiscover from './VideoDiscover';
 
@@ -39,20 +40,32 @@ export default function MediaCarousel({
     nextOuterItem = () => {},
 }: Props) {
     const frame = useSafeAreaFrame();
+
     const carousel = useRef<any>(null);
-    const growAnim = useRef(new Animated.Value(0)).current;
+    // const growAnim = useRef(new Animated.Value(0)).current;
     const [activeInnerIndex, setActiveInnerIndex] = useState<number>(0);
-    const [duration, setDuration] = useState<number>(0);
-    const [position, setPosition] = useState<number>(0);
+    // const [duration, setDuration] = useState<number>(0);
+    // const [position, setPosition] = useState<number>(0);
     const isFocused = useIsFocused();
 
-    useEffect(() => {
-        Animated.timing(growAnim, {
-            toValue: 1,
-            duration: 10000,
-            useNativeDriver: true,
-        }).start();
-    }, [growAnim]);
+    // TODO: force refresh on screen focus to get newest media?
+    const { media } = useMediaFetch(item.id);
+
+    if (!media) {
+        // TODO: improve this, inline styles are bad I guess
+        return (
+            <View
+                style={{
+                    width: frame.width,
+                    height: frame.height,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                }}
+            >
+                <ActivityIndicator size="large" />
+            </View>
+        );
+    }
 
     const onFinishedVideo = () => {
         // if current video is not last media of event, then go to next inner item
@@ -66,7 +79,7 @@ export default function MediaCarousel({
     };
 
     const checkIfLastMedia = () => {
-        return carousel.current.getCurrentIndex() === item.media?.length! - 1;
+        return carousel.current.getCurrentIndex() === media.length - 1;
     };
 
     const nextInnerItem = () => {
@@ -79,6 +92,37 @@ export default function MediaCarousel({
         setActiveInnerIndex(carousel.current.getCurrentIndex());
     };
 
+    // useEffect(
+    //     () => startAnimation(),
+    //     [growAnim, duration, position]);
+
+    // const startAnimation = () => {
+    //     Animated.timing(growAnim, {
+    //         toValue: 1,
+    //         duration: duration,
+    //         useNativeDriver: true,
+    //         easing: Easing.linear,
+    //     }).reset();
+    //     if (position && duration) {
+    //         growAnim.setValue(position / duration);
+    //     }
+    //     Animated.timing(growAnim, {
+    //         toValue: 1,
+    //         duration: duration,
+    //         useNativeDriver: true,
+    //         easing: Easing.linear,
+    //     }).start();
+    // }
+
+    // const stopAnimation = () => {
+    //     Animated.timing(growAnim, {
+    //         toValue: 1,
+    //         duration: duration,
+    //         useNativeDriver: true,
+    //         easing: Easing.linear,
+    //     }).stop();
+    // }
+
     return (
         <>
             <Carousel
@@ -87,7 +131,7 @@ export default function MediaCarousel({
                 height={frame.height}
                 autoPlay={false}
                 loop={false}
-                data={item.media!}
+                data={media}
                 scrollAnimationDuration={200}
                 enabled={false}
                 ref={carousel}
@@ -103,30 +147,27 @@ export default function MediaCarousel({
                         <>
                             {item.type === 'video' ? (
                                 <VideoDiscover
-                                    discoverData={item}
+                                    item={item}
                                     navigateDetail={navigateDetail}
                                     isPlay={shouldThisSpecificVideoPlay}
                                     isMute={isMute}
-                                    setDuration={setDuration}
-                                    setPosition={setPosition}
+                                    // setDuration={setDuration}
+                                    // setPosition={setPosition}
                                     finishedVideo={onFinishedVideo}
                                 />
                             ) : (
-                                <ImageDiscover
-                                    discoverData={item}
-                                    navigateDetail={navigateDetail}
-                                />
+                                <ImageDiscover item={item} navigateDetail={navigateDetail} />
                             )}
                         </>
                     );
                 }}
             />
-            {new Array(2).fill(0).map((el, index) => (
+            {new Array(media.length).fill(0).map((el, index) => (
                 <View
                     style={{
                         ...styles.indicator,
-                        width: frame.width / item.media!.length,
-                        left: (index * frame.width) / item.media!.length,
+                        width: frame.width / media.length,
+                        left: (index * frame.width) / media.length,
                         opacity: index === activeInnerIndex ? 1 : 0.5,
                     }}
                     key={index}
@@ -148,9 +189,18 @@ export default function MediaCarousel({
                 style={{
                     ...styles.indicator,
                     width: frame.width / item.media!.length,
-                    left: (activeInnerIndex * frame.width) / item.media!.length,
-                    opacity: 1,
-                    transform: [{ scaleX: 0.1 },]
+                    left: ((activeInnerIndex - 0.5) * frame.width) / item.media!.length,
+                    opacity: outerIndex === activeOuterIndex ? 1 : 0,
+                    transform: [{
+                        translateX: growAnim.interpolate({
+                            inputRange: [0, 1],
+                            outputRange: [0, (frame.width / item.media!.length) / 2]
+                        })
+                    },
+                    {
+                        scaleX: growAnim,
+                    },
+                    ]
                 }}
             /> */}
             <TouchableOpacity
@@ -161,7 +211,10 @@ export default function MediaCarousel({
                     height: frame.height,
                     left: frame.width / 4,
                 }}
-                onPress={() => setIsPlay(!isPlay)}
+                onPress={() => {
+                    setIsPlay(!isPlay);
+                    // !isPlay ? startAnimation() : stopAnimation();
+                }}
             />
             <TouchableOpacity
                 activeOpacity={1}
@@ -187,6 +240,7 @@ export default function MediaCarousel({
             >
                 <Image
                     style={styles.eventIcon}
+                    // TODO: include full host user object in events, then use UserManager.getAvatarUrl here
                     source={{
                         uri: urlJoin(config.BASE_URL, 'media', 'avatar', item.hostId, 'high.jpg'),
                     }}

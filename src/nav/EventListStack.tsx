@@ -1,7 +1,7 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import React from 'react';
+import VideoCamera from '../components/VideoCamera';
 
-import CameraScreen from '../screens/CameraScreen';
 import ChatScreen from '../screens/ChatScreen';
 import CreateEventScreen from '../screens/CreateEventScreen';
 import EventDetailScreen from '../screens/EventDetailScreen';
@@ -37,7 +37,7 @@ function EventListStack() {
             />
             <Stack.Screen
                 name="MediaCapture"
-                component={CameraScreen}
+                component={VideoCamera}
                 options={{ title: 'Upload your Content' }}
             />
             <Stack.Screen name="ChatScreen" component={ChatScreen} options={{ title: 'Chat' }} />

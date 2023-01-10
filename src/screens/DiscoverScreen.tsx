@@ -57,12 +57,9 @@ function DiscoverScreen({ navigation }: Props) {
     const [eventData, setEventData] = useState<Event[]>([]);
 
     async function updateMedia() {
-        const responseData = await request('GET', 'discover/', getToken());
-        const data = responseData.map((event: Event) => ({
-            ...event,
-            media: event.media?.map((el: Media) => ({ ...el, src: MediaManager.src(el, 'high') })),
-        }));
-        setEventData(data);
+        // TODO: use `EventStore.eventMedia`
+        const responseData = (await request('GET', 'discover/')) as unknown as Event[];
+        setEventData(responseData);
     }
     const navigateDetail = useCallback(
         (id: string) => {

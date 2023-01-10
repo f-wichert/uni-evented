@@ -1,19 +1,20 @@
 import React from 'react';
 import { Image, StyleSheet, View } from 'react-native';
 
+import { Media, MediaManager } from '../models';
 import { baseHeaders } from '../util';
 
 declare type Props = {
-    discoverData: { src: string };
+    item: Media;
     navigateDetail: (id: string) => void;
 };
 
-function ImageDiscover({ discoverData, navigateDetail }: Props) {
+function ImageDiscover({ item, navigateDetail }: Props) {
     return (
         <View style={styles.container}>
             <Image
                 source={{
-                    uri: discoverData.src,
+                    uri: MediaManager.src(item),
                     headers: {
                         ...baseHeaders,
                     },
@@ -29,14 +30,11 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        borderWidth: 2,
-        borderRadius: 8,
-        margin: 5,
     },
     image: {
         width: 350,
         height: 450,
-        // flex: 1
+        flex: 1,
     },
 });
 

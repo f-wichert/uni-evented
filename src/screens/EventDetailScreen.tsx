@@ -1,7 +1,7 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { HeaderBackButton } from '@react-navigation/elements';
 import { StackActions, useFocusEffect } from '@react-navigation/native';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     BackHandler,
     Dimensions,
@@ -40,8 +40,10 @@ let media_data = [
 function EventDetailScreen({ route, navigation }: EventListStackNavProps<'EventDetail'>) {
     const eventId = route.params.eventId;
     const origin = route.params.origin;
+    const { event: eventData, loading } = useEventFetch(eventId);
 
-    const { event: eventData } = useEventFetch(eventId);
+    const [isPlay, setIsPlay] = useState<boolean>(true);
+    const [isMute, setIsMute] = useState<boolean>(true);
 
     useEffect(() => {
         // overwrite back button functionality on this component to depend on where it came from (nested screens)
@@ -62,7 +64,6 @@ function EventDetailScreen({ route, navigation }: EventListStackNavProps<'EventD
 
     // const eventID = useEventStore((state) => state.currentEventId) // Get event ID of current event of currently logged in user
 
-    // console.log('eventData:', eventData);
     if (!eventData) {
         return (
             <View
@@ -312,7 +313,7 @@ const styles = StyleSheet.create({
         alignSelf: 'stretch',
         alignItems: 'center',
         justifyContent: 'center',
-        minHeight: 200,
+        minHeight: 400,
         borderRadius: 10,
     },
     tagArea: {
