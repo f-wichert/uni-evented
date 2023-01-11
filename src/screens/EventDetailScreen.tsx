@@ -37,15 +37,21 @@ let media_data = [
     },
 ];
 
-function EventDetailScreen({ route, navigation, media }: EventListStackNavProps<'EventDetail'>) {
-    const eventId = route.params.eventId;
-    const origin = route.params.origin;
+function EventDetailScreen({
+    route,
+    navigation,
+    preview,
+    evId,
+    orig,
+}: EventListStackNavProps<'EventDetail'>) {
+    const eventId = evId ? evId : route.params.eventId;
+    const origin = orig ? orig : route.params.origin;
     const { event: eventData, loading } = useEventFetch(eventId);
 
     const [isPlay, setIsPlay] = useState<boolean>(true);
     const [isMute, setIsMute] = useState<boolean>(true);
 
-    const showMedia = media ? media : true;
+    const isPreview = preview ? preview : false;
 
     useEffect(() => {
         // overwrite back button functionality on this component to depend on where it came from (nested screens)
@@ -166,129 +172,141 @@ function EventDetailScreen({ route, navigation, media }: EventListStackNavProps<
             'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum.Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum.Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum.Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum.Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum.Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum.Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum.',
     };
 
+    const navigationBar = (
+        <>
+            <View style={styles.joinButtonContainer}>
+                <Pressable
+                    style={styles.joinButton}
+                    onPress={asyncHandler(
+                        async () => {
+                            await EventManager.join(eventId, 0, 0);
+                        },
+                        { prefix: 'Failed to join event' }
+                    )}
+                >
+                    <Text style={styles.joinButtonText}>{"I'm Here!"}</Text>
+                </Pressable>
+            </View>
+            <View style={styles.chatButtonContainer}>
+                <Pressable
+                    style={styles.chatButton}
+                    onPress={() => navigation.navigate('ChatScreen', { eventId: eventId })}
+                >
+                    <Ionicons name={'chatbox-ellipses-outline'} size={37} color={'white'} />
+                </Pressable>
+            </View>
+        </>
+    );
+
+    const tagArea = (
+        <View style={styles.tagArea}>
+            {event.tags.map((tag) => (
+                <Tag style={{ ...styles.tag, backgroundColor: tag.color }} key={tag.name}>
+                    {tag.name}
+                </Tag>
+            ))}
+        </View>
+    );
+
+    const ratingArea = (
+        <View style={styles.RatingArea}>
+            <Rating imageSize={28} />
+        </View>
+    );
+
+    const titleLine = (
+        <View style={styles.TitleLine}>
+            <Text style={{ fontSize: 25, fontWeight: 'bold', maxWidth: '70%' }}>{event.title}</Text>
+            <View
+                style={{
+                    display: 'flex',
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                }}
+            >
+                <Ionicons name="people" size={28} />
+                <Text style={{ fontSize: 25, fontWeight: 'bold', marginLeft: 2 }}>
+                    {event.numberOfAttendants}
+                </Text>
+            </View>
+            <Image
+                style={styles.ProfilePicture}
+                source={{ uri: getProfilePicture().profilePicture }}
+            />
+        </View>
+    );
+
+    const generalInformationArea = (
+        <View style={styles.GeneralInformationArea}>
+            <View style={{ maxWidth: '60%' }}>
+                <Text style={{ color: 'grey', fontSize: 16 }}>
+                    {event.startingTime}-{event.endingTime}
+                </Text>
+                <Text style={{ fontSize: 18, fontWeight: 'bold' }}>{event.address}</Text>
+            </View>
+            <View
+                style={{
+                    display: 'flex',
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    marginRight: 13,
+                }}
+            >
+                <Ionicons name="musical-notes-sharp" size={25}></Ionicons>
+                <Text style={{ fontSize: 23, fontWeight: '900' }}>{event.musicStyle}</Text>
+            </View>
+        </View>
+    );
+
+    const descriptionArea = (
+        <View style={styles.DescriptionArea}>
+            <Text>{event.description}</Text>
+        </View>
+    );
+
+    const mediaCarousel = (
+        <View style={styles.camera}>
+            <GestureHandlerRootView>
+                <Carousel
+                    width={Dimensions.get('window').width}
+                    height={200}
+                    autoPlay={false}
+                    loop={false}
+                    data={media_data}
+                    scrollAnimationDuration={350}
+                    renderItem={({ item, index }) => getJsx(item)}
+                />
+            </GestureHandlerRootView>
+        </View>
+    );
+
     return (
         <>
             <SafeAreaView style={{ display: 'flex' }}>
                 <ScrollView>
                     <View style={styles.section}>
                         {/* @Jonas - please build in the media thing here. this logic is used for the map screen */}
-                        {showMedia == true ? (
-                            <View style={styles.camera}>
-                                <GestureHandlerRootView>
-                                    <Carousel
-                                        width={Dimensions.get('window').width}
-                                        height={200}
-                                        autoPlay={false}
-                                        loop={false}
-                                        data={media_data}
-                                        scrollAnimationDuration={350}
-                                        renderItem={({ item, index }) => getJsx(item)}
-                                    />
-                                </GestureHandlerRootView>
-                            </View>
+                        {isPreview == false ? <>{mediaCarousel}</> : <></>}
+                        {isPreview == false ? (
+                            <>
+                                {tagArea}
+                                {ratingArea}
+                            </>
                         ) : (
                             <></>
                         )}
-                        <View style={styles.tagArea}>
-                            {event.tags.map((tag) => (
-                                <Tag
-                                    style={{ ...styles.tag, backgroundColor: tag.color }}
-                                    key={tag.name}
-                                >
-                                    {tag.name}
-                                </Tag>
-                            ))}
-                        </View>
-                        <View style={styles.RatingArea}>
-                            <Rating imageSize={28} />
-                        </View>
                         <View style={styles.InformationArea}>
-                            <View style={styles.TitleLine}>
-                                <Text style={{ fontSize: 25, fontWeight: 'bold', maxWidth: '70%' }}>
-                                    {event.title}
-                                </Text>
-                                <View
-                                    style={{
-                                        display: 'flex',
-                                        flexDirection: 'row',
-                                        alignItems: 'center',
-                                    }}
-                                >
-                                    <Ionicons name="people" size={28} />
-                                    <Text
-                                        style={{ fontSize: 25, fontWeight: 'bold', marginLeft: 2 }}
-                                    >
-                                        {event.numberOfAttendants}
-                                    </Text>
-                                </View>
-                                <Image
-                                    style={styles.ProfilePicture}
-                                    source={{ uri: getProfilePicture().profilePicture }}
-                                />
-                            </View>
-                            <View style={styles.GeneralInformationArea}>
-                                <View style={{ maxWidth: '60%' }}>
-                                    <Text style={{ color: 'grey', fontSize: 16 }}>
-                                        {event.startingTime}-{event.endingTime}
-                                    </Text>
-                                    <Text style={{ fontSize: 18, fontWeight: 'bold' }}>
-                                        {event.address}
-                                    </Text>
-                                </View>
-                                <View
-                                    style={{
-                                        display: 'flex',
-                                        flexDirection: 'row',
-                                        alignItems: 'center',
-                                        marginRight: 13,
-                                    }}
-                                >
-                                    <Ionicons name="musical-notes-sharp" size={25}></Ionicons>
-                                    <Text style={{ fontSize: 23, fontWeight: '900' }}>
-                                        {event.musicStyle}
-                                    </Text>
-                                </View>
-                            </View>
-                            <View style={styles.DescriptionArea}>
-                                <Text>{event.description}</Text>
-                            </View>
+                            {titleLine}
+                            {generalInformationArea}
+                            {descriptionArea}
                         </View>
-                        <View style={styles.ChatArea}></View>
-                        {/* <View style={styles.IMHereButtonContainer}> */}
-                        <View style={{ height: 100, backgroundColor: 'white' }}>
-                            {/* <Pressable
-                                style={styles.IMHereButtonArea}
-                                onPress={asyncHandler(registerUserArrivalAtEvent)}
-                            >
-                                <Text style={styles.IMHereButton}> I'm Here!</Text>
-                            </Pressable> */}
+                        <View style={styles.navigationBarPlaceholder}>
+                            {isPreview == true ? navigationBar : <></>}
                         </View>
                     </View>
                 </ScrollView>
             </SafeAreaView>
-            <View style={styles.overlay}>
-                <View style={styles.joinButtonContainer}>
-                    <Pressable
-                        style={styles.joinButton}
-                        onPress={asyncHandler(
-                            async () => {
-                                await EventManager.join(eventId, 0, 0);
-                            },
-                            { prefix: 'Failed to join event' }
-                        )}
-                    >
-                        <Text style={styles.joinButtonText}>{"I'm Here!"}</Text>
-                    </Pressable>
-                </View>
-                <View style={styles.chatButtonContainer}>
-                    <Pressable
-                        style={styles.chatButton}
-                        onPress={() => navigation.navigate('ChatScreen', { eventId: eventId })}
-                    >
-                        <Ionicons name={'chatbox-ellipses-outline'} size={37} color={'white'} />
-                    </Pressable>
-                </View>
-            </View>
+            <View style={styles.overlay}>{isPreview == false ? navigationBar : <></>}</View>
         </>
     );
 }
@@ -449,6 +467,16 @@ const styles = StyleSheet.create({
         alignSelf: 'stretch',
         justifyContent: 'center',
         alignItems: 'center',
+    },
+    navigationBarPlaceholder: {
+        bottom: 0,
+        // backgroundColor: 'red',
+        width: '100%',
+        height: 70,
+        paddingVertical: 10,
+        flex: 1,
+        flexDirection: 'row',
+        display: 'flex',
     },
 });
 

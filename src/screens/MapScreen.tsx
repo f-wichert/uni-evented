@@ -7,14 +7,16 @@ import MapView, { LatLng, Marker } from 'react-native-maps';
 import { TabNavProps } from '../nav/types';
 import { useFindEvents } from '../state/event';
 import { asyncHandler } from '../util';
+import EventDetailScreen from './EventDetailScreen';
 
-function MapScreen({ navigation }: TabNavProps<'Map'>) {
+function MapScreen({ navigation, route }: TabNavProps<'Map'>) {
     const mapRef = React.useRef<MapView>(null);
+    const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
     const [location, setLocation] = useState<LatLng | null>({
         latitude: 48.877616,
         longitude: 8.652653,
     });
-
+    console.log(`Selected Event: ${JSON.stringify(selectedEvent)}`);
     const { events, refresh } = useFindEvents();
 
     const getCurrentPosition = async () => {
@@ -72,52 +74,73 @@ function MapScreen({ navigation }: TabNavProps<'Map'>) {
     );
 
     return (
-        <View style={styles.container}>
-            {location ? (
-                <MapView
-                    initialRegion={{
-                        latitude: location.latitude,
-                        longitude: location.longitude,
-                        latitudeDelta: 0.01,
-                        longitudeDelta: 0.01,
-                    }}
-                    ref={mapRef}
-                    showsUserLocation={true}
-                    style={styles.map}
-                >
-                    <>
-                        {events.map((el) => (
-                            <Marker
-                                key={el.id}
-                                coordinate={{
-                                    latitude: el.lat,
-                                    longitude: el.lon,
-                                }}
-                                title={el.name}
-                                pinColor="teal"
-                                // TODO: this might re-render every time since the
-                                // callback isn't memoized, not sure
-                                onCalloutPress={() => {
-                                    navigateDetail(el.id);
-                                }}
-                            />
-                        ))}
-                        {/* {events.map((el: any) => (
-                            <EventMarker
-                                key={el.id}
-                                coordinate={{
-                                    latitude: parseFloat(el.lat),
-                                    longitude: parseFloat(el.lon),
-                                }}
-                                title={el.name}
-                                pinColor="orange"
-                                onCalloutPress={() => {console.log('Callout pressed')}}
-                            />
-                        ))} */}
-                    </>
-                </MapView>
-            ) : null}
-        </View>
+        <>
+            <View style={styles.container}>
+                {location ? (
+                    <MapView
+                        initialRegion={{
+                            latitude: location.latitude,
+                            longitude: location.longitude,
+                            latitudeDelta: 0.01,
+                            longitudeDelta: 0.01,
+                        }}
+                        ref={mapRef}
+                        showsUserLocation={true}
+                        style={styles.map}
+                        onMarkerPress={(e) => {
+                            const ev = events.filter((item) => {
+                                // TODO: this could be done better, e.g. in a single statement, but I didn't quiet got it working
+                                if (
+                                    e.nativeEvent.coordinate.latitude == item.lat &&
+                                    e.nativeEvent.coordinate.longitude == item.lon
+                                ) {
+                                    return true;
+                                } else {
+                                    return false;
+                                }
+                            });
+                            setSelectedEvent(ev[0]);
+                        }}
+                        onPress={() => {
+                            setSelectedEvent(null);
+                        }}
+                    >
+                        <>
+                            {events.map((el) => (
+                                <Marker
+                                    key={el.id}
+                                    coordinate={{
+                                        latitude: el.lat,
+                                        longitude: el.lon,
+                                    }}
+                                    title={el.name}
+                                    pinColor="teal"
+                                    // TODO: this might re-render every time since the
+                                    // callback isn't memoized, not sure
+                                    onCalloutPress={() => {
+                                        navigateDetail(el.id);
+                                    }}
+                                />
+                            ))}
+                        </>
+                    </MapView>
+                ) : null}
+            </View>
+            {selectedEvent ? (
+                <View style={styles.bottomOverlay}>
+                    {/* <Text>{selectedEvent.id}</Text> */}
+                    <EventDetailScreen
+                        navigation={navigation}
+                        route={route}
+                        preview={true}
+                        evId={selectedEvent.id}
+                        orig={'Map'}
+                    />
+                </View>
+            ) : (
+                <></>
+            )}
+        </>
     );
 }
 
@@ -142,6 +165,11 @@ const styles = StyleSheet.create({
         width: Dimensions.get('window').width,
         height: Dimensions.get('window').height,
         zIndex: 99,
+    },
+    bottomOverlay: {
+        backgroundColor: 'white',
+        height: 220,
+        borderRadius: 15,
     },
 });
 
