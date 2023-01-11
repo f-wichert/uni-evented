@@ -1,7 +1,7 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import * as Location from 'expo-location';
 import React, { useCallback, useEffect, useState } from 'react';
-import { Dimensions, StyleSheet, View } from 'react-native';
+import { Dimensions, StyleSheet, Text, View } from 'react-native';
 import MapView, { LatLng, Marker } from 'react-native-maps';
 
 import { TabNavProps } from '../nav/types';
@@ -12,11 +12,13 @@ import EventDetailScreen from './EventDetailScreen';
 function MapScreen({ navigation, route }: TabNavProps<'Map'>) {
     const mapRef = React.useRef<MapView>(null);
     const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
+    // console.log(`Selected Event: ${JSON.stringify(selectedEvent)}`);
+    const [menuVisible, setMenuVisible] = useState<Boolean>(false);
+    console.log(`Vis: ${menuVisible}`);
     const [location, setLocation] = useState<LatLng | null>({
         latitude: 48.877616,
         longitude: 8.652653,
     });
-    console.log(`Selected Event: ${JSON.stringify(selectedEvent)}`);
     const { events, refresh } = useFindEvents();
 
     const getCurrentPosition = async () => {
@@ -36,17 +38,32 @@ function MapScreen({ navigation, route }: TabNavProps<'Map'>) {
 
     useEffect(
         asyncHandler(async () => {
+            setMenuVisible(false);
             navigation.setOptions({
                 headerRight: () => (
-                    <Ionicons
-                        name="refresh-outline"
-                        size={32}
-                        color="black"
-                        onPress={refresh}
-                        style={{
-                            marginRight: 10,
-                        }}
-                    />
+                    <View style={{ flexDirection: 'row' }}>
+                        <Ionicons
+                            name="refresh-outline"
+                            size={32}
+                            color="black"
+                            onPress={refresh}
+                            style={{
+                                marginRight: 10,
+                            }}
+                        />
+                        <Ionicons
+                            name="menu-outline"
+                            size={32}
+                            color="black"
+                            onPress={() => {
+                                // TODO: herausfinden warum das hier funktioniert?
+                                setMenuVisible((val) => !val);
+                            }}
+                            style={{
+                                marginRight: 10,
+                            }}
+                        />
+                    </View>
                 ),
             });
             await getCurrentPosition();
@@ -128,7 +145,6 @@ function MapScreen({ navigation, route }: TabNavProps<'Map'>) {
             </View>
             {selectedEvent ? (
                 <View style={styles.bottomOverlay}>
-                    {/* <Text>{selectedEvent.id}</Text> */}
                     <EventDetailScreen
                         navigation={navigation}
                         route={route}
@@ -136,6 +152,13 @@ function MapScreen({ navigation, route }: TabNavProps<'Map'>) {
                         evId={selectedEvent.id}
                         orig={'Map'}
                     />
+                </View>
+            ) : (
+                <></>
+            )}
+            {menuVisible == true ? (
+                <View style={styles.menuOverlay}>
+                    <Text>This might a menu someday!</Text>
                 </View>
             ) : (
                 <></>
@@ -168,8 +191,23 @@ const styles = StyleSheet.create({
     },
     bottomOverlay: {
         backgroundColor: 'white',
-        height: 220,
-        borderRadius: 15,
+        height: 190,
+        borderTopLeftRadius: 15,
+        borderTopRightRadius: 15,
+        justifyContent: 'center',
+        elevation: 15,
+        shadowColor: '#71717',
+    },
+    menuOverlay: {
+        backgroundColor: 'red',
+        width: '100%',
+        height: 70,
+        position: 'absolute',
+        top: 0,
+        borderBottomRightRadius: 10,
+        borderBottomLeftRadius: 10,
+        elevation: 5,
+        shadowColor: '#71717',
     },
 });
 

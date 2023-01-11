@@ -195,6 +195,14 @@ function EventDetailScreen({
                     <Ionicons name={'chatbox-ellipses-outline'} size={37} color={'white'} />
                 </Pressable>
             </View>
+            <View style={styles.chatButtonContainer}>
+                <Pressable
+                    style={styles.chatButton}
+                    onPress={() => navigation.navigate('ChatScreen', { eventId: eventId })}
+                >
+                    <Ionicons name={'arrow-redo-outline'} size={37} color={'white'} />
+                </Pressable>
+            </View>
         </>
     );
 
@@ -286,20 +294,25 @@ function EventDetailScreen({
                 <ScrollView>
                     <View style={styles.section}>
                         {/* @Jonas - please build in the media thing here. this logic is used for the map screen */}
-                        {isPreview == false ? <>{mediaCarousel}</> : <></>}
-                        {isPreview == false ? (
+                        {isPreview == true ? (
                             <>
-                                {tagArea}
-                                {ratingArea}
+                                <View style={styles.InformationArea}>
+                                    {titleLine}
+                                    {generalInformationArea}
+                                </View>
                             </>
                         ) : (
-                            <></>
+                            <>
+                                {mediaCarousel}
+                                {tagArea}
+                                {ratingArea}
+                                <View style={styles.InformationArea}>
+                                    {titleLine}
+                                    {generalInformationArea}
+                                    {descriptionArea}
+                                </View>
+                            </>
                         )}
-                        <View style={styles.InformationArea}>
-                            {titleLine}
-                            {generalInformationArea}
-                            {descriptionArea}
-                        </View>
                         <View style={styles.navigationBarPlaceholder}>
                             {isPreview == true ? navigationBar : <></>}
                         </View>
@@ -442,7 +455,7 @@ const styles = StyleSheet.create({
         backgroundColor: 'black',
         borderRadius: 7,
         flex: 1,
-        width: 300,
+        // width: 300,
         alignSelf: 'stretch',
         justifyContent: 'center',
         alignItems: 'center',
