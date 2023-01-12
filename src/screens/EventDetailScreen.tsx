@@ -101,7 +101,7 @@ function EventDetailScreen({
                         size={64}
                         color="orange"
                         onPress={() => {
-                            navigation.navigate('MediaCapture', { eventID: eventId });
+                            navigation.navigate('MediaCapture', { eventId: eventId });
                         }}
                     />
                     <Text>Load Picture/Video of event here</Text>
