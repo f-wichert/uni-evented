@@ -3,6 +3,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import { Camera, CameraType } from 'expo-camera';
 import React, { useEffect, useRef, useState } from 'react';
 import { BackHandler, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { NodeCameraView } from 'react-native-nodemediaclient';
 
 import { EventListStackNavProps } from '../nav/types';
 import { asyncHandler, request } from '../util';
@@ -13,7 +14,11 @@ function VideoCamera({ route, navigation }: EventListStackNavProps<'MediaCapture
     const [hasPermission, setHasPermission] = useState(false);
     const [type, setType] = useState(CameraType.back);
     const [recording, setRecording] = useState(false);
+    const [streaming, setStreaming] = useState(false);
+    const [liveMode, setLiveMode] = useState(false);
+
     const cameraRef = useRef<Camera>(null);
+    const liveCameraRef = useRef<NodeCameraView>(null);
 
     useFocusEffect(() => {
         BackHandler.addEventListener('hardwareBackPress', () => {
@@ -70,6 +75,12 @@ function VideoCamera({ route, navigation }: EventListStackNavProps<'MediaCapture
         await request('POST', '/upload/clip', createFormData(uri, 'video/mp4'));
     };
 
+    const onStreamButton = () => {
+        if (!liveCameraRef.current) return;
+        setStreaming(!streaming);
+        liveCameraRef.current[streaming ? 'stop' : 'start']();
+    };
+
     useEffect(
         asyncHandler(
             async () => {
@@ -94,55 +105,119 @@ function VideoCamera({ route, navigation }: EventListStackNavProps<'MediaCapture
 
     return (
         <View style={[styles.container]}>
-            <Camera style={[styles.camera]} type={type} ref={cameraRef}>
-                <View style={[styles.column]}>
+            {liveMode ? (
+                <>
+                    <NodeCameraView
+                        style={[styles.camera]}
+                        ref={liveCameraRef}
+                        outputUrl={'rtmp://192.168.2.119:3003/live/test_stream'}
+                        camera={{ cameraId: 0, cameraFrontMirror: true }}
+                        audio={{ bitrate: 32000, profile: 1, samplerate: 44100 }}
+                        video={{
+                            preset: 1,
+                            bitrate: 400000,
+                            profile: 1,
+                            fps: 24,
+                            videoFrontMirror: false,
+                        }}
+                        autopreview={true}
+                    />
                     <View style={[styles.row]}>
                         <TouchableOpacity
-                            disabled={recording}
-                            style={{
-                                ...styles.flexEl,
-                                opacity: recording ? 0.25 : 1,
-                            }}
-                            onPress={() => {
-                                setType(
-                                    type === CameraType.back ? CameraType.front : CameraType.back
-                                );
-                            }}
-                        >
-                            <Ionicons name="camera-reverse-outline" size={32} color="white" />
-                        </TouchableOpacity>
-                        <TouchableOpacity
                             style={[styles.flexEl]}
-                            onPress={asyncHandler(onVideoButton, {
-                                prefix: 'Failed to record video',
-                            })}
+                            onPress={() => {
+                                if (!liveCameraRef.current) return;
+                                liveCameraRef.current.switchCamera();
+                            }}
                         >
+                            <Ionicons name="camera-reverse-outline" size={32} color="black" />
+                        </TouchableOpacity>
+                        <TouchableOpacity style={[styles.flexEl]} onPress={onStreamButton}>
                             <View style={[styles.outerCircleVideo]}>
                                 <View
                                     style={{
                                         ...styles.innerCircleVideo,
-                                        borderRadius: recording ? 0 : 25,
+                                        borderRadius: streaming ? 0 : 25,
                                     }}
                                 ></View>
                             </View>
                         </TouchableOpacity>
                         <TouchableOpacity
-                            disabled={recording}
                             style={{
                                 ...styles.flexEl,
-                                opacity: recording ? 0.25 : 1,
+                                opacity: streaming ? 0.25 : 1,
                             }}
-                            onPress={asyncHandler(onPhotoButton, {
-                                prefix: 'Failed to take picture',
-                            })}
+                            disabled={streaming}
+                            onPress={() => {
+                                setLiveMode(false);
+                            }}
                         >
-                            <View style={[styles.outerCirclePhoto]}>
-                                <View style={[styles.innerCirclePhoto]}></View>
-                            </View>
+                            <Ionicons name="videocam-outline" size={32} color="black" />
                         </TouchableOpacity>
                     </View>
-                </View>
-            </Camera>
+                </>
+            ) : (
+                <Camera style={[styles.camera]} type={type} ref={cameraRef}>
+                    <View style={[styles.column]}>
+                        <View style={[styles.row]}>
+                            <TouchableOpacity
+                                disabled={recording}
+                                style={{
+                                    ...styles.flexEl,
+                                    opacity: recording ? 0.25 : 1,
+                                }}
+                                onPress={() => {
+                                    setType(
+                                        type === CameraType.back
+                                            ? CameraType.front
+                                            : CameraType.back
+                                    );
+                                }}
+                            >
+                                <Ionicons name="camera-reverse-outline" size={32} color="white" />
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                style={[styles.flexEl]}
+                                onPress={asyncHandler(onVideoButton, {
+                                    prefix: 'Failed to record video',
+                                })}
+                            >
+                                <View style={[styles.outerCircleVideo]}>
+                                    <View
+                                        style={{
+                                            ...styles.innerCircleVideo,
+                                            borderRadius: recording ? 0 : 25,
+                                        }}
+                                    ></View>
+                                </View>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                disabled={recording}
+                                style={{
+                                    ...styles.flexEl,
+                                    opacity: recording ? 0.25 : 1,
+                                }}
+                                onPress={asyncHandler(onPhotoButton, {
+                                    prefix: 'Failed to take picture',
+                                })}
+                            >
+                                <View style={[styles.outerCirclePhoto]}>
+                                    <View style={[styles.innerCirclePhoto]}></View>
+                                </View>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                style={styles.flexEl}
+                                disabled={recording}
+                                onPress={() => {
+                                    setLiveMode(true);
+                                }}
+                            >
+                                <Ionicons name="videocam-outline" size={32} color="white" />
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </Camera>
+            )}
         </View>
     );
 }
