@@ -40,6 +40,7 @@ const config: ExpoConfig = {
             foregroundImage: './assets/adaptive-icon.png',
             backgroundColor: '#FFFFFF',
         },
+        package: 'com.anonymous.Evented',
     },
     web: {
         favicon: './assets/favicon.png',
