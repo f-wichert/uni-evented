@@ -22,6 +22,10 @@ export interface CurrentUser extends User {
     readonly email: string;
 }
 
+export interface CurrentUserResponse extends CurrentUser {
+    readonly currentEventId: string | null;
+}
+
 export class UserManager {
     static fromUserResponse(response: UserResponse): User {
         // currently just a no-op
@@ -34,10 +38,18 @@ export class UserManager {
     }
 
     static async editSelf(params: {
+        username?: string;
+        displayName?: string;
+        email?: string;
         // base64-encoded image
         avatar?: string;
     }) {
-        const user = (await request('PATCH', '/user/@me', params)) as unknown as UserResponse;
+        const user = (await request(
+            'PATCH',
+            '/user/@me',
+            params
+        )) as unknown as CurrentUserResponse;
+        console.debug(user);
 
         useUserStore.setState((state) => {
             addUsers(state, this.fromUserResponse(user));

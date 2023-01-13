@@ -1,42 +1,79 @@
 import React, { useEffect, useState } from 'react';
-import { Button, ScrollView, StyleSheet, Text } from 'react-native';
+import { ActivityIndicator, Button, Keyboard, ScrollView, StyleSheet, Text } from 'react-native';
 
 import FancyTextInput from '../components/FancyTextInput';
 import { DISPLAYNAME_VALIDATION, USERNAME_VALIDATION } from '../constants';
+import { UserManager } from '../models';
 import { ProfileStackNavProps } from '../nav/types';
 import { useCurrentUser } from '../state/user';
-import { validateString } from '../validate';
+import { handleError } from '../util';
+import { StringValidateOptions, validateString } from '../validate';
+
+function validate(value: string, original: string, opts: StringValidateOptions) {
+    const changed = value !== original;
+    return {
+        error: validateString(value, opts),
+        changed: changed,
+        submitValue: changed ? value : undefined,
+    };
+}
 
 export default function ManageAccountScreen({ navigation }: ProfileStackNavProps<'ManageAccount'>) {
     const currentUser = useCurrentUser();
 
+    const [submitting, setSubmitting] = useState(false);
+
     const [username, setUsername] = useState<string>(currentUser.username);
-    const usernameError =
-        username !== currentUser.username && validateString(username, USERNAME_VALIDATION);
+    const usernameResult = validate(username, currentUser.username, USERNAME_VALIDATION);
 
     const [displayName, setDisplayName] = useState<string>(currentUser.displayName);
-    const displayNameError =
-        displayName !== currentUser.displayName &&
-        validateString(displayName, DISPLAYNAME_VALIDATION);
+    const displayNameResult = validate(
+        displayName,
+        currentUser.displayName,
+        DISPLAYNAME_VALIDATION
+    );
 
     const [email, setEmail] = useState<string>(currentUser.email);
-    const emailError = email !== currentUser.email && validateString(email, { email: true });
+    const emailResult = validate(email, currentUser.email, { email: true });
 
-    // TODO: surely this can be optimized :^)
-    const hasChanged =
-        username !== currentUser.username ||
-        displayName !== currentUser.displayName ||
-        email !== currentUser.email;
-    const isValid = !usernameError && !displayNameError && !emailError;
+    const results = [usernameResult, displayNameResult, emailResult];
+    const hasChanged = results.some((r) => r.changed);
+    const isValid = results.every((r) => !r.error);
 
-    // set up save button
+    // no point in using `useCallback` here, since this would probably change every render anyway.
+    const submit = async () => {
+        // FIXME: this doesn't call `onBlur` in the textinput, which results in the text not being greyed out on submit
+        Keyboard.dismiss();
+        try {
+            setSubmitting(true);
+            await UserManager.editSelf({
+                username: usernameResult.submitValue,
+                displayName: displayNameResult.submitValue,
+                email: emailResult.submitValue,
+            });
+        } catch (e) {
+            handleError(e, { prefix: 'Failed to update profile' });
+        } finally {
+            setSubmitting(false);
+        }
+    };
+
+    // set up save button (see above as to why this doesn't specify dependencies)
     useEffect(() => {
         navigation.setOptions({
             headerRight: () => {
-                return <Button title="Save" color="green" disabled={!hasChanged || !isValid} />;
+                if (submitting) return <ActivityIndicator />;
+                return (
+                    <Button
+                        title="Save"
+                        color="green"
+                        disabled={!hasChanged || !isValid}
+                        onPress={() => void submit()}
+                    />
+                );
             },
         });
-    }, [navigation, hasChanged, isValid]);
+    });
 
     return (
         <ScrollView style={styles.container}>
@@ -46,7 +83,7 @@ export default function ManageAccountScreen({ navigation }: ProfileStackNavProps
                 originalValue={currentUser.username}
                 value={username}
                 onChangeText={setUsername}
-                validationError={usernameError}
+                validationError={usernameResult.error}
                 maxLength={USERNAME_VALIDATION.maxLength}
                 textInputProps={{ autoCorrect: false }}
                 style={styles.input}
@@ -56,7 +93,7 @@ export default function ManageAccountScreen({ navigation }: ProfileStackNavProps
                 originalValue={currentUser.displayName}
                 value={displayName}
                 onChangeText={setDisplayName}
-                validationError={displayNameError}
+                validationError={displayNameResult.error}
                 maxLength={DISPLAYNAME_VALIDATION.maxLength}
                 textInputProps={{ autoCorrect: false }}
                 style={styles.input}
@@ -68,7 +105,7 @@ export default function ManageAccountScreen({ navigation }: ProfileStackNavProps
                 originalValue={currentUser.email}
                 value={email}
                 onChangeText={setEmail}
-                validationError={emailError}
+                validationError={emailResult.error}
                 textInputProps={{ autoCorrect: false, keyboardType: 'email-address' }}
                 style={styles.input}
             />
