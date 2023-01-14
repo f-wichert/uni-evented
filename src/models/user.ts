@@ -49,7 +49,6 @@ export class UserManager {
             '/user/@me',
             params
         )) as unknown as CurrentUserResponse;
-        console.debug(user);
 
         useUserStore.setState((state) => {
             addUsers(state, this.fromUserResponse(user));

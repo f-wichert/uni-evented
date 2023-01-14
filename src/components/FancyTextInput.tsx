@@ -47,8 +47,7 @@ export default function FancyTextInput({
     const inputRef = useRef<TextInput>(null);
     const focusOnPress = useCallback(() => inputRef.current?.focus(), [inputRef]);
 
-    // if text input is not focused, only show value if changed from original value
-    // FIXME: change text color to grey instead, don't use placeholder at all
+    // if text input is not focused, grey out text if unchanged from original value
     const [showValue, setShowValue] = useState(originalValue !== value);
     const onBlur = useCallback(() => setShowValue(originalValue !== value), [originalValue, value]);
     const onFocus = useCallback(() => setShowValue(true), []);
@@ -80,11 +79,10 @@ export default function FancyTextInput({
             {/* main input field */}
             <TextInput
                 {...textInputProps}
-                style={styles.input}
-                value={showValue ? value : undefined}
+                style={[styles.input, showValue ? null : styles.inputUnchanged]}
+                value={value}
                 onChangeText={onChangeText}
                 ref={inputRef}
-                placeholder={originalValue}
                 onFocus={onFocus}
                 onBlur={onBlur}
             />
@@ -129,6 +127,9 @@ const styles = StyleSheet.create({
     input: {
         fontSize: 18,
         marginTop: 4,
+    },
+    inputUnchanged: {
+        color: 'lightgrey',
     },
     // styles for invalid inputs
     invalid: {
