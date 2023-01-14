@@ -75,7 +75,7 @@ function VideoCamera({ route, navigation }: EventListStackNavProps<'MediaCapture
         await request('POST', '/upload/clip', createFormData(uri, 'video/mp4'));
     };
 
-    const onStreamButton = () => {
+    const onStreamButton = async () => {
         if (!liveCameraRef.current) return;
         setStreaming(!streaming);
         liveCameraRef.current[streaming ? 'stop' : 'start']();
@@ -106,7 +106,76 @@ function VideoCamera({ route, navigation }: EventListStackNavProps<'MediaCapture
     return (
         <View style={[styles.container]}>
             {liveMode ? (
-                <>
+                <View style={{ flex: 1, backgroundColor: 'black' }}>
+                    {/* <LiveStreamView
+                        style={{ flex: 1, alignSelf: 'stretch' }}
+                        ref={liveViewRef}
+                        camera="back"
+                        video={{
+                            fps: 30,
+                            resolution: '480p',
+                            bitrate: 1024 * 1024,
+                            gopDuration: 1, // 1 second
+                        }}
+                        audio={{
+                            bitrate: 32000,
+                            sampleRate: 44100,
+                            isStereo: true,
+                        }}
+                        isMuted={false}
+                        enablePinchedZoom={false}
+                        onConnectionSuccess={() => {}}
+                        onConnectionFailed={(e) => {}}
+                        onDisconnect={() => {}}
+                    />
+                    <View style={[styles.row]}>
+                        <TouchableOpacity
+                            disabled={streaming}
+                            style={{
+                                ...styles.flexEl,
+                                opacity: streaming ? 0.25 : 1,
+                            }}
+                            onPress={() => {
+                                setType(
+                                    type === CameraType.back ? CameraType.front : CameraType.back
+                                );
+                            }}
+                        >
+                            <Ionicons name="camera-reverse-outline" size={32} color="white" />
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                            style={[styles.flexEl]}
+                            onPress={asyncHandler(async () => {
+                                if (streaming) {
+                                    liveViewRef.current.stopStreaming();
+                                } else {
+                                    liveViewRef.current.startStreaming(
+                                        'test_stream',
+                                        'rtmp://192.168.2.119:3003/live/'
+                                    );
+                                }
+                                setStreaming(!streaming);
+                            })}
+                        >
+                            <View style={[styles.outerCircleVideo]}>
+                                <View
+                                    style={{
+                                        ...styles.innerCircleVideo,
+                                        borderRadius: streaming ? 0 : 25,
+                                    }}
+                                ></View>
+                            </View>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                            style={styles.flexEl}
+                            disabled={streaming}
+                            onPress={() => {
+                                setLiveMode(false);
+                            }}
+                        >
+                            <Ionicons name="videocam-outline" size={32} color="white" />
+                        </TouchableOpacity>
+                    </View> */}
                     <NodeCameraView
                         style={[styles.camera]}
                         ref={liveCameraRef}
@@ -115,7 +184,7 @@ function VideoCamera({ route, navigation }: EventListStackNavProps<'MediaCapture
                         audio={{ bitrate: 32000, profile: 1, samplerate: 44100 }}
                         video={{
                             preset: 1,
-                            bitrate: 400000,
+                            bitrate: 1024 * 1024,
                             profile: 1,
                             fps: 24,
                             videoFrontMirror: false,
@@ -126,13 +195,17 @@ function VideoCamera({ route, navigation }: EventListStackNavProps<'MediaCapture
                         <TouchableOpacity
                             style={[styles.flexEl]}
                             onPress={() => {
-                                if (!liveCameraRef.current) return;
-                                liveCameraRef.current.switchCamera();
+                                liveCameraRef.current?.switchCamera();
                             }}
                         >
-                            <Ionicons name="camera-reverse-outline" size={32} color="black" />
+                            <Ionicons name="camera-reverse-outline" size={32} color="white" />
                         </TouchableOpacity>
-                        <TouchableOpacity style={[styles.flexEl]} onPress={onStreamButton}>
+                        <TouchableOpacity
+                            style={[styles.flexEl]}
+                            onPress={asyncHandler(onStreamButton, {
+                                prefix: 'Failed to start stream',
+                            })}
+                        >
                             <View style={[styles.outerCircleVideo]}>
                                 <View
                                     style={{
@@ -152,10 +225,10 @@ function VideoCamera({ route, navigation }: EventListStackNavProps<'MediaCapture
                                 setLiveMode(false);
                             }}
                         >
-                            <Ionicons name="videocam-outline" size={32} color="black" />
+                            <Ionicons name="videocam-outline" size={32} color="white" />
                         </TouchableOpacity>
                     </View>
-                </>
+                </View>
             ) : (
                 <Camera style={[styles.camera]} type={type} ref={cameraRef}>
                     <View style={[styles.column]}>
