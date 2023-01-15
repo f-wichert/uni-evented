@@ -1,5 +1,4 @@
 import { Ionicons } from '@expo/vector-icons';
-import * as ImagePicker from 'expo-image-picker';
 import React, { useCallback } from 'react';
 import { Alert, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -13,7 +12,6 @@ import { ProfileStackNavProps } from '../nav/types';
 import { useAuthStore } from '../state/auth';
 import { useCurrentUser } from '../state/user';
 import { IoniconsName } from '../types';
-import { asyncHandler } from '../util';
 
 export default function ProfileScreen({ navigation }: ProfileStackNavProps<'ProfileView'>) {
     const user = useCurrentUser();
@@ -42,20 +40,6 @@ export default function ProfileScreen({ navigation }: ProfileStackNavProps<'Prof
                     username={user.username}
                     // TODO: better fallback image
                     fallbackImage={yellowSplash}
-                    onAvatarPress={asyncHandler(async () => {
-                        const result = await ImagePicker.launchImageLibraryAsync({
-                            allowsEditing: true,
-                            aspect: [1, 1],
-                            base64: true,
-                        });
-
-                        const asset = result.assets?.pop();
-                        if (!asset || !asset.base64) {
-                            return;
-                        }
-
-                        await UserManager.editSelf({ avatar: asset.base64 });
-                    })}
                 />
             </View>
 

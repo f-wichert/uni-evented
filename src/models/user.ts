@@ -42,7 +42,7 @@ export class UserManager {
         displayName?: string;
         email?: string;
         // base64-encoded image
-        avatar?: string;
+        avatar?: string | null;
     }) {
         const user = (await request(
             'PATCH',

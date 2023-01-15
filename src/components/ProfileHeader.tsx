@@ -1,32 +1,21 @@
 import { Image, StyleSheet, Text, View } from 'react-native';
-import { TouchableHighlight } from 'react-native-gesture-handler';
 
 interface Props {
     imageUri: string | null;
     username: string;
     displayName: string;
     fallbackImage?: number;
-    onAvatarPress?: () => void;
 }
 
-export default function ProfileHeader({
-    imageUri,
-    username,
-    displayName,
-    fallbackImage,
-    onAvatarPress,
-}: Props) {
+export default function ProfileHeader({ imageUri, username, displayName, fallbackImage }: Props) {
     const usernameFmt = `@${username}`;
     return (
         <View style={styles.container}>
-            {/* TODO: profile pictures */}
-            <TouchableHighlight style={styles.profilePicture} onPress={onAvatarPress}>
-                <Image
-                    style={styles.profilePicture}
-                    source={{ uri: imageUri ?? undefined }}
-                    defaultSource={fallbackImage}
-                />
-            </TouchableHighlight>
+            <Image
+                style={styles.profilePicture}
+                source={{ uri: imageUri ?? undefined }}
+                defaultSource={fallbackImage}
+            />
             <View style={styles.nameContainer}>
                 {/* Show display name first, if set */}
                 <Text style={styles.titleText}>{displayName || usernameFmt}</Text>

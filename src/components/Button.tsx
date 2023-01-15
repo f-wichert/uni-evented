@@ -1,30 +1,57 @@
 import { ComponentProps } from 'react';
-import { StyleSheet, Text, TouchableHighlight } from 'react-native';
+import { StyleProp, StyleSheet, Text, TouchableHighlight, View, ViewStyle } from 'react-native';
+
+import { Ionicons } from '@expo/vector-icons';
+import { IoniconsName } from '../types';
 
 interface Props {
     text: string;
-    onPress: ComponentProps<typeof TouchableHighlight>['onPress'];
+    onPress?: ComponentProps<typeof TouchableHighlight>['onPress'];
+
+    style?: StyleProp<ViewStyle>;
+    icon?: IoniconsName;
+    disabled?: boolean;
 }
 
-export default function Button({ text, onPress }: Props) {
+// TODO: rename to something more descriptive
+export default function Button({ text, onPress, style, icon, disabled }: Props) {
     return (
-        <TouchableHighlight style={styles.submitButton} onPress={onPress} underlayColor="#bc9b00">
-            <Text style={styles.submitButtonText}>{text}</Text>
+        <TouchableHighlight
+            style={[styles.container, style, disabled ? styles.containerDisabled : null]}
+            onPress={onPress}
+            underlayColor="#bc9b00"
+            disabled={disabled}
+        >
+            <View style={styles.inner}>
+                {icon ? <Ionicons name={icon} size={18} style={styles.icon} /> : null}
+                <Text style={styles.submitButtonText}>{text}</Text>
+            </View>
         </TouchableHighlight>
     );
 }
 
 const styles = StyleSheet.create({
-    submitButton: {
-        paddingHorizontal: 20,
-        height: 36,
+    container: {
+        paddingHorizontal: 14,
+        height: 34,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#d9b611',
+        backgroundColor: '#e0c440',
         borderRadius: 20,
     },
+    containerDisabled: {
+        opacity: 0.4,
+    },
+
+    inner: {
+        flexDirection: 'row',
+    },
+
+    icon: {
+        marginRight: 4,
+    },
     submitButtonText: {
-        fontSize: 18,
+        fontSize: 16,
         fontWeight: 'bold',
     },
 });
