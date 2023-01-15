@@ -42,8 +42,13 @@ export default function AvatarEditView({ avatarUrl, setAvatarUrl, setAvatarData,
                 };
 
                 let result: ImagePicker.ImagePickerResult;
-                if (useCamera) result = await ImagePicker.launchCameraAsync(pickerOptions);
-                else result = await ImagePicker.launchImageLibraryAsync(pickerOptions);
+                if (useCamera) {
+                    await ImagePicker.requestCameraPermissionsAsync();
+                    result = await ImagePicker.launchCameraAsync(pickerOptions);
+                } else {
+                    await ImagePicker.requestMediaLibraryPermissionsAsync();
+                    result = await ImagePicker.launchImageLibraryAsync(pickerOptions);
+                }
 
                 const asset = result.assets?.pop();
                 if (!asset || !asset.base64) {
@@ -73,7 +78,6 @@ export default function AvatarEditView({ avatarUrl, setAvatarUrl, setAvatarData,
                 disabledButtonIndices: avatarUrl ? [] : [destructiveButtonIndex],
             },
             (index) => {
-                console.log(index);
                 switch (index) {
                     case takePhotoIndex:
                         pickAvatar(true);
