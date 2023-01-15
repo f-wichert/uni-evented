@@ -4,7 +4,6 @@ import { StackActions, useFocusEffect } from '@react-navigation/native';
 import React, { useEffect, useState } from 'react';
 import {
     BackHandler,
-    Dimensions,
     Image,
     Pressable,
     SafeAreaView,
@@ -15,8 +14,9 @@ import {
 } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { Rating } from 'react-native-ratings';
-import Carousel from 'react-native-reanimated-carousel';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
+import MediaCarousel from '../components/MediaCarousel';
 import { Tag } from '../components/Tag';
 import { EventManager } from '../models';
 import { EventListStackNavProps } from '../nav/types';
@@ -196,12 +196,21 @@ function EventDetailScreen({
                 </Pressable>
             </View>
             <View style={styles.chatButtonContainer}>
-                <Pressable
-                    style={styles.chatButton}
-                    onPress={() => navigation.navigate('ChatScreen', { eventId: eventId })}
-                >
-                    <Ionicons name={'arrow-redo-outline'} size={37} color={'white'} />
-                </Pressable>
+                {isPreview ? (
+                    <Pressable
+                        style={styles.chatButton}
+                        onPress={() => navigation.navigate('ChatScreen', { eventId: eventId })}
+                    >
+                        <Ionicons name={'arrow-redo-outline'} size={37} color={'white'} />
+                    </Pressable>
+                ) : (
+                    <Pressable
+                        style={styles.chatButton}
+                        onPress={() => navigation.navigate('MediaCapture', { eventId: eventId })}
+                    >
+                        <Ionicons name="camera" size={37} color="white" />
+                    </Pressable>
+                )}
             </View>
         </>
     );
@@ -274,17 +283,17 @@ function EventDetailScreen({
 
     const mediaCarousel = (
         <View style={styles.camera}>
-            <GestureHandlerRootView>
-                <Carousel
-                    width={Dimensions.get('window').width}
-                    height={200}
-                    autoPlay={false}
-                    loop={false}
-                    data={media_data}
-                    scrollAnimationDuration={350}
-                    renderItem={({ item, index }) => getJsx(item)}
-                />
-            </GestureHandlerRootView>
+            <SafeAreaProvider>
+                <GestureHandlerRootView>
+                    <MediaCarousel
+                        item={eventData}
+                        isPlay={isPlay}
+                        isMute={isMute}
+                        setIsPlay={setIsPlay}
+                        setIsMute={setIsMute}
+                    />
+                </GestureHandlerRootView>
+            </SafeAreaProvider>
         </View>
     );
 
@@ -314,12 +323,12 @@ function EventDetailScreen({
                             </>
                         )}
                         <View style={styles.navigationBarPlaceholder}>
-                            {isPreview == true ? navigationBar : <></>}
+                            {isPreview ? navigationBar : <></>}
                         </View>
                     </View>
                 </ScrollView>
             </SafeAreaView>
-            <View style={styles.overlay}>{isPreview == false ? navigationBar : <></>}</View>
+            <View style={styles.overlay}>{!isPreview ? navigationBar : <></>}</View>
         </>
     );
 }

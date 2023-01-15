@@ -29,6 +29,9 @@ function VideoCamera({ route, navigation }: EventListStackNavProps<'MediaCapture
             uri: uri,
             type: type,
         });
+        console.log('-----------------------');
+        console.log(eventId);
+        console.log('-----------------------');
         form.append('eventID', eventId);
         return form;
     };
