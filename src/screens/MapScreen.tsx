@@ -1,8 +1,9 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import * as Location from 'expo-location';
 import React, { useCallback, useEffect, useState } from 'react';
-import { Dimensions, StyleSheet, Text, View } from 'react-native';
+import { Dimensions, StyleSheet, View } from 'react-native';
 import MapView, { LatLng, Marker } from 'react-native-maps';
+import MapFilter from '../components/MapFilter';
 
 import { TabNavProps } from '../nav/types';
 import { useFindEvents } from '../state/event';
@@ -157,9 +158,10 @@ function MapScreen({ navigation, route }: TabNavProps<'Map'>) {
                 <></>
             )}
             {menuVisible == true ? (
-                <View style={styles.menuOverlay}>
-                    <Text>This might a menu someday!</Text>
-                </View>
+                // <View style={styles.menuOverlay}>
+                //     <Text>This might a menu someday!</Text>
+                // </View>
+                <MapFilter />
             ) : (
                 <></>
             )}
