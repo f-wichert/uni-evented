@@ -35,22 +35,22 @@ function ChatScreen({ route, navigation }) {
     }
 
     function sendMessage(text: String) {
-        if (messages) {
-            setMessages([
-                ...messages,
-                {
-                    message: text,
-                    messageCorrespondent: userId,
-                },
-            ]);
-        } else {
-            setMessages([
-                {
-                    message: text,
-                    messageCorrespondent: userId,
-                },
-            ]);
-        }
+        // if (messages) {
+        //     setMessages([
+        //         ...messages,
+        //         {
+        //             message: text,
+        //             messageCorrespondent: userId,
+        //         },
+        //     ]);
+        // } else {
+        //     setMessages([
+        //         {
+        //             message: text,
+        //             messageCorrespondent: userId,
+        //         },
+        //     ]);
+        // }
 
         asyncHandler(
             async () => {
@@ -63,6 +63,8 @@ function ChatScreen({ route, navigation }) {
             },
             { prefix: 'Failed to do stuff' }
         )();
+
+        setMessages(getMessages());
     }
 
     return (
