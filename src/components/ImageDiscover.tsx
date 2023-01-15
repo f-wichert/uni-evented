@@ -7,14 +7,15 @@ import { baseHeaders } from '../util';
 declare type Props = {
     item: Media;
     navigateDetail: (id: string) => void;
+    quality?: 'auto' | '1080' | '720' | '480' | '360';
 };
 
-function ImageDiscover({ item, navigateDetail }: Props) {
+function ImageDiscover({ item, navigateDetail, quality }: Props) {
     return (
         <View style={styles.container}>
             <Image
                 source={{
-                    uri: MediaManager.src(item),
+                    uri: MediaManager.src(item, quality),
                     headers: {
                         ...baseHeaders,
                     },

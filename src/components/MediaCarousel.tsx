@@ -17,8 +17,12 @@ interface Props {
     item: Event;
     isPlay: boolean;
     isMute: boolean;
+    isOpenQuality: boolean;
     setIsPlay: (val: boolean) => void;
     setIsMute: (val: boolean) => void;
+    quality: 'auto' | '1080' | '720' | '480' | '360';
+    setQuality: (val: 'auto' | '1080' | '720' | '480' | '360') => void;
+    setIsOpenQuality: (val: boolean) => void;
     navigateDetail?: (id: string) => void;
     discover?: boolean;
     outerIndex?: number;
@@ -30,8 +34,12 @@ export default function MediaCarousel({
     item,
     isPlay,
     isMute,
+    isOpenQuality,
     setIsPlay,
     setIsMute,
+    setIsOpenQuality,
+    quality,
+    setQuality,
     // default values if it's not implemented in discover screen
     navigateDetail = () => {},
     discover = false,
@@ -125,43 +133,58 @@ export default function MediaCarousel({
 
     return (
         <>
-            <Carousel
-                vertical={false}
-                width={frame.width}
-                height={frame.height}
-                autoPlay={false}
-                loop={false}
-                data={media}
-                scrollAnimationDuration={200}
-                enabled={false}
-                ref={carousel}
-                renderItem={({ item, index: innerIndex }) => {
-                    // provide logic if a specific video should play
-                    // only play video when the current index in the carousel is correct and the screen is focused
-                    const shouldThisSpecificVideoPlay =
-                        isFocused &&
-                        outerIndex === activeOuterIndex &&
-                        innerIndex === activeInnerIndex &&
-                        isPlay;
-                    return (
-                        <>
-                            {item.type === 'video' ? (
-                                <VideoDiscover
-                                    item={item}
-                                    navigateDetail={navigateDetail}
-                                    isPlay={shouldThisSpecificVideoPlay}
-                                    isMute={isMute}
-                                    // setDuration={setDuration}
-                                    // setPosition={setPosition}
-                                    finishedVideo={onFinishedVideo}
-                                />
-                            ) : (
-                                <ImageDiscover item={item} navigateDetail={navigateDetail} />
-                            )}
-                        </>
-                    );
-                }}
-            />
+            {media.length !== 0 ? (
+                <Carousel
+                    vertical={false}
+                    width={frame.width}
+                    height={frame.height}
+                    autoPlay={false}
+                    loop={false}
+                    data={media}
+                    scrollAnimationDuration={200}
+                    enabled={false}
+                    ref={carousel}
+                    renderItem={({ item, index: innerIndex }) => {
+                        // provide logic if a specific video should play
+                        // only play video when the current index in the carousel is correct and the screen is focused
+                        const shouldThisSpecificVideoPlay =
+                            isFocused &&
+                            outerIndex === activeOuterIndex &&
+                            innerIndex === activeInnerIndex &&
+                            isPlay;
+                        return (
+                            <>
+                                {item.type === 'video' ? (
+                                    <VideoDiscover
+                                        item={item}
+                                        navigateDetail={navigateDetail}
+                                        isPlay={shouldThisSpecificVideoPlay}
+                                        isMute={isMute}
+                                        // setDuration={setDuration}
+                                        // setPosition={setPosition}
+                                        finishedVideo={onFinishedVideo}
+                                        quality={quality}
+                                    />
+                                ) : (
+                                    <ImageDiscover
+                                        item={item}
+                                        navigateDetail={navigateDetail}
+                                        quality={quality}
+                                    />
+                                )}
+                            </>
+                        );
+                    }}
+                />
+            ) : (
+                <View style={{ ...styles.sadContainer, height: frame.height, width: frame.width }}>
+                    <Ionicons name="sad-outline" size={50} color="black" style={styles.sadIcon} />
+                    <Text style={styles.sadText}>
+                        Seems like there are no clips for this event right now...
+                    </Text>
+                </View>
+            )}
+
             {new Array(media.length).fill(0).map((el, index) => (
                 <View
                     style={{
@@ -253,6 +276,85 @@ export default function MediaCarousel({
             <TouchableOpacity onPress={() => setIsMute(!isMute)} style={styles.mute}>
                 <Ionicons name={isMute ? 'volume-mute' : 'volume-high'} size={36} color="white" />
             </TouchableOpacity>
+            <TouchableOpacity
+                onPress={() => setIsOpenQuality(!isOpenQuality)}
+                style={styles.qualityButton}
+            >
+                <Ionicons
+                    name={isOpenQuality ? 'settings' : 'settings-outline'}
+                    size={36}
+                    color="white"
+                />
+            </TouchableOpacity>
+            {isOpenQuality ? (
+                <View style={styles.qualityView}>
+                    <TouchableOpacity
+                        style={styles.qualityOption}
+                        onPress={() => setQuality('auto')}
+                    >
+                        <Text
+                            style={{
+                                ...styles.qualityText,
+                                opacity: quality === 'auto' ? 1 : 0.25,
+                            }}
+                        >
+                            Auto
+                        </Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                        style={styles.qualityOption}
+                        onPress={() => setQuality('1080')}
+                    >
+                        <Text
+                            style={{
+                                ...styles.qualityText,
+                                opacity: quality === '1080' ? 1 : 0.25,
+                            }}
+                        >
+                            1080p
+                        </Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                        style={styles.qualityOption}
+                        onPress={() => setQuality('720')}
+                    >
+                        <Text
+                            style={{
+                                ...styles.qualityText,
+                                opacity: quality === '720' ? 1 : 0.25,
+                            }}
+                        >
+                            720p
+                        </Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                        style={styles.qualityOption}
+                        onPress={() => setQuality('480')}
+                    >
+                        <Text
+                            style={{
+                                ...styles.qualityText,
+                                opacity: quality === '480' ? 1 : 0.25,
+                            }}
+                        >
+                            480p
+                        </Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                        style={styles.qualityOption}
+                        onPress={() => setQuality('360')}
+                    >
+                        <Text
+                            style={{
+                                ...styles.qualityText,
+                                opacity: quality === '360' ? 1 : 0.25,
+                            }}
+                        >
+                            360p
+                        </Text>
+                    </TouchableOpacity>
+                </View>
+            ) : null}
         </>
     );
 }
@@ -275,8 +377,31 @@ const styles = StyleSheet.create({
     mute: {
         position: 'absolute',
         color: 'white',
-        right: 15,
+        right: 20,
         bottom: 15,
+    },
+    qualityButton: {
+        position: 'absolute',
+        color: 'white',
+        left: 20,
+        bottom: 15,
+    },
+    qualityView: {
+        position: 'absolute',
+        color: 'white',
+        left: 12.5,
+        bottom: 60,
+        borderWidth: 1,
+        borderColor: 'white',
+        borderRadius: 10,
+        backgroundColor: 'black',
+    },
+    qualityOption: {
+        padding: 10,
+    },
+    qualityText: {
+        color: 'white',
+        textAlign: 'center',
     },
     indicator: {
         position: 'absolute',
@@ -305,5 +430,16 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         fontSize: 16,
         marginLeft: 10,
+    },
+    sadContainer: {
+        backgroundColor: 'lightgrey',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    sadIcon: {
+        marginBottom: 20,
+    },
+    sadText: {
+        fontSize: 20,
     },
 });
