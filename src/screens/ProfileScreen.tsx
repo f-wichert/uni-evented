@@ -72,7 +72,7 @@ export default function ProfileScreen({ navigation }: ProfileStackNavProps<'Prof
                             title="Manage Account"
                             accessory="DisclosureIndicator"
                             onPress={useCallback(() => {
-                                navigation.navigate('ManageAccount');
+                                navigation.navigate('EditProfile');
                             }, [navigation])}
                         />
                         <Cell

@@ -1,7 +1,7 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import React from 'react';
 
-import ManageAccountScreen from '../screens/ManageAccountScreen';
+import EditProfileScreen from '../screens/EditProfileScreen';
 import MyEventsScreen from '../screens/MyEventsScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import { ProfileStackNavParams } from './types';
@@ -17,9 +17,9 @@ function ProfileStack() {
                 options={{ headerShown: false }}
             />
             <Stack.Screen
-                name="ManageAccount"
-                component={ManageAccountScreen}
-                options={{ title: 'Manage Account' }}
+                name="EditProfile"
+                component={EditProfileScreen}
+                options={{ title: 'Edit Profile' }}
             />
             <Stack.Screen
                 name="MyEvents"

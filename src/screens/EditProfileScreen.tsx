@@ -19,7 +19,7 @@ function validate(value: string, original: string, opts: StringValidateOptions) 
     };
 }
 
-export default function ManageAccountScreen({ navigation }: ProfileStackNavProps<'ManageAccount'>) {
+export default function EditProfileScreen({ navigation }: ProfileStackNavProps<'EditProfile'>) {
     const currentUser = useCurrentUser();
 
     const [submitting, setSubmitting] = useState(false);
