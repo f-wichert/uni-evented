@@ -1,30 +1,14 @@
-import { useActionSheet } from '@expo/react-native-action-sheet';
-import { Ionicons } from '@expo/vector-icons';
-import * as ImagePicker from 'expo-image-picker';
-import React, { useCallback, useEffect, useState } from 'react';
-import {
-    ActivityIndicator,
-    Button,
-    Image,
-    Keyboard,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableHighlight,
-    View,
-} from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { ActivityIndicator, Button, Keyboard, ScrollView, StyleSheet, Text } from 'react-native';
 
-import CustomButton from '../components/Button';
+import AvatarEditView from '../components/AvatarEditView';
 import FancyTextInput from '../components/FancyTextInput';
 import { DISPLAYNAME_VALIDATION, USERNAME_VALIDATION } from '../constants';
 import { UserManager } from '../models';
 import { ProfileStackNavProps } from '../nav/types';
 import { useCurrentUser } from '../state/user';
-import { asyncHandler, handleError } from '../util';
+import { handleError } from '../util';
 import { StringValidateOptions, validateString } from '../validate';
-
-// px, width and height
-const AVATAR_SIZE = 100;
 
 function validate(value: string, original: string, opts: StringValidateOptions) {
     const changed = value !== original;
@@ -36,8 +20,6 @@ function validate(value: string, original: string, opts: StringValidateOptions) 
 }
 
 export default function ManageAccountScreen({ navigation }: ProfileStackNavProps<'ManageAccount'>) {
-    const { showActionSheetWithOptions } = useActionSheet();
-
     const currentUser = useCurrentUser();
 
     const [submitting, setSubmitting] = useState(false);
@@ -52,10 +34,6 @@ export default function ManageAccountScreen({ navigation }: ProfileStackNavProps
         changed: avatarUrl !== currentAvatarUrl,
         submitValue: avatarUrl !== currentAvatarUrl ? avatarData : undefined,
     };
-
-    // update url in state once user's avatar changes
-    // (this also fixes `avatarResult.changed` to be false after uploading)
-    useEffect(() => setAvatarUrl(currentAvatarUrl), [currentAvatarUrl]);
 
     const [username, setUsername] = useState<string>(currentUser.username);
     const usernameResult = validate(username, currentUser.username, USERNAME_VALIDATION);
@@ -93,63 +71,6 @@ export default function ManageAccountScreen({ navigation }: ProfileStackNavProps
         }
     };
 
-    const pickAvatar = useCallback((useCamera: boolean) => {
-        const inner = asyncHandler(async () => {
-            const pickerOptions: ImagePicker.ImagePickerOptions = {
-                allowsEditing: true,
-                aspect: [1, 1],
-                base64: true,
-            };
-
-            let result: ImagePicker.ImagePickerResult;
-            if (useCamera) result = await ImagePicker.launchCameraAsync(pickerOptions);
-            else result = await ImagePicker.launchImageLibraryAsync(pickerOptions);
-
-            const asset = result.assets?.pop();
-            if (!asset || !asset.base64) {
-                return;
-            }
-
-            setAvatarUrl(asset.uri);
-            setAvatarData(asset.base64);
-        });
-        inner();
-    }, []);
-
-    const editAvatar = useCallback(() => {
-        const options = ['Take Photo', 'Choose Photo', 'Delete', 'Cancel'] as const;
-        const takePhotoIndex = 0;
-        const choosePhotoIndex = 1;
-        const destructiveButtonIndex = 2;
-        const cancelButtonIndex = 3;
-
-        showActionSheetWithOptions(
-            {
-                options: [...options],
-                cancelButtonIndex,
-                destructiveButtonIndex,
-                disabledButtonIndices: avatarUrl ? [] : [destructiveButtonIndex],
-            },
-            (index) => {
-                console.log(index);
-                switch (index) {
-                    case takePhotoIndex:
-                        pickAvatar(true);
-                        break;
-                    case choosePhotoIndex:
-                        pickAvatar(false);
-                        break;
-                    case destructiveButtonIndex:
-                        setAvatarUrl(null);
-                        setAvatarData(null);
-                        break;
-                    case cancelButtonIndex:
-                        break;
-                }
-            }
-        );
-    }, [showActionSheetWithOptions, pickAvatar, avatarUrl]);
-
     // set up save button (see above as to why this doesn't specify dependencies)
     useEffect(() => {
         navigation.setOptions({
@@ -171,20 +92,12 @@ export default function ManageAccountScreen({ navigation }: ProfileStackNavProps
         <ScrollView style={styles.container}>
             <Text style={styles.header}>Public Information</Text>
             {/* avatar view */}
-            <View style={styles.profilePictureContainer}>
-                <TouchableHighlight style={styles.profilePicture} onPress={editAvatar}>
-                    {avatarUrl ? (
-                        <Image
-                            source={{ uri: avatarUrl, width: AVATAR_SIZE, height: AVATAR_SIZE }}
-                        />
-                    ) : (
-                        <View style={styles.profilePictureEmpty}>
-                            <Ionicons name="images" size={AVATAR_SIZE / 4} />
-                        </View>
-                    )}
-                </TouchableHighlight>
-                <CustomButton text="Edit" icon="create-outline" onPress={editAvatar} />
-            </View>
+            <AvatarEditView
+                avatarUrl={avatarUrl}
+                setAvatarUrl={setAvatarUrl}
+                setAvatarData={setAvatarData}
+                style={styles.avatarContainer}
+            />
 
             {/* inputs for other profile fields */}
             <FancyTextInput
@@ -234,27 +147,10 @@ const styles = StyleSheet.create({
         marginBottom: 8,
     },
 
-    profilePictureContainer: {
+    avatarContainer: {
         marginTop: 8,
         marginBottom: 16,
         marginHorizontal: '15%',
-        flexDirection: 'row',
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    profilePicture: {
-        marginRight: 16,
-        width: AVATAR_SIZE,
-        height: AVATAR_SIZE,
-        borderRadius: AVATAR_SIZE / 2,
-        overflow: 'hidden',
-    },
-    profilePictureEmpty: {
-        width: '100%',
-        height: '100%',
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: 'lightgrey',
     },
 
     input: {
