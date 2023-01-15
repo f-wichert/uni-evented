@@ -153,7 +153,7 @@ function EventDetailScreen({
                 {isPreview ? (
                     <Pressable
                         style={styles.chatButton}
-                        onPress={() => navigation.navigate('ChatScreen', { eventId: eventId })}
+                        onPress={() => navigation.navigate('EventDetail', { eventId: eventId })}
                     >
                         <Ionicons name={'arrow-redo-outline'} size={37} color={'white'} />
                     </Pressable>

@@ -1,13 +1,7 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { useFocusEffect } from '@react-navigation/native';
 import React, { useEffect, useState } from 'react';
-import {
-    RefreshControl,
-    SafeAreaView,
-    ScrollView,
-    StyleSheet,
-    TextInput,
-    View,
-} from 'react-native';
+import { SafeAreaView, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 import Message from '../components/Message';
 import { useUserStore } from '../state/user';
 import { asyncHandler, request } from '../util';
@@ -19,15 +13,33 @@ function ChatScreen({ route, navigation }) {
     const [loading, setLoading] = useState<boolean>(false);
     const [text, setText] = useState();
     const textInputRef = React.createRef();
-
+    const scrollRef = useRef();
     // console.log(`User: ${useUserStore((state) => state.fetchCurrentUser())}`);
 
     useEffect(() => {
         setMessages(getMessages());
     }, []);
 
+    useFocusEffect(
+        React.useCallback(() => {
+            const id = setInterval(() => {
+                const newMessages = getMessages();
+                if (JSON.stringify(newMessages) == JSON.stringify(messages)) {
+                    // TODO: Figure out why this is not printed but it somehow seems to work
+                    console.log('new');
+                    setMessages(messages);
+                    // scrollRef.current.scrollToEnd({ animated: true })
+                    // console.log(`Ref: ${JSON.stringify(scrollRef)}`);
+                } else {
+                    // console.log('old');
+                }
+            }, 1000);
+            return () => clearInterval(id);
+        }, [messages])
+    );
+
     function getMessages() {
-        console.log('Get Messages');
+        // console.log('Get Messages');
         asyncHandler(
             async () => {
                 setLoading(true);
@@ -35,8 +47,8 @@ function ChatScreen({ route, navigation }) {
                     eventId: eventId,
                 });
 
-                console.log();
-                console.log(`Messages: ${JSON.stringify(data.messages)}`);
+                // console.log();
+                // console.log(`Messages: ${JSON.stringify(data.messages)}`);
                 setMessages(data.messages);
                 setLoading(false);
             },
@@ -45,22 +57,18 @@ function ChatScreen({ route, navigation }) {
     }
 
     function sendMessage(text: String) {
-        // if (messages) {
-        //     setMessages([
-        //         ...messages,
-        //         {
-        //             message: text,
-        //             messageCorrespondent: userId,
-        //         },
-        //     ]);
-        // } else {
-        //     setMessages([
-        //         {
-        //             message: text,
-        //             messageCorrespondent: userId,
-        //         },
-        //     ]);
+        // const message = {
+        //     id:"new",
+        //     messageContent:text,
+        //     // "sendTime":"2023-01-15T16:33:36.199Z",
+        //     messageCorrespondent:"b4dd7b74-e531-4b42-b683-f2a9ec92f59b",
+        //     eventId:eventId,
+        //     createdAt:"2023-01-15T16:33:36.200Z",
+        //     updatedAt:"2023-01-15T16:33:36.200Z",
+        //     displayname:"Notlorenzo"
         // }
+
+        // setMessages([...messages, message]);
 
         asyncHandler(
             async () => {
@@ -74,18 +82,14 @@ function ChatScreen({ route, navigation }) {
             { prefix: 'Failed to do stuff' }
         )();
 
-        setMessages(getMessages());
+        // setMessages(getMessages());
     }
 
     return (
         <View style={styles.container}>
             <View style={styles.chatArea}>
                 <SafeAreaView style={{ display: 'flex' }}>
-                    <ScrollView
-                        refreshControl={
-                            <RefreshControl refreshing={loading} onRefresh={getMessages} />
-                        }
-                    >
+                    <ScrollView ref={scrollRef}>
                         {messages ? (
                             messages.map((e, i) => (
                                 <Message key={`message-${i}`} message={messages[i]} />
