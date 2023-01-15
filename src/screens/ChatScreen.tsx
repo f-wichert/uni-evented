@@ -1,13 +1,6 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
-import React, { useEffect, useState } from 'react';
-import {
-    RefreshControl,
-    SafeAreaView,
-    ScrollView,
-    StyleSheet,
-    TextInput,
-    View,
-} from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { SafeAreaView, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 import Message from '../components/Message';
 import { useUserStore } from '../state/user';
 import { asyncHandler, request } from '../util';
@@ -16,9 +9,10 @@ function ChatScreen({ route, navigation }) {
     const eventId = route.params?.eventId ?? null;
     const userId = useUserStore((state) => state.currentUserId);
     const [messages, setMessages] = useState();
-    const [loading, setLoading] = useState<boolean>(false);
     const [text, setText] = useState();
     const textInputRef = React.createRef();
+
+    const scrollViewRef = useRef();
 
     // console.log(`User: ${useUserStore((state) => state.fetchCurrentUser())}`);
 
@@ -30,7 +24,6 @@ function ChatScreen({ route, navigation }) {
         console.log('Get Messages');
         asyncHandler(
             async () => {
-                setLoading(true);
                 const data = await request('POST', '/event/getMessages', {
                     eventId: eventId,
                 });
@@ -38,7 +31,6 @@ function ChatScreen({ route, navigation }) {
                 console.log();
                 console.log(`Messages: ${JSON.stringify(data.messages)}`);
                 setMessages(data.messages);
-                setLoading(false);
             },
             { prefix: 'Failed to load messages' }
         )();
@@ -82,8 +74,9 @@ function ChatScreen({ route, navigation }) {
             <View style={styles.chatArea}>
                 <SafeAreaView style={{ display: 'flex' }}>
                     <ScrollView
-                        refreshControl={
-                            <RefreshControl refreshing={loading} onRefresh={getMessages} />
+                        ref={scrollViewRef}
+                        onContentSizeChange={() =>
+                            scrollViewRef.current?.scrollToEnd({ animated: false })
                         }
                     >
                         {messages ? (
