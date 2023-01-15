@@ -1,3 +1,4 @@
+import { useActionSheet } from '@expo/react-native-action-sheet';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import React, { useCallback, useEffect, useState } from 'react';
@@ -35,6 +36,8 @@ function validate(value: string, original: string, opts: StringValidateOptions) 
 }
 
 export default function ManageAccountScreen({ navigation }: ProfileStackNavProps<'ManageAccount'>) {
+    const { showActionSheetWithOptions } = useActionSheet();
+
     const currentUser = useCurrentUser();
 
     const [submitting, setSubmitting] = useState(false);
@@ -90,13 +93,17 @@ export default function ManageAccountScreen({ navigation }: ProfileStackNavProps
         }
     };
 
-    const chooseAvatar = useCallback(() => {
+    const pickAvatar = useCallback((useCamera: boolean) => {
         const inner = asyncHandler(async () => {
-            const result = await ImagePicker.launchImageLibraryAsync({
+            const pickerOptions: ImagePicker.ImagePickerOptions = {
                 allowsEditing: true,
                 aspect: [1, 1],
                 base64: true,
-            });
+            };
+
+            let result: ImagePicker.ImagePickerResult;
+            if (useCamera) result = await ImagePicker.launchCameraAsync(pickerOptions);
+            else result = await ImagePicker.launchImageLibraryAsync(pickerOptions);
 
             const asset = result.assets?.pop();
             if (!asset || !asset.base64) {
@@ -107,12 +114,41 @@ export default function ManageAccountScreen({ navigation }: ProfileStackNavProps
             setAvatarData(asset.base64);
         });
         inner();
-    }, [setAvatarUrl, setAvatarData]);
+    }, []);
 
-    const removeAvatar = useCallback(() => {
-        setAvatarUrl(null);
-        setAvatarData(null);
-    }, [setAvatarUrl, setAvatarData]);
+    const editAvatar = useCallback(() => {
+        const options = ['Take Photo', 'Choose Photo', 'Delete', 'Cancel'] as const;
+        const takePhotoIndex = 0;
+        const choosePhotoIndex = 1;
+        const destructiveButtonIndex = 2;
+        const cancelButtonIndex = 3;
+
+        showActionSheetWithOptions(
+            {
+                options: [...options],
+                cancelButtonIndex,
+                destructiveButtonIndex,
+                disabledButtonIndices: avatarUrl ? [] : [destructiveButtonIndex],
+            },
+            (index) => {
+                console.log(index);
+                switch (index) {
+                    case takePhotoIndex:
+                        pickAvatar(true);
+                        break;
+                    case choosePhotoIndex:
+                        pickAvatar(false);
+                        break;
+                    case destructiveButtonIndex:
+                        setAvatarUrl(null);
+                        setAvatarData(null);
+                        break;
+                    case cancelButtonIndex:
+                        break;
+                }
+            }
+        );
+    }, [showActionSheetWithOptions, pickAvatar, avatarUrl]);
 
     // set up save button (see above as to why this doesn't specify dependencies)
     useEffect(() => {
@@ -136,7 +172,7 @@ export default function ManageAccountScreen({ navigation }: ProfileStackNavProps
             <Text style={styles.header}>Public Information</Text>
             {/* avatar view */}
             <View style={styles.profilePictureContainer}>
-                <TouchableHighlight style={styles.profilePicture} onPress={chooseAvatar}>
+                <TouchableHighlight style={styles.profilePicture} onPress={editAvatar}>
                     {avatarUrl ? (
                         <Image
                             source={{ uri: avatarUrl, width: AVATAR_SIZE, height: AVATAR_SIZE }}
@@ -147,16 +183,7 @@ export default function ManageAccountScreen({ navigation }: ProfileStackNavProps
                         </View>
                     )}
                 </TouchableHighlight>
-                <View style={styles.profilePictureButtonsContainer}>
-                    <CustomButton text="Edit" icon="pencil" onPress={chooseAvatar} />
-                    <CustomButton
-                        text="Remove"
-                        icon="close"
-                        onPress={removeAvatar}
-                        style={{ marginTop: 8 }}
-                        disabled={avatarUrl === null}
-                    />
-                </View>
+                <CustomButton text="Edit" icon="create-outline" onPress={editAvatar} />
             </View>
 
             {/* inputs for other profile fields */}
@@ -228,9 +255,6 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: 'lightgrey',
-    },
-    profilePictureButtonsContainer: {
-        flexDirection: 'column',
     },
 
     input: {

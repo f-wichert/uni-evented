@@ -1,3 +1,4 @@
+import { ActionSheetProvider } from '@expo/react-native-action-sheet';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { StatusBar } from 'expo-status-bar';
@@ -90,14 +91,16 @@ function App() {
 
 export default function Root() {
     return (
-        <SafeAreaProvider>
-            <ToastRoot />
+        <ActionSheetProvider>
+            <SafeAreaProvider>
+                <ToastRoot />
 
-            <NavigationContainer>
-                <App />
-            </NavigationContainer>
+                <NavigationContainer>
+                    <App />
+                </NavigationContainer>
 
-            <StatusBar style="dark" />
-        </SafeAreaProvider>
+                <StatusBar style="dark" />
+            </SafeAreaProvider>
+        </ActionSheetProvider>
     );
 }

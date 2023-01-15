@@ -32,7 +32,7 @@ export default function Button({ text, onPress, style, icon, disabled }: Props) 
 
 const styles = StyleSheet.create({
     container: {
-        paddingHorizontal: 14,
+        paddingHorizontal: 20,
         height: 34,
         justifyContent: 'center',
         alignItems: 'center',
