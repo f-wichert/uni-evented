@@ -58,7 +58,6 @@ function EventDetailScreen({
         useCallback(() => {
             BackHandler.addEventListener('hardwareBackPress', navigateToOrigin);
             refresh();
-            console.log('refreshed');
         }, [])
     );
 
@@ -79,43 +78,6 @@ function EventDetailScreen({
             </View>
         );
     }
-
-    // const getJsx = (item) => {
-    //     if (item.type == 'video') {
-    //         return <Text>{item.name}</Text>;
-    //         // return (<VideoDiscover discoverData={item} navigateDetail={navigateDetail} />);
-    //     } else if (item.type == 'image') {
-    //     } else if (item.type == 'upload') {
-    //         return (
-    //             <>
-    //                 <Ionicons
-    //                     name="camera"
-    //                     size={64}
-    //                     color="orange"
-    //                     onPress={() => {
-    //                         navigation.navigate('MediaCapture', { eventId: eventId });
-    //                     }}
-    //                 />
-    //                 <Text>Load Picture/Video of event here</Text>
-    //             </>
-    //         );
-    //     }
-
-    //     return <Text>hi</Text>;
-    // };
-
-    // console.log(`Data: ${JSON.stringify(eventData)}`);
-    //     return  (async () => {
-    //     eventData = EventManager.fromId(eventID!) as Event
-    //     console.log('Event:', eventData);
-    //     loaded = true;
-    //     return eventData
-    // }).then(run(eventData))
-    // async function registerUserArrivalAtEvent() {
-    //     if (!eventId) return;
-    //     // console.log(`You are now checked in at the Event (Mock Message, did nothing)`);
-    //     await joinEvent({ eventId });
-    // }
 
     function getProfilePicture() {
         return {

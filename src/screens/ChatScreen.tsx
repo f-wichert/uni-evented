@@ -1,6 +1,13 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import React, { useEffect, useState } from 'react';
-import { SafeAreaView, ScrollView, StyleSheet, TextInput, View } from 'react-native';
+import {
+    RefreshControl,
+    SafeAreaView,
+    ScrollView,
+    StyleSheet,
+    TextInput,
+    View,
+} from 'react-native';
 import Message from '../components/Message';
 import { useUserStore } from '../state/user';
 import { asyncHandler, request } from '../util';
@@ -9,6 +16,7 @@ function ChatScreen({ route, navigation }) {
     const eventId = route.params?.eventId ?? null;
     const userId = useUserStore((state) => state.currentUserId);
     const [messages, setMessages] = useState();
+    const [loading, setLoading] = useState<boolean>(false);
     const [text, setText] = useState();
     const textInputRef = React.createRef();
 
@@ -22,6 +30,7 @@ function ChatScreen({ route, navigation }) {
         console.log('Get Messages');
         asyncHandler(
             async () => {
+                setLoading(true);
                 const data = await request('POST', '/event/getMessages', {
                     eventId: eventId,
                 });
@@ -29,6 +38,7 @@ function ChatScreen({ route, navigation }) {
                 console.log();
                 console.log(`Messages: ${JSON.stringify(data.messages)}`);
                 setMessages(data.messages);
+                setLoading(false);
             },
             { prefix: 'Failed to load messages' }
         )();
@@ -71,7 +81,11 @@ function ChatScreen({ route, navigation }) {
         <View style={styles.container}>
             <View style={styles.chatArea}>
                 <SafeAreaView style={{ display: 'flex' }}>
-                    <ScrollView>
+                    <ScrollView
+                        refreshControl={
+                            <RefreshControl refreshing={loading} onRefresh={getMessages} />
+                        }
+                    >
                         {messages ? (
                             messages.map((e, i) => (
                                 <Message key={`message-${i}`} message={messages[i]} />

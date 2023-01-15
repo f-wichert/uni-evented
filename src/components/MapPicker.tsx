@@ -78,7 +78,6 @@ export default function MapPicker({ route, navigation }) {
                     pinColor="orange"
                     draggable
                     onDragEnd={(e) => {
-                        console.log('dragEnd', e.nativeEvent.coordinate);
                         setPickedLocation(e.nativeEvent.coordinate);
                     }}
                 />

@@ -14,7 +14,6 @@ function MapScreen({ navigation, route }: TabNavProps<'Map'>) {
     const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
     // console.log(`Selected Event: ${JSON.stringify(selectedEvent)}`);
     const [menuVisible, setMenuVisible] = useState<Boolean>(false);
-    console.log(`Vis: ${menuVisible}`);
     const [location, setLocation] = useState<LatLng | null>({
         latitude: 48.877616,
         longitude: 8.652653,

@@ -10,8 +10,6 @@ function Message(props) {
     // const user = useUserStore((state) => state.fetchCurrentUser());
     // console.log(`User: ${JSON.stringify(user)}`);
 
-    console.log(`Messages: ${JSON.stringify(message)}`);
-
     return (
         <>
             {left == false ? (
