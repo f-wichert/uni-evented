@@ -13,7 +13,7 @@ function VideoCamera({ route, navigation }: EventListStackNavProps<'MediaCapture
     const eventId = route.params.eventId;
 
     const [hasPermission, setHasPermission] = useState(false);
-    const [type, setType] = useState(CameraType.back);
+    const [cameraType, setCameraType] = useState(CameraType.back);
     const [recording, setRecording] = useState(false);
 
     /**
@@ -21,7 +21,6 @@ function VideoCamera({ route, navigation }: EventListStackNavProps<'MediaCapture
      * necessary because we need a special camera component for the live stream
      */
     const [liveMode, setLiveMode] = useState(false);
-    const [streaming, setStreaming] = useState(false);
     const [streamUrl, setStreamUrl] = useState<string>('');
 
     const cameraRef = useRef<Camera>(null);
@@ -29,7 +28,6 @@ function VideoCamera({ route, navigation }: EventListStackNavProps<'MediaCapture
         if (oldValue) {
             // make sure the stream stops when ref changes
             oldValue.stop();
-            setStreaming(false);
             setLiveMode(false);
         }
     });
@@ -42,7 +40,6 @@ function VideoCamera({ route, navigation }: EventListStackNavProps<'MediaCapture
             if (appState.current === 'active' && nextState === 'background') {
                 if (liveCameraRef.current) {
                     liveCameraRef.current.stop();
-                    setStreaming(false);
                     setLiveMode(false);
                 }
             }
@@ -54,10 +51,14 @@ function VideoCamera({ route, navigation }: EventListStackNavProps<'MediaCapture
     }, []);
 
     useFocusEffect(() => {
-        BackHandler.addEventListener('hardwareBackPress', () => {
+        const subscription = BackHandler.addEventListener('hardwareBackPress', () => {
             navigation.goBack();
             return true;
         });
+
+        return () => {
+            subscription.remove();
+        };
     });
 
     const createFormData = (uri: string, type: string) => {
@@ -117,27 +118,20 @@ function VideoCamera({ route, navigation }: EventListStackNavProps<'MediaCapture
 
     const onLiveModeButton = async () => {
         if (!liveMode) {
-            await updateStreamUrl();
+            try {
+                await updateStreamUrl();
+            } catch {
+                return;
+            }
         }
         setLiveMode(!liveMode);
     };
 
-    const onStreamButton = async () => {
-        if (!liveCameraRef.current) return;
-
-        if (streaming) {
-            liveCameraRef.current.stop();
-
-            // we have to leave live mode here since a stream url is only valid once
-            // and the camera component has to be reloaded to change the url
-            // TODO: maybe change this
-            setLiveMode(false);
-        } else {
+    useEffect(() => {
+        if (liveMode && liveCameraRef.current) {
             liveCameraRef.current.start();
         }
-
-        setStreaming(!streaming);
-    };
+    }, [liveMode]);
 
     useEffect(
         asyncHandler(
@@ -169,7 +163,10 @@ function VideoCamera({ route, navigation }: EventListStackNavProps<'MediaCapture
                         style={[styles.camera]}
                         ref={liveCameraRef}
                         outputUrl={streamUrl}
-                        camera={{ cameraId: 0, cameraFrontMirror: true }}
+                        camera={{
+                            cameraId: cameraType === CameraType.back ? 0 : 1,
+                            cameraFrontMirror: true,
+                        }}
                         audio={{ bitrate: 32000, profile: 1, samplerate: 44100 }}
                         video={{
                             preset: 1,
@@ -183,7 +180,7 @@ function VideoCamera({ route, navigation }: EventListStackNavProps<'MediaCapture
                             console.log(`onStatus code=${code} msg=${msg}`);
                         }}
                     />
-                    <View style={[styles.row]}>
+                    <View style={{ ...styles.row, marginTop: 10, marginBottom: 10 }}>
                         <TouchableOpacity
                             style={[styles.flexEl]}
                             onPress={() => {
@@ -192,37 +189,40 @@ function VideoCamera({ route, navigation }: EventListStackNavProps<'MediaCapture
                         >
                             <Ionicons name="camera-reverse-outline" size={32} color="white" />
                         </TouchableOpacity>
-                        <TouchableOpacity
-                            style={[styles.flexEl]}
-                            onPress={asyncHandler(onStreamButton, {
-                                prefix: 'Failed to start stream',
-                            })}
-                        >
+                        <TouchableOpacity disabled={true} style={[styles.flexEl]}>
                             <View style={[styles.outerCircleVideo]}>
                                 <View
                                     style={{
                                         ...styles.innerCircleVideo,
-                                        borderRadius: streaming ? 0 : 25,
+                                        borderRadius: 25,
+                                        opacity: 0.25,
                                     }}
                                 ></View>
                             </View>
                         </TouchableOpacity>
                         <TouchableOpacity
+                            disabled={true}
                             style={{
                                 ...styles.flexEl,
-                                opacity: streaming ? 0.25 : 1,
+                                opacity: 0.25,
                             }}
-                            disabled={streaming}
+                        >
+                            <View style={[styles.outerCirclePhoto]}>
+                                <View style={[styles.innerCirclePhoto]}></View>
+                            </View>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                            style={[styles.flexEl]}
                             onPress={asyncHandler(onLiveModeButton, {
                                 prefix: 'Failed to leave live mode',
                             })}
                         >
-                            <Ionicons name="videocam-outline" size={32} color="white" />
+                            <Ionicons name="videocam" size={32} color="red" />
                         </TouchableOpacity>
                     </View>
                 </View>
             ) : (
-                <Camera style={[styles.camera]} type={type} ref={cameraRef}>
+                <Camera style={[styles.camera]} type={cameraType} ref={cameraRef}>
                     <View style={[styles.column]}>
                         <View style={[styles.row]}>
                             <TouchableOpacity
@@ -232,8 +232,8 @@ function VideoCamera({ route, navigation }: EventListStackNavProps<'MediaCapture
                                     opacity: recording ? 0.25 : 1,
                                 }}
                                 onPress={() => {
-                                    setType(
-                                        type === CameraType.back
+                                    setCameraType(
+                                        cameraType === CameraType.back
                                             ? CameraType.front
                                             : CameraType.back
                                     );
@@ -298,7 +298,7 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: 'transparent',
         justifyContent: 'flex-end',
-        marginBottom: 15,
+        marginBottom: 10,
     },
     row: {
         display: 'flex',
