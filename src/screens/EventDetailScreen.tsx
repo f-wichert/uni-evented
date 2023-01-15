@@ -2,7 +2,16 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { HeaderBackButton } from '@react-navigation/elements';
 import { StackActions, useFocusEffect } from '@react-navigation/native';
 import React, { useCallback, useEffect, useState } from 'react';
-import { BackHandler, Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import {
+    BackHandler,
+    Image,
+    Pressable,
+    RefreshControl,
+    ScrollView,
+    StyleSheet,
+    Text,
+    View,
+} from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { Rating } from 'react-native-ratings';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -285,7 +294,9 @@ function EventDetailScreen({
     return (
         <>
             <SafeAreaProvider>
-                <ScrollView>
+                <ScrollView
+                    refreshControl={<RefreshControl refreshing={loading} onRefresh={refresh} />}
+                >
                     <View style={styles.section}>
                         {/* @Jonas - please build in the media thing here. this logic is used for the map screen */}
                         {isPreview == true ? (
