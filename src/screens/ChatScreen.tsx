@@ -25,7 +25,7 @@ function ChatScreen({ route, navigation }) {
         React.useCallback(() => {
             const id = setInterval(() => {
                 const newMessages = getMessages();
-                if (JSON.stringify(newMessages) == JSON.stringify(messages)) {
+                if (JSON.stringify(newMessages) === JSON.stringify(messages)) {
                     // TODO: Figure out why this is not printed but it somehow seems to work
                     console.log('new');
                     setMessages(messages);

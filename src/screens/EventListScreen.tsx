@@ -11,13 +11,10 @@ export default function EventListScreen({ navigation }: EventListStackNavProps<'
         navigation.setOptions({
             headerRight: () => (
                 <Ionicons
-                    name="add-outline"
-                    size={32}
+                    name="add-circle-outline"
+                    size={40}
                     color="black"
                     onPress={() => navigation.navigate('CreateEvent')}
-                    style={{
-                        marginRight: 15,
-                    }}
                 />
             ),
         });
