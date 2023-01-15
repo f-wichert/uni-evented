@@ -2,8 +2,9 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { useFocusEffect } from '@react-navigation/native';
 import { Camera, CameraType } from 'expo-camera';
 import React, { useEffect, useRef, useState } from 'react';
-import { BackHandler, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { AppState, BackHandler, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { NodeCameraView } from 'react-native-nodemediaclient';
+import { useCallbackRef } from 'use-callback-ref';
 
 import { EventListStackNavProps } from '../nav/types';
 import { asyncHandler, request } from '../util';
@@ -14,11 +15,43 @@ function VideoCamera({ route, navigation }: EventListStackNavProps<'MediaCapture
     const [hasPermission, setHasPermission] = useState(false);
     const [type, setType] = useState(CameraType.back);
     const [recording, setRecording] = useState(false);
-    const [streaming, setStreaming] = useState(false);
+
+    /**
+     * switch between camera and live mode
+     * necessary because we need a special camera component for the live stream
+     */
     const [liveMode, setLiveMode] = useState(false);
+    const [streaming, setStreaming] = useState(false);
+    const [streamUrl, setStreamUrl] = useState<string>('');
 
     const cameraRef = useRef<Camera>(null);
-    const liveCameraRef = useRef<NodeCameraView>(null);
+    const liveCameraRef = useCallbackRef<NodeCameraView>(null, (_, oldValue) => {
+        if (oldValue) {
+            // make sure the stream stops when ref changes
+            oldValue.stop();
+            setStreaming(false);
+            setLiveMode(false);
+        }
+    });
+
+    const appState = useRef(AppState.currentState);
+
+    // make sure the stream stops when app closes or goes inactive
+    useEffect(() => {
+        const subscription = AppState.addEventListener('change', (nextState) => {
+            if (appState.current === 'active' && nextState === 'background') {
+                if (liveCameraRef.current) {
+                    liveCameraRef.current.stop();
+                    setStreaming(false);
+                    setLiveMode(false);
+                }
+            }
+        });
+
+        return () => {
+            subscription.remove();
+        };
+    }, []);
 
     useFocusEffect(() => {
         BackHandler.addEventListener('hardwareBackPress', () => {
@@ -75,10 +108,35 @@ function VideoCamera({ route, navigation }: EventListStackNavProps<'MediaCapture
         await request('POST', '/upload/clip', createFormData(uri, 'video/mp4'));
     };
 
+    const updateStreamUrl = async () => {
+        const response = await request('POST', '/upload/livestream', { eventID: eventId });
+        const { id, streamKey } = response as { id: string; streamKey: string };
+        const url = `rtmp://192.168.2.119:3003/live/${id}?key=${streamKey}`;
+        setStreamUrl(url);
+    };
+
+    const onLiveModeButton = async () => {
+        if (!liveMode) {
+            await updateStreamUrl();
+        }
+        setLiveMode(!liveMode);
+    };
+
     const onStreamButton = async () => {
         if (!liveCameraRef.current) return;
+
+        if (streaming) {
+            liveCameraRef.current.stop();
+
+            // we have to leave live mode here since a stream url is only valid once
+            // and the camera component has to be reloaded to change the url
+            // TODO: maybe change this
+            setLiveMode(false);
+        } else {
+            liveCameraRef.current.start();
+        }
+
         setStreaming(!streaming);
-        liveCameraRef.current[streaming ? 'stop' : 'start']();
     };
 
     useEffect(
@@ -107,79 +165,10 @@ function VideoCamera({ route, navigation }: EventListStackNavProps<'MediaCapture
         <View style={[styles.container]}>
             {liveMode ? (
                 <View style={{ flex: 1, backgroundColor: 'black' }}>
-                    {/* <LiveStreamView
-                        style={{ flex: 1, alignSelf: 'stretch' }}
-                        ref={liveViewRef}
-                        camera="back"
-                        video={{
-                            fps: 30,
-                            resolution: '480p',
-                            bitrate: 1024 * 1024,
-                            gopDuration: 1, // 1 second
-                        }}
-                        audio={{
-                            bitrate: 32000,
-                            sampleRate: 44100,
-                            isStereo: true,
-                        }}
-                        isMuted={false}
-                        enablePinchedZoom={false}
-                        onConnectionSuccess={() => {}}
-                        onConnectionFailed={(e) => {}}
-                        onDisconnect={() => {}}
-                    />
-                    <View style={[styles.row]}>
-                        <TouchableOpacity
-                            disabled={streaming}
-                            style={{
-                                ...styles.flexEl,
-                                opacity: streaming ? 0.25 : 1,
-                            }}
-                            onPress={() => {
-                                setType(
-                                    type === CameraType.back ? CameraType.front : CameraType.back
-                                );
-                            }}
-                        >
-                            <Ionicons name="camera-reverse-outline" size={32} color="white" />
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                            style={[styles.flexEl]}
-                            onPress={asyncHandler(async () => {
-                                if (streaming) {
-                                    liveViewRef.current.stopStreaming();
-                                } else {
-                                    liveViewRef.current.startStreaming(
-                                        'test_stream',
-                                        'rtmp://192.168.2.119:3003/live/'
-                                    );
-                                }
-                                setStreaming(!streaming);
-                            })}
-                        >
-                            <View style={[styles.outerCircleVideo]}>
-                                <View
-                                    style={{
-                                        ...styles.innerCircleVideo,
-                                        borderRadius: streaming ? 0 : 25,
-                                    }}
-                                ></View>
-                            </View>
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                            style={styles.flexEl}
-                            disabled={streaming}
-                            onPress={() => {
-                                setLiveMode(false);
-                            }}
-                        >
-                            <Ionicons name="videocam-outline" size={32} color="white" />
-                        </TouchableOpacity>
-                    </View> */}
                     <NodeCameraView
                         style={[styles.camera]}
                         ref={liveCameraRef}
-                        outputUrl={'rtmp://192.168.2.119:3003/live/test_stream'}
+                        outputUrl={streamUrl}
                         camera={{ cameraId: 0, cameraFrontMirror: true }}
                         audio={{ bitrate: 32000, profile: 1, samplerate: 44100 }}
                         video={{
@@ -190,6 +179,9 @@ function VideoCamera({ route, navigation }: EventListStackNavProps<'MediaCapture
                             videoFrontMirror: false,
                         }}
                         autopreview={true}
+                        onStatus={(code: string, msg: string) => {
+                            console.log(`onStatus code=${code} msg=${msg}`);
+                        }}
                     />
                     <View style={[styles.row]}>
                         <TouchableOpacity
@@ -221,9 +213,9 @@ function VideoCamera({ route, navigation }: EventListStackNavProps<'MediaCapture
                                 opacity: streaming ? 0.25 : 1,
                             }}
                             disabled={streaming}
-                            onPress={() => {
-                                setLiveMode(false);
-                            }}
+                            onPress={asyncHandler(onLiveModeButton, {
+                                prefix: 'Failed to leave live mode',
+                            })}
                         >
                             <Ionicons name="videocam-outline" size={32} color="white" />
                         </TouchableOpacity>
@@ -281,9 +273,9 @@ function VideoCamera({ route, navigation }: EventListStackNavProps<'MediaCapture
                             <TouchableOpacity
                                 style={styles.flexEl}
                                 disabled={recording}
-                                onPress={() => {
-                                    setLiveMode(true);
-                                }}
+                                onPress={asyncHandler(onLiveModeButton, {
+                                    prefix: 'Failed to enter live mode',
+                                })}
                             >
                                 <Ionicons name="videocam-outline" size={32} color="white" />
                             </TouchableOpacity>
