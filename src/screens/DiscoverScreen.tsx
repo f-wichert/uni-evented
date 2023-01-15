@@ -1,12 +1,11 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import React, { useCallback, useEffect, useState } from 'react';
-import { Dimensions, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import EventCarousel from '../components/EventCarousel';
-import { Event, Media, MediaManager } from '../models';
-import { getToken } from '../state/auth';
+import { Event } from '../models';
 import { asyncHandler, request } from '../util';
 
 declare type Props = {
@@ -14,25 +13,6 @@ declare type Props = {
 };
 
 function DiscoverScreen({ navigation }: Props) {
-    const [media, setMedia] = useState<ExtendedMedia[]>([]);
-    const width = Dimensions.get('window').width;
-    const [height, setHeight] = useState<number>(300);
-
-    async function updateMedia() {
-        const responseData = await request('GET', 'info/all_media', getToken());
-        const data = responseData.media as Media[];
-        const media: ExtendedMedia[] = data
-            .filter((el) => el.fileAvailable)
-            .map((el) => ({ ...el, src: MediaManager.src(el, 'high') }));
-        setMedia(media);
-    }
-
-    const updateHeigth = (h: number) => {
-        console.log(`Layout changed`);
-        // height = h;
-        setHeight(h);
-    };
-
     useEffect(() => {
         // Use `setOptions` to update the button that we previously specified
         // Now the button includes an `onPress` handler to update the discoverData
@@ -82,20 +62,13 @@ function DiscoverScreen({ navigation }: Props) {
 
     return (
         <View style={styles.container}>
-            {eventData.length == 0 ? (
-                <View style={styles.sadContainer}>
-                    <Ionicons name="sad-outline" size={50} color="black" style={styles.sadIcon} />
-                    <Text style={styles.sadText}>Seems like there are no clips right now...</Text>
-                </View>
-            ) : (
-                // wrap carousel in another safearea provider since the carousel
-                // needs a pixel height and doesn't support `height: '100%'`
-                <SafeAreaProvider>
-                    <GestureHandlerRootView>
-                        <EventCarousel eventData={eventData} navigateDetail={navigateDetail} />
-                    </GestureHandlerRootView>
-                </SafeAreaProvider>
-            )}
+            {/* // wrap carousel in another safearea provider since the carousel 
+            // needs a pixel height and doesn't support `height: '100%'` */}
+            <SafeAreaProvider>
+                <GestureHandlerRootView>
+                    <EventCarousel eventData={eventData} navigateDetail={navigateDetail} />
+                </GestureHandlerRootView>
+            </SafeAreaProvider>
         </View>
     );
 }
@@ -106,18 +79,6 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
         alignItems: 'center',
         justifyContent: 'center',
-        height: '100%',
-        width: '100%',
-    },
-    sadContainer: {
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    sadIcon: {
-        marginBottom: 20,
-    },
-    sadText: {
-        fontSize: 20,
     },
 });
 

@@ -19,6 +19,8 @@ export default function EventCarousel({ eventData, navigateDetail }: Props) {
 
     const [isPlay, setIsPlay] = useState<boolean>(true);
     const [isMute, setIsMute] = useState<boolean>(true);
+    const [isOpenQuality, setIsOpenQuality] = useState<boolean>(false);
+    const [quality, setQuality] = useState<'auto' | '1080' | '720' | '480' | '360'>('auto');
 
     const nextOuterItem = () => {
         if (checkIfLastEvent()) return;
@@ -64,6 +66,10 @@ export default function EventCarousel({ eventData, navigateDetail }: Props) {
                         outerIndex={outerIndex}
                         activeOuterIndex={activeOuterIndex}
                         nextOuterItem={nextOuterItem}
+                        isOpenQuality={isOpenQuality}
+                        setIsOpenQuality={setIsOpenQuality}
+                        quality={quality}
+                        setQuality={setQuality}
                     />
                 );
             }}
@@ -71,57 +77,4 @@ export default function EventCarousel({ eventData, navigateDetail }: Props) {
     );
 }
 
-const styles = StyleSheet.create({
-    playPause: {
-        position: 'absolute',
-        // backgroundColor: 'lightgreen',
-    },
-    nextVideo: {
-        position: 'absolute',
-        // backgroundColor: 'lightblue',
-        right: 0,
-    },
-    prevVideo: {
-        position: 'absolute',
-        // backgroundColor: 'lightyellow',
-        left: 0,
-    },
-    mute: {
-        position: 'absolute',
-        color: 'white',
-        right: 0,
-        bottom: 0,
-        marginRight: 15,
-        marginBottom: 15,
-    },
-    indicator: {
-        position: 'absolute',
-        height: 5,
-        top: 0,
-        backgroundColor: 'white',
-        borderRadius: 15,
-        marginTop: 10,
-    },
-    headerContainer: {
-        position: 'absolute',
-        top: 0,
-        marginTop: 25,
-        marginLeft: 10,
-        display: 'flex',
-        justifyContent: 'flex-start',
-        flexDirection: 'row',
-    },
-    eventIcon: {
-        borderWidth: 1,
-        borderColor: 'white',
-        borderRadius: 50,
-        padding: 2,
-        textAlign: 'center',
-    },
-    eventHeader: {
-        color: 'white',
-        fontWeight: 'bold',
-        fontSize: 16,
-        marginLeft: 10,
-    },
-});
+const styles = StyleSheet.create({});

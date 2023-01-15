@@ -1,17 +1,8 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { HeaderBackButton } from '@react-navigation/elements';
 import { StackActions, useFocusEffect } from '@react-navigation/native';
-import React, { useEffect, useState } from 'react';
-import {
-    BackHandler,
-    Image,
-    Pressable,
-    SafeAreaView,
-    ScrollView,
-    StyleSheet,
-    Text,
-    View,
-} from 'react-native';
+import React, { useCallback, useEffect, useState } from 'react';
+import { BackHandler, Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { Rating } from 'react-native-ratings';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -23,20 +14,6 @@ import { EventListStackNavProps } from '../nav/types';
 import { useEventFetch } from '../state/event';
 import { asyncHandler } from '../util';
 
-let media_data = [
-    {
-        name: 'One',
-        type: 'video',
-    },
-    {
-        name: 'Two',
-        type: 'video',
-    },
-    {
-        type: 'upload',
-    },
-];
-
 function EventDetailScreen({
     route,
     navigation,
@@ -46,10 +23,12 @@ function EventDetailScreen({
 }: EventListStackNavProps<'EventDetail'>) {
     const eventId = evId ? evId : route.params.eventId;
     const origin = orig ? orig : route.params.origin;
-    const { event: eventData, loading } = useEventFetch(eventId);
+    const { event: eventData, loading, refresh } = useEventFetch(eventId);
 
     const [isPlay, setIsPlay] = useState<boolean>(true);
     const [isMute, setIsMute] = useState<boolean>(true);
+    const [isOpenQuality, setIsOpenQuality] = useState<boolean>(false);
+    const [quality, setQuality] = useState<'auto' | '1080' | '720' | '480' | '360'>('auto');
 
     const isPreview = preview ? preview : false;
 
@@ -66,9 +45,13 @@ function EventDetailScreen({
         });
     }, [navigation]);
 
-    useFocusEffect(() => {
-        BackHandler.addEventListener('hardwareBackPress', navigateToOrigin);
-    });
+    useFocusEffect(
+        useCallback(() => {
+            BackHandler.addEventListener('hardwareBackPress', navigateToOrigin);
+            refresh();
+            console.log('refreshed');
+        }, [])
+    );
 
     // const eventID = useEventStore((state) => state.currentEventId) // Get event ID of current event of currently logged in user
 
@@ -88,42 +71,42 @@ function EventDetailScreen({
         );
     }
 
-    const getJsx = (item) => {
-        if (item.type == 'video') {
-            return <Text>{item.name}</Text>;
-            // return (<VideoDiscover discoverData={item} navigateDetail={navigateDetail} />);
-        } else if (item.type == 'image') {
-        } else if (item.type == 'upload') {
-            return (
-                <>
-                    <Ionicons
-                        name="camera"
-                        size={64}
-                        color="orange"
-                        onPress={() => {
-                            navigation.navigate('MediaCapture', { eventID: eventId });
-                        }}
-                    />
-                    <Text>Load Picture/Video of event here</Text>
-                </>
-            );
-        }
+    // const getJsx = (item) => {
+    //     if (item.type == 'video') {
+    //         return <Text>{item.name}</Text>;
+    //         // return (<VideoDiscover discoverData={item} navigateDetail={navigateDetail} />);
+    //     } else if (item.type == 'image') {
+    //     } else if (item.type == 'upload') {
+    //         return (
+    //             <>
+    //                 <Ionicons
+    //                     name="camera"
+    //                     size={64}
+    //                     color="orange"
+    //                     onPress={() => {
+    //                         navigation.navigate('MediaCapture', { eventId: eventId });
+    //                     }}
+    //                 />
+    //                 <Text>Load Picture/Video of event here</Text>
+    //             </>
+    //         );
+    //     }
 
-        return <Text>hi</Text>;
-    };
+    //     return <Text>hi</Text>;
+    // };
 
-    console.log(`Data: ${JSON.stringify(eventData)}`);
+    // console.log(`Data: ${JSON.stringify(eventData)}`);
     //     return  (async () => {
     //     eventData = EventManager.fromId(eventID!) as Event
     //     console.log('Event:', eventData);
     //     loaded = true;
     //     return eventData
     // }).then(run(eventData))
-    async function registerUserArrivalAtEvent() {
-        if (!eventId) return;
-        // console.log(`You are now checked in at the Event (Mock Message, did nothing)`);
-        await joinEvent({ eventId });
-    }
+    // async function registerUserArrivalAtEvent() {
+    //     if (!eventId) return;
+    //     // console.log(`You are now checked in at the Event (Mock Message, did nothing)`);
+    //     await joinEvent({ eventId });
+    // }
 
     function getProfilePicture() {
         return {
@@ -283,23 +266,25 @@ function EventDetailScreen({
 
     const mediaCarousel = (
         <View style={styles.camera}>
-            <SafeAreaProvider>
-                <GestureHandlerRootView>
-                    <MediaCarousel
-                        item={eventData}
-                        isPlay={isPlay}
-                        isMute={isMute}
-                        setIsPlay={setIsPlay}
-                        setIsMute={setIsMute}
-                    />
-                </GestureHandlerRootView>
-            </SafeAreaProvider>
+            <GestureHandlerRootView>
+                <MediaCarousel
+                    item={eventData}
+                    isPlay={isPlay}
+                    isMute={isMute}
+                    setIsPlay={setIsPlay}
+                    setIsMute={setIsMute}
+                    isOpenQuality={isOpenQuality}
+                    setIsOpenQuality={setIsOpenQuality}
+                    quality={quality}
+                    setQuality={setQuality}
+                />
+            </GestureHandlerRootView>
         </View>
     );
 
     return (
         <>
-            <SafeAreaView style={{ display: 'flex' }}>
+            <SafeAreaProvider>
                 <ScrollView>
                     <View style={styles.section}>
                         {/* @Jonas - please build in the media thing here. this logic is used for the map screen */}
@@ -327,8 +312,8 @@ function EventDetailScreen({
                         </View>
                     </View>
                 </ScrollView>
-            </SafeAreaView>
-            <View style={styles.overlay}>{!isPreview ? navigationBar : <></>}</View>
+                <View style={styles.overlay}>{!isPreview ? navigationBar : <></>}</View>
+            </SafeAreaProvider>
         </>
     );
 }
@@ -355,13 +340,13 @@ const styles = StyleSheet.create({
         padding: 20,
     },
     camera: {
+        flex: 1,
         display: 'flex',
-        backgroundColor: 'grey',
         alignSelf: 'stretch',
         alignItems: 'center',
         justifyContent: 'center',
         minHeight: 400,
-        borderRadius: 10,
+        height: '70%',
     },
     tagArea: {
         display: 'flex',

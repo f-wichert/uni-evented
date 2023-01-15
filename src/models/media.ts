@@ -19,8 +19,30 @@ export interface Media {
 }
 
 export class MediaManager {
-    static src(media: Media, quality?: 'high' | 'medium' | 'low'): string {
-        const file = media.type == 'image' ? `${quality || 'high'}.jpg` : 'index.m3u8';
+    static src(media: Media, quality?: 'auto' | '1080' | '720' | '480' | '360'): string {
+        const parsedVideoQuality = quality === 'auto' ? undefined : quality;
+        let parsedImageQuality = 'high';
+        switch (quality) {
+            case 'auto':
+                parsedImageQuality = 'high';
+                break;
+            case '1080':
+                parsedImageQuality = 'high';
+                break;
+            case '720':
+                parsedImageQuality = 'high';
+                break;
+            case '480':
+                parsedImageQuality = 'medium';
+                break;
+            case '360':
+                parsedImageQuality = 'low';
+                break;
+        }
+        const file =
+            media.type == 'image'
+                ? `${parsedImageQuality}.jpg`
+                : `index${parsedVideoQuality ? `-${quality}p` : ''}.m3u8`;
         const path = urlJoin(config.BASE_URL, 'media', media.type, media.id, file);
         return path;
     }
