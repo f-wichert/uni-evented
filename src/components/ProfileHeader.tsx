@@ -1,4 +1,5 @@
-import { Image, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
+import Image from 'react-native-image-progress';
 
 interface Props {
     imageUri: string | null;
@@ -7,14 +8,23 @@ interface Props {
     fallbackImage?: number;
 }
 
+function BackgroundIndicator() {
+    return (
+        <View style={[styles.profilePicture, styles.profilePictureLoading]}>
+            <ActivityIndicator size="large" />
+        </View>
+    );
+}
+
 export default function ProfileHeader({ imageUri, username, displayName, fallbackImage }: Props) {
     const usernameFmt = `@${username}`;
     return (
         <View style={styles.container}>
             <Image
+                source={imageUri ? { uri: imageUri } : fallbackImage}
                 style={styles.profilePicture}
-                source={{ uri: imageUri ?? undefined }}
-                defaultSource={fallbackImage}
+                imageStyle={styles.profilePicture}
+                indicator={BackgroundIndicator}
             />
             <View style={styles.nameContainer}>
                 {/* Show display name first, if set */}
@@ -34,6 +44,11 @@ const styles = StyleSheet.create({
         width: 200,
         height: 200,
         borderRadius: 100,
+    },
+    profilePictureLoading: {
+        backgroundColor: 'lightgrey',
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     nameContainer: {
         marginTop: 20,
