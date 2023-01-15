@@ -1,7 +1,7 @@
 import { AVPlaybackStatusToSet, ResizeMode } from 'expo-av';
 import VideoPlayer from 'expo-video-player';
 import { useEffect, useRef, useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { useSafeAreaFrame } from 'react-native-safe-area-context';
 
 import { Media, MediaManager } from '../models';
@@ -15,6 +15,7 @@ declare type Props = {
     // setDuration: (dur: number) => void;
     // setPosition: (pos: number) => void;
     finishedVideo: () => void;
+    quality?: 'auto' | '1080' | '720' | '480' | '360';
 };
 
 function VideoDiscover({
@@ -22,6 +23,7 @@ function VideoDiscover({
     navigateDetail,
     isPlay,
     isMute,
+    quality,
     // setDuration,
     // setPosition,
     finishedVideo,
@@ -75,7 +77,7 @@ function VideoDiscover({
             <VideoPlayer
                 videoProps={{
                     source: {
-                        uri: MediaManager.src(item),
+                        uri: MediaManager.src(item, quality),
                         headers: baseHeaders,
                     },
                     resizeMode: ResizeMode.CONTAIN,
@@ -87,12 +89,14 @@ function VideoDiscover({
                     progressUpdateIntervalMillis: 1000,
                     // onPlaybackStatusUpdate: (status: AVPlaybackStatusToSet) => setStatus(() => status),
                 }}
-                header={<Text style={{ color: '#FFF' }}>Custom title</Text>}
                 style={{ ...styles.video, width: frame.width }}
+                slider={{ visible: false }}
                 icon={{
                     play: <></>,
                     pause: <></>,
                     replay: <></>,
+                    fullscreen: <></>,
+                    exitFullscreen: <></>,
                 }}
                 playbackCallback={(playState: AVPlaybackStatusToSet) => updateStatus(playState)}
             />

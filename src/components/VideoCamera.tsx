@@ -29,9 +29,6 @@ function VideoCamera({ route, navigation }: EventListStackNavProps<'MediaCapture
             uri: uri,
             type: type,
         });
-        console.log('-----------------------');
-        console.log(eventId);
-        console.log('-----------------------');
         form.append('eventID', eventId);
         return form;
     };
@@ -97,7 +94,7 @@ function VideoCamera({ route, navigation }: EventListStackNavProps<'MediaCapture
 
     return (
         <View style={[styles.container]}>
-            <Camera style={[styles.camera]} type={type} ref={cameraRef}>
+            <Camera style={[styles.camera]} type={type} ref={cameraRef} ratio={'16:9'}>
                 <View style={[styles.column]}>
                     <View style={[styles.row]}>
                         <TouchableOpacity
