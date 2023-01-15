@@ -17,31 +17,42 @@ import MapView, { LatLng, Marker } from 'react-native-maps';
 import { INPUT_BACKGR_COLOR } from '../const';
 import { EventManager } from '../models';
 import { EventListStackNavProps } from '../nav/types';
-import { IoniconsName } from '../types';
-import { asyncHandler } from '../util';
+import { IoniconsName, Tag } from '../types';
+import { asyncHandler, request } from '../util';
 
 const width = Dimensions.get('window').width;
 // const height = Dimensions.get('window').height;
 
-const tags = [
-    { label: 'Activity', value: 'activity' },
-    { label: 'Party', value: 'party', parent: 'activity' },
-    { label: 'Boardgames', value: 'boardgames', parent: 'activity' },
-    { label: 'Sports', value: 'sports', parent: 'activity' },
-    { label: 'Drinking', value: 'drinking', parent: 'activity' },
-    { label: 'Chilling', value: 'chilling', parent: 'activity' },
-    { label: 'Music', value: 'music' },
-    { label: 'Jazz', value: 'jazz', parent: 'music' },
-    { label: 'Techno', value: 'techno', parent: 'music' },
-    { label: 'Rock', value: 'rock', parent: 'music' },
-    { label: 'R&B', value: 'rnb', parent: 'music' },
-    { label: 'Reggae', value: 'reggae', parent: 'music' },
-] as const;
-type TagValue = typeof tags[number]['value'];
+// const tags = [
+//     { label: 'Activity', value: 'activity' },
+//     { label: 'Party', value: 'party', parent: 'activity' },
+//     { label: 'Boardgames', value: 'boardgames', parent: 'activity' },
+//     { label: 'Sports', value: 'sports', parent: 'activity' },
+//     { label: 'Drinking', value: 'drinking', parent: 'activity' },
+//     { label: 'Chilling', value: 'chilling', parent: 'activity' },
+//     { label: 'Music', value: 'music' },
+//     { label: 'Jazz', value: 'jazz', parent: 'music' },
+//     { label: 'Techno', value: 'techno', parent: 'music' },
+//     { label: 'Rock', value: 'rock', parent: 'music' },
+//     { label: 'R&B', value: 'rnb', parent: 'music' },
+//     { label: 'Reggae', value: 'reggae', parent: 'music' },
+// ] as const;
 
 function CreateEventScreen({ navigation, route }: EventListStackNavProps<'CreateEvent'>) {
     // This is passed back from the map picker (https://reactnavigation.org/docs/params#passing-params-to-a-previous-screen).
     // If `params.location` changed, we call `setLocation` with the new value.
+
+    const [tags, setTags] = useState<Tag[]>([
+        { id: 'TestID', label: 'TestLabel', color: 'red', parent: 'TestID', value: 'testValue' },
+    ]);
+    useEffect(
+        asyncHandler(async () => {
+            const response = await request('GET', '/info/all_tags');
+            setTags(response as unknown as Tag[]);
+        }),
+        []
+    );
+
     const locationParam = route.params?.location;
     useEffect(() => {
         if (locationParam) {
@@ -56,8 +67,7 @@ function CreateEventScreen({ navigation, route }: EventListStackNavProps<'Create
 
     // Dropdown State
     const [open, setOpen] = useState(false);
-    const [value, setValue] = useState([] as TagValue[]);
-    const [items, setItems] = useState([...tags]);
+    const [value, setValue] = useState([]);
 
     // Location State
     const [location, setLocation] = useState<LatLng | null>(null);
@@ -239,10 +249,10 @@ function CreateEventScreen({ navigation, route }: EventListStackNavProps<'Create
                         max={3}
                         open={open}
                         value={value}
-                        items={items}
+                        items={tags}
                         setOpen={setOpen}
                         setValue={setValue}
-                        setItems={setItems}
+                        setItems={setTags}
                         placeholder="Select up to three tags"
                         maxHeight={300}
                         categorySelectable={false}
