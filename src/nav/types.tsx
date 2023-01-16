@@ -67,3 +67,18 @@ export type EventListStackNavParams = {
 export type EventListStackNavProps<
     T extends keyof EventListStackNavParams = keyof EventListStackNavParams
 > = CompositeScreenProps<NativeStackScreenProps<EventListStackNavParams, T>, TabNavProps>;
+
+// ==========
+// profile tab
+// ==========
+
+export type ProfileStackNavParams = {
+    ProfileView: undefined;
+    EditProfile: undefined;
+    MyEvents: undefined;
+    ManageAccount: undefined;
+};
+
+export type ProfileStackNavProps<
+    T extends keyof ProfileStackNavParams = keyof ProfileStackNavParams
+> = CompositeScreenProps<NativeStackScreenProps<ProfileStackNavParams, T>, TabNavProps>;

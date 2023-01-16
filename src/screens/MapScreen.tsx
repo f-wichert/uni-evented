@@ -1,8 +1,9 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import * as Location from 'expo-location';
 import React, { useCallback, useEffect, useState } from 'react';
-import { Dimensions, StyleSheet, Text, View } from 'react-native';
+import { Dimensions, StyleSheet, View } from 'react-native';
 import MapView, { LatLng, Marker } from 'react-native-maps';
+import MapFilter from '../components/MapFilter';
 
 import { TabNavProps } from '../nav/types';
 import { useFindEvents } from '../state/event';
@@ -14,12 +15,17 @@ function MapScreen({ navigation, route }: TabNavProps<'Map'>) {
     const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
     // console.log(`Selected Event: ${JSON.stringify(selectedEvent)}`);
     const [menuVisible, setMenuVisible] = useState<Boolean>(false);
-    console.log(`Vis: ${menuVisible}`);
     const [location, setLocation] = useState<LatLng | null>({
         latitude: 48.877616,
         longitude: 8.652653,
     });
     const { events, refresh } = useFindEvents();
+
+    // Filter options
+    const [showCurrentEvents, setShowCurrentEvents] = useState(true);
+    const [currentDayRange, setCurrentDayRange] = useState(1);
+    const [showFutureEvents, setShowFutureEvents] = useState(true);
+    const [futureDayRange, setFutureDayRange] = useState([2, 4]);
 
     const getCurrentPosition = async () => {
         const { status } = await Location.requestForegroundPermissionsAsync();
@@ -57,6 +63,7 @@ function MapScreen({ navigation, route }: TabNavProps<'Map'>) {
                             color="black"
                             onPress={() => {
                                 // TODO: herausfinden warum das hier funktioniert?
+                                console.log('Value toggled.');
                                 setMenuVisible((val) => !val);
                             }}
                             style={{
@@ -157,9 +164,19 @@ function MapScreen({ navigation, route }: TabNavProps<'Map'>) {
                 <></>
             )}
             {menuVisible == true ? (
-                <View style={styles.menuOverlay}>
-                    <Text>This might a menu someday!</Text>
-                </View>
+                // <View style={styles.menuOverlay}>
+                //     <Text>This might a menu someday!</Text>
+                // </View>
+                <MapFilter
+                    showCurrentEvents={showCurrentEvents}
+                    setShowCurrentEvents={setShowCurrentEvents}
+                    currentDayRange={currentDayRange}
+                    setCurrentDayRange={setCurrentDayRange}
+                    showFutureEvents={showFutureEvents}
+                    setShowFutureEvents={setShowFutureEvents}
+                    futureDayRange={futureDayRange}
+                    setFutureDayRange={setFutureDayRange}
+                />
             ) : (
                 <></>
             )}

@@ -24,11 +24,9 @@ export default function EventCarousel({ eventData, navigateDetail }: Props) {
 
     const nextOuterItem = () => {
         if (checkIfLastEvent()) return;
-        // console.log(`go to next outer item: old indizes: ${innerCarousel.current[activeOuterIndex].getCurrentIndex()} | ${outerCarousel.current?.getCurrentIndex()}`);
         outerCarousel.current.next();
         // set active outer index
         setActiveOuterIndex(outerCarousel.current?.getCurrentIndex());
-        // console.log(`go to next outer item: new indizes: ${innerCarousel.current[activeOuterIndex].getCurrentIndex()} | ${outerCarousel.current?.getCurrentIndex()}`);
     };
 
     const onOuterCarouselSwipe = () => {

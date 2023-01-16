@@ -7,19 +7,23 @@ import { request } from '../util';
 export interface UserResponse {
     readonly id: string;
     readonly username: string;
-    readonly displayName: string | null;
+    readonly displayName: string;
     readonly avatarHash: string | null;
 }
 
 export interface User {
     readonly id: string;
     readonly username: string;
-    readonly displayName: string | null;
+    readonly displayName: string;
     readonly avatarHash: string | null;
 }
 
 export interface CurrentUser extends User {
     readonly email: string;
+}
+
+export interface CurrentUserResponse extends CurrentUser {
+    readonly currentEventId: string | null;
 }
 
 export class UserManager {
@@ -35,9 +39,19 @@ export class UserManager {
 
     static async editSelf(params: {
         // base64-encoded image
-        avatar?: string;
+        avatar?: string | null;
+        username?: string;
+        displayName?: string;
+
+        // account fields
+        email?: string;
+        password?: string;
     }) {
-        const user = (await request('PATCH', '/user/@me', params)) as unknown as UserResponse;
+        const user = (await request(
+            'PATCH',
+            '/user/@me',
+            params
+        )) as unknown as CurrentUserResponse;
 
         useUserStore.setState((state) => {
             addUsers(state, this.fromUserResponse(user));

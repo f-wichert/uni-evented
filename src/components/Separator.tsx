@@ -1,19 +1,21 @@
-import { View, ViewStyle } from 'react-native';
+import { StyleProp, View, ViewStyle } from 'react-native';
 
 interface Props {
-    color?: ViewStyle['backgroundColor'];
-    width?: ViewStyle['width'];
+    style?: StyleProp<ViewStyle>;
 }
 
-export default function Separator({ color, width }: Props) {
+export default function Separator({ style }: Props) {
     return (
         <View
-            style={{
-                height: 1,
-                backgroundColor: color ?? '#e3e3e3',
-                width: width ?? '95%',
-                alignSelf: 'center',
-            }}
+            style={[
+                {
+                    height: 1,
+                    backgroundColor: '#b0b0b0',
+                    width: '90%',
+                    alignSelf: 'center',
+                },
+                style,
+            ]}
         />
     );
 }

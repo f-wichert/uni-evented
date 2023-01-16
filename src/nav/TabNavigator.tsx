@@ -4,10 +4,10 @@ import React from 'react';
 
 import DiscoverScreen from '../screens/DiscoverScreen';
 import MapScreen from '../screens/MapScreen';
-import ProfileScreen from '../screens/ProfileScreen';
 import { useEventStore } from '../state/event';
 import { IoniconsName } from '../types';
 import EventListStack from './EventListStack';
+import ProfileStack from './ProfileStack';
 import { TabNavParams } from './types';
 
 export const Tab = createBottomTabNavigator<TabNavParams>();
@@ -43,7 +43,7 @@ export default function TabNavigator() {
             <Tab.Screen name="Discover" component={DiscoverScreen} />
             <Tab.Screen name="Map" component={MapScreen} />
             <Tab.Screen name="Events" component={EventListStack} options={{ headerShown: false }} />
-            <Tab.Screen name="Profile" component={ProfileScreen} options={{ headerShown: false }} />
+            <Tab.Screen name="Profile" component={ProfileStack} options={{ headerShown: false }} />
         </Tab.Navigator>
     );
 }
