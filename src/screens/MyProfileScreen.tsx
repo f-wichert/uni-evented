@@ -32,7 +32,7 @@ export default function MyProfileScreen({ navigation }: ProfileStackNavProps<'My
     );
 
     return (
-        <SafeAreaView>
+        <SafeAreaView style={styles.container}>
             <View style={styles.profileHeader}>
                 <ProfileHeader
                     imageUri={UserManager.getAvatarUrl(user)}
@@ -45,7 +45,7 @@ export default function MyProfileScreen({ navigation }: ProfileStackNavProps<'My
 
             <Separator style={styles.separator} />
             <ScrollView style={styles.tableContainer} alwaysBounceVertical={false}>
-                <TableView style={styles.table}>
+                <TableView>
                     <Section>
                         <Cell
                             image={getCellIcon('person-circle-outline')}
@@ -107,11 +107,12 @@ export default function MyProfileScreen({ navigation }: ProfileStackNavProps<'My
 }
 
 const styles = StyleSheet.create({
-    tableContainer: {
-        height: '100%',
+    container: {
+        alignItems: 'center',
     },
-    table: {
+    tableContainer: {
         width: '100%',
+        height: '100%',
     },
     profileHeader: {
         marginTop: 40,
