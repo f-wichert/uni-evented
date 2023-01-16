@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, Button, Keyboard, ScrollView, StyleSheet, Text } from 'react-native';
+import { ActivityIndicator, Button, Keyboard, ScrollView, StyleSheet } from 'react-native';
 
 import AvatarEditView from '../components/AvatarEditView';
 import FancyTextInput from '../components/FancyTextInput';
@@ -45,10 +45,7 @@ export default function EditProfileScreen({ navigation }: ProfileStackNavProps<'
         DISPLAYNAME_VALIDATION
     );
 
-    const [email, setEmail] = useState<string>(currentUser.email);
-    const emailResult = validate(email, currentUser.email, { email: true });
-
-    const results = [avatarResult, usernameResult, displayNameResult, emailResult];
+    const results = [avatarResult, usernameResult, displayNameResult];
     const hasChanged = results.some((r) => r.changed);
     const isValid = results.every((r) => !r.error);
 
@@ -62,7 +59,6 @@ export default function EditProfileScreen({ navigation }: ProfileStackNavProps<'
                 avatar: avatarResult.submitValue,
                 username: usernameResult.submitValue,
                 displayName: displayNameResult.submitValue,
-                email: emailResult.submitValue,
             });
         } catch (e) {
             handleError(e, { prefix: 'Failed to update profile' });
@@ -90,7 +86,6 @@ export default function EditProfileScreen({ navigation }: ProfileStackNavProps<'
 
     return (
         <ScrollView style={styles.container}>
-            <Text style={styles.header}>Public Information</Text>
             {/* avatar view */}
             <AvatarEditView
                 avatarUrl={avatarUrl}
@@ -120,18 +115,6 @@ export default function EditProfileScreen({ navigation }: ProfileStackNavProps<'
                 textInputProps={{ autoCorrect: false }}
                 style={styles.input}
             />
-
-            <Text style={styles.header}>Account Data</Text>
-            {/* inputs for private fields */}
-            <FancyTextInput
-                title="Email"
-                originalValue={currentUser.email}
-                value={email}
-                onChangeText={setEmail}
-                validationError={emailResult.error}
-                textInputProps={{ autoCorrect: false, keyboardType: 'email-address' }}
-                style={styles.input}
-            />
         </ScrollView>
     );
 }
@@ -139,12 +122,7 @@ export default function EditProfileScreen({ navigation }: ProfileStackNavProps<'
 const styles = StyleSheet.create({
     container: {
         padding: 10,
-        gap: 20,
-    },
-    header: {
-        textTransform: 'uppercase',
-        marginTop: 16,
-        marginBottom: 8,
+        paddingHorizontal: 16,
     },
 
     avatarContainer: {

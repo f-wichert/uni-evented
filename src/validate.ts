@@ -5,6 +5,7 @@ export interface StringValidateOptions {
     maxLength?: number;
     alphanumeric?: boolean;
     email?: boolean;
+    equals?: string;
 }
 
 export function validateString(value: string, opts: StringValidateOptions): string | null {
@@ -17,6 +18,8 @@ export function validateString(value: string, opts: StringValidateOptions): stri
         return `Value may only contain A-Z, a-z, 0-9`;
     if (opts.email === true && !validator.isEmail(value))
         return `Value must be a valid E-mail address`;
+
+    if (opts.equals !== undefined && value !== opts.equals) return `Values do not match`;
 
     // valid input
     return null;

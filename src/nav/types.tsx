@@ -76,6 +76,7 @@ export type ProfileStackNavParams = {
     ProfileView: undefined;
     EditProfile: undefined;
     MyEvents: undefined;
+    ManageAccount: undefined;
 };
 
 export type ProfileStackNavProps<

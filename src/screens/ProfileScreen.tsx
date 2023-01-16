@@ -43,7 +43,7 @@ export default function ProfileScreen({ navigation }: ProfileStackNavProps<'Prof
                 />
             </View>
 
-            <Separator color="black" width="90%" />
+            <Separator style={styles.separator} />
             <ScrollView style={styles.tableContainer} alwaysBounceVertical={false}>
                 <TableView style={styles.table}>
                     <Section>
@@ -51,6 +51,10 @@ export default function ProfileScreen({ navigation }: ProfileStackNavProps<'Prof
                             image={getCellIcon('person-circle-outline')}
                             title="Profile"
                             accessory="DisclosureIndicator"
+                            // TODO: show current user's profile here, and show edit screen as a subscreen of that
+                            onPress={useCallback(() => {
+                                navigation.navigate('EditProfile');
+                            }, [navigation])}
                         />
                         <Cell
                             image={getCellIcon('earth-outline')}
@@ -72,7 +76,7 @@ export default function ProfileScreen({ navigation }: ProfileStackNavProps<'Prof
                             title="Manage Account"
                             accessory="DisclosureIndicator"
                             onPress={useCallback(() => {
-                                navigation.navigate('EditProfile');
+                                navigation.navigate('ManageAccount');
                             }, [navigation])}
                         />
                         <Cell
@@ -99,7 +103,7 @@ const styles = StyleSheet.create({
         marginTop: 40,
         marginBottom: 20,
     },
-    logoutContainer: {
-        alignItems: 'center',
+    separator: {
+        backgroundColor: 'black',
     },
 });

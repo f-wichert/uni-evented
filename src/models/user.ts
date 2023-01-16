@@ -38,11 +38,14 @@ export class UserManager {
     }
 
     static async editSelf(params: {
-        username?: string;
-        displayName?: string;
-        email?: string;
         // base64-encoded image
         avatar?: string | null;
+        username?: string;
+        displayName?: string;
+
+        // account fields
+        email?: string;
+        password?: string;
     }) {
         const user = (await request(
             'PATCH',

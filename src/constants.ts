@@ -13,6 +13,6 @@ export const DISPLAYNAME_VALIDATION: StringValidateOptions = {
     maxLength: 32,
 };
 export const PASSWORD_VALIDATION: StringValidateOptions = {
-    minLength: 16,
+    minLength: 8,
     maxLength: 64,
 };
