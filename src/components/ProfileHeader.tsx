@@ -1,32 +1,31 @@
-import { Image, StyleSheet, Text, View } from 'react-native';
-import { TouchableHighlight } from 'react-native-gesture-handler';
+import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
+import Image from 'react-native-image-progress';
 
 interface Props {
     imageUri: string | null;
-    displayName: string | null;
     username: string;
+    displayName: string;
     fallbackImage?: number;
-    onAvatarPress?: () => void;
 }
 
-export default function ProfileHeader({
-    imageUri,
-    displayName,
-    username,
-    fallbackImage,
-    onAvatarPress,
-}: Props) {
+function BackgroundIndicator() {
+    return (
+        <View style={[styles.profilePicture, styles.profilePictureLoading]}>
+            <ActivityIndicator size="large" />
+        </View>
+    );
+}
+
+export default function ProfileHeader({ imageUri, username, displayName, fallbackImage }: Props) {
     const usernameFmt = `@${username}`;
     return (
         <View style={styles.container}>
-            {/* TODO: profile pictures */}
-            <TouchableHighlight style={styles.profilePicture} onPress={onAvatarPress}>
-                <Image
-                    style={styles.profilePicture}
-                    source={{ uri: imageUri ?? undefined }}
-                    defaultSource={fallbackImage}
-                />
-            </TouchableHighlight>
+            <Image
+                source={imageUri ? { uri: imageUri } : fallbackImage}
+                style={styles.profilePicture}
+                imageStyle={styles.profilePicture}
+                indicator={BackgroundIndicator}
+            />
             <View style={styles.nameContainer}>
                 {/* Show display name first, if set */}
                 <Text style={styles.titleText}>{displayName || usernameFmt}</Text>
@@ -45,6 +44,11 @@ const styles = StyleSheet.create({
         width: 200,
         height: 200,
         borderRadius: 100,
+    },
+    profilePictureLoading: {
+        backgroundColor: 'lightgrey',
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     nameContainer: {
         marginTop: 20,

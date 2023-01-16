@@ -1,5 +1,4 @@
 import { Ionicons } from '@expo/vector-icons';
-import * as ImagePicker from 'expo-image-picker';
 import React, { useCallback } from 'react';
 import { Alert, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -9,12 +8,12 @@ import yellowSplash from '../../assets/yellow_splash.png';
 import ProfileHeader from '../components/ProfileHeader';
 import Separator from '../components/Separator';
 import { UserManager } from '../models';
+import { ProfileStackNavProps } from '../nav/types';
 import { useAuthStore } from '../state/auth';
 import { useCurrentUser } from '../state/user';
 import { IoniconsName } from '../types';
-import { asyncHandler } from '../util';
 
-export default function ProfileScreen() {
+export default function ProfileScreen({ navigation }: ProfileStackNavProps<'ProfileView'>) {
     const user = useCurrentUser();
     const signout = useAuthStore((state) => state.signout);
 
@@ -28,7 +27,9 @@ export default function ProfileScreen() {
         ]);
     }, [signout]);
 
-    const getCellIcon = (name: IoniconsName) => <Ionicons name={name} size={27} />;
+    const getCellIcon = (name: IoniconsName, color?: string) => (
+        <Ionicons name={name} size={27} color={color} />
+    );
 
     return (
         <SafeAreaView>
@@ -39,24 +40,10 @@ export default function ProfileScreen() {
                     username={user.username}
                     // TODO: better fallback image
                     fallbackImage={yellowSplash}
-                    onAvatarPress={asyncHandler(async () => {
-                        const result = await ImagePicker.launchImageLibraryAsync({
-                            allowsEditing: true,
-                            aspect: [1, 1],
-                            base64: true,
-                        });
-
-                        const asset = result.assets?.pop();
-                        if (!asset || !asset.base64) {
-                            return;
-                        }
-
-                        await UserManager.editSelf({ avatar: asset.base64 });
-                    })}
                 />
             </View>
 
-            <Separator color="black" width="90%" />
+            <Separator style={styles.separator} />
             <ScrollView style={styles.tableContainer} alwaysBounceVertical={false}>
                 <TableView style={styles.table}>
                     <Section>
@@ -64,11 +51,18 @@ export default function ProfileScreen() {
                             image={getCellIcon('person-circle-outline')}
                             title="Profile"
                             accessory="DisclosureIndicator"
+                            // TODO: show current user's profile here, and show edit screen as a subscreen of that
+                            onPress={useCallback(() => {
+                                navigation.navigate('EditProfile');
+                            }, [navigation])}
                         />
                         <Cell
                             image={getCellIcon('earth-outline')}
                             title="My Events"
                             accessory="DisclosureIndicator"
+                            onPress={useCallback(() => {
+                                navigation.navigate('MyEvents');
+                            }, [navigation])}
                         />
                         <Cell
                             image={getCellIcon('time-outline')}
@@ -81,11 +75,15 @@ export default function ProfileScreen() {
                             image={getCellIcon('build-outline')}
                             title="Manage Account"
                             accessory="DisclosureIndicator"
+                            onPress={useCallback(() => {
+                                navigation.navigate('ManageAccount');
+                            }, [navigation])}
                         />
                         <Cell
-                            image={getCellIcon('exit-outline')}
+                            image={getCellIcon('exit-outline', 'red')}
                             title="Logout"
                             onPress={confirmLogout}
+                            titleTextColor="red"
                         />
                     </Section>
                 </TableView>
@@ -105,7 +103,7 @@ const styles = StyleSheet.create({
         marginTop: 40,
         marginBottom: 20,
     },
-    logoutContainer: {
-        alignItems: 'center',
+    separator: {
+        backgroundColor: 'black',
     },
 });
