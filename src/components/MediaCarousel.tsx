@@ -154,7 +154,7 @@ export default function MediaCarousel({
                             isPlay;
                         return (
                             <>
-                                {item.type === 'video' ? (
+                                {item.type === 'video' || item.type === 'livestream' ? (
                                     <VideoDiscover
                                         item={item}
                                         navigateDetail={navigateDetail}

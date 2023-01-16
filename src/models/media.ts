@@ -3,7 +3,7 @@ import urlJoin from 'url-join';
 import config from '../config';
 import { JSONObject } from '../types';
 
-export const MediaTypes = ['image', 'video'] as const;
+export const MediaTypes = ['image', 'video', 'livestream'] as const;
 export type MediaType = typeof MediaTypes[number];
 
 export interface MediaResponse extends JSONObject {
@@ -39,12 +39,17 @@ export class MediaManager {
                 parsedImageQuality = 'low';
                 break;
         }
-        const file =
-            media.type == 'image'
-                ? `${parsedImageQuality}.jpg`
-                : `index${parsedVideoQuality ? `-${quality}p` : ''}.m3u8`;
-        const path = urlJoin(config.BASE_URL, 'media', media.type, media.id, file);
-        return path;
+        if (media.type === 'image' || media.type === 'video') {
+            const file =
+                media.type == 'image'
+                    ? `${parsedImageQuality}.jpg`
+                    : `index${parsedVideoQuality ? `-${quality}p` : ''}.m3u8`;
+
+            const path = urlJoin(config.BASE_URL, 'media', media.type, media.id, file);
+            return path;
+        } else if (media.type === 'livestream') {
+            return `${config.NMS_HTTP_URL}/live/${media.id}/index.m3u8`;
+        }
     }
 
     static fromMediaResponse(response: MediaResponse): Media {
