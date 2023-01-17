@@ -1,16 +1,15 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { useFocusEffect } from '@react-navigation/native';
 import { Camera, CameraType } from 'expo-camera';
 import React, { useEffect, useRef, useState } from 'react';
-import { AppState, BackHandler, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { AppState, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { NodeCameraView } from 'react-native-nodemediaclient';
 import { useCallbackRef } from 'use-callback-ref';
 import config from '../config';
 
-import { EventListStackNavProps } from '../nav/types';
+import { EventDetailProps } from '../nav/types';
 import { asyncHandler, request } from '../util';
 
-function VideoCamera({ route, navigation }: EventListStackNavProps<'MediaCapture'>) {
+function VideoCamera({ route, navigation }: EventDetailProps<'MediaCapture'>) {
     const eventId = route.params.eventId;
 
     const [hasPermission, setHasPermission] = useState(false);
@@ -46,17 +45,6 @@ function VideoCamera({ route, navigation }: EventListStackNavProps<'MediaCapture
             subscription.remove();
         };
     }, []);
-
-    useFocusEffect(() => {
-        const subscription = BackHandler.addEventListener('hardwareBackPress', () => {
-            navigation.goBack();
-            return true;
-        });
-
-        return () => {
-            subscription.remove();
-        };
-    });
 
     const createFormData = (uri: string, type: string) => {
         const form = new FormData();

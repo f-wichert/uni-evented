@@ -40,19 +40,7 @@ function DiscoverScreen({ navigation }: DiscoverStackNavProps<'DiscoverView'>) {
     }
     const navigateDetail = useCallback(
         (id: string) => {
-            // TODO: pretty sure this error can be fixed using this? https://javascript.plainenglish.io/react-navigation-v6-with-typescript-nested-navigation-part-2-87844f643e37
-            // this shit is confusing af, send help
-            // same error in EventDetailScreen
-
-            // need to transition to another navigator here
-            navigation.navigate('Events', {
-                // captain, we're going deep
-                screen: 'EventDetail',
-                params: {
-                    eventId: id,
-                    origin: 'Discover',
-                },
-            });
+            navigation.navigate('EventDetail', { eventId: id });
         },
         [navigation]
     );

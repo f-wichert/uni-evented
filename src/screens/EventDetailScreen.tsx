@@ -1,19 +1,8 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { HeaderBackButton } from '@react-navigation/elements';
-import { StackActions, useFocusEffect } from '@react-navigation/native';
 import * as Location from 'expo-location';
 import { LocationObject } from 'expo-location';
-import React, { useCallback, useEffect, useState } from 'react';
-import {
-    BackHandler,
-    Image,
-    Pressable,
-    RefreshControl,
-    ScrollView,
-    StyleSheet,
-    Text,
-    View,
-} from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { Image, Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import MapView, { LatLng, Marker } from 'react-native-maps';
 import { Rating } from 'react-native-ratings';
@@ -22,7 +11,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import MediaCarousel from '../components/MediaCarousel';
 import { Tag } from '../components/Tag';
 import { EventManager } from '../models';
-import { EventListStackNavProps } from '../nav/types';
+import { EventDetailProps } from '../nav/types';
 import { useEventFetch, useEventStore } from '../state/event';
 import { useCurrentUser } from '../state/user';
 import { asyncHandler } from '../util';
@@ -33,7 +22,7 @@ function EventDetailScreen({
     preview,
     evId,
     orig,
-}: EventListStackNavProps<'EventDetail'>) {
+}: EventDetailProps<'EventDetail'>) {
     const eventId = evId ? evId : route.params.eventId;
     const origin = orig ? orig : route.params.origin;
     const { event: eventData, loading, refresh } = useEventFetch(eventId);
@@ -51,27 +40,10 @@ function EventDetailScreen({
     const isPreview = preview ? preview : false;
 
     useEffect(() => {
-        // overwrite back button functionality on this component to depend on where it came from (nested screens)
-        navigation.setOptions({
-            headerLeft: () => (
-                <HeaderBackButton
-                    onPress={() => {
-                        navigateToOrigin();
-                    }}
-                />
-            ),
-        });
-
+        // TODO: await
         getLastKnownPosition();
         getCurrentPosition();
-    }, [navigation]);
-
-    useFocusEffect(
-        useCallback(() => {
-            BackHandler.addEventListener('hardwareBackPress', navigateToOrigin);
-            refresh();
-        }, [])
-    );
+    }, []);
 
     if (!eventData) {
         return (
@@ -117,30 +89,6 @@ function EventDetailScreen({
             profilePicture:
                 'https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=745&q=80',
         };
-    }
-
-    function navigateToOrigin() {
-        // probably same TS error as in MapScreen (link there)
-        switch (origin) {
-            case 'Map':
-                // this is needed here to also remove the EventDetailsScreen from the stack
-                // otherwise the following happens:
-                // 1. Open Event from Map Screen & go back to Map Screen using Back functionality
-                // 2. if you click 'Events' it will still show the Event from before and not the list
-                navigation.dispatch(StackActions.replace('TabScreen', { screen: 'Map' }));
-                break;
-            case 'Discover':
-                navigation.dispatch(StackActions.replace('TabScreen', { screen: 'Discover' }));
-                break;
-            case 'MyEvents':
-                // TODO: this removes the `MyEvents` screen from the stack, navigating directly doesn't appear to work correctly;
-                //       Maybe have a separate `EventDetail` for each tab stack, so that all this isn't needed?
-                navigation.dispatch(StackActions.replace('TabScreen', { screen: 'Profile' }));
-                break;
-            default:
-                navigation.navigate('EventList');
-        }
-        return true;
     }
 
     const formatTime = (date: Date) => {
@@ -197,7 +145,7 @@ function EventDetailScreen({
             <View style={styles.chatButtonContainer}>
                 <Pressable
                     style={styles.chatButton}
-                    onPress={() => navigation.navigate('ChatScreen', { eventId: eventId })}
+                    onPress={() => navigation.navigate('Chat', { eventId: eventId })}
                 >
                     <Ionicons name={'chatbox-ellipses-outline'} size={37} color={'white'} />
                 </Pressable>
