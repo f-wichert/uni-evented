@@ -22,14 +22,14 @@ function MapFilter(props) {
         <View style={styles.container}>
             <View style={styles.body}>
                 <View style={styles.section}>
-                    <Text style={styles.sectionHeader}>Range for current events:</Text>
+                    <Text style={styles.sectionHeader}>Range for visible events:</Text>
                     <View style={styles.sectionBody}>
                         <View style={{ flex: 3 }}>
                             <Text>{currentDayRange} Days</Text>
                         </View>
                         <View style={{ flex: 14 }}>
                             <Slider
-                                minimumValue={1}
+                                minimumValue={0}
                                 maximumValue={7}
                                 step={true}
                                 value={currentDayRange}
@@ -40,17 +40,17 @@ function MapFilter(props) {
                         </View>
                     </View>
                 </View>
-                <View style={styles.section}>
+                {/* <View style={styles.section}>
                     <Text style={styles.sectionHeader}>Range for future events:</Text>
                     <View style={styles.sectionBody}>
                         <View style={{ flex: 3 }}>
                             <Text>
-                                {futureDayRange[0]} - {futureDayRange[1]} Days
+                                {currentDayRange} - {futureDayRange} Days
                             </Text>
                         </View>
                         <View style={{ flex: 14 }}>
                             <Slider
-                                minimumValue={1}
+                                minimumValue={0}
                                 maximumValue={7}
                                 step={1}
                                 value={futureDayRange}
@@ -63,7 +63,17 @@ function MapFilter(props) {
                             />
                         </View>
                     </View>
-                </View>
+                </View> */}
+                {/* <View style={styles.section}>
+                    <Pressable 
+                        onPress={(e) => {
+                            console.log("Update");
+                            refresh();
+                        }}
+                    >
+                        <Text>Update</Text>
+                    </Pressable>
+                </View> */}
             </View>
         </View>
     );
