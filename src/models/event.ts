@@ -1,6 +1,7 @@
 import { LatLng } from 'react-native-maps';
 
 import { addEvents, useEventStore } from '../state/event';
+import { Tag } from '../types';
 import { request } from '../util';
 import { Media, MediaManager, MediaResponse } from './media';
 import { User, UserManager, UserResponse } from './user';
@@ -34,6 +35,9 @@ export interface Event {
     readonly endDate?: Date | null;
     readonly users?: User[] | null;
     readonly currentUsers?: User[] | null;
+    readonly description: string;
+    readonly tags: Tag[];
+    readonly musicStyle?: string;
 }
 
 // transient type for processed API responses by `fromEventResponse`
