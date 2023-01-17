@@ -11,6 +11,7 @@ import config from '../config';
 import { Event } from '../models';
 import { useMediaFetch } from '../state/event';
 import ImageDiscover from './ImageDiscover';
+import LiveDiscover from './LiveDiscover';
 import VideoDiscover from './VideoDiscover';
 
 interface Props {
@@ -124,7 +125,7 @@ export default function MediaCarousel({
                                 isPlay;
                             return (
                                 <>
-                                    {item.type === 'video' ? (
+                                    {item.type === 'video' && (
                                         <VideoDiscover
                                             item={item}
                                             navigateDetail={navigateDetail}
@@ -135,18 +136,26 @@ export default function MediaCarousel({
                                             finishedVideo={onFinishedVideo}
                                             quality={quality}
                                         />
-                                    ) : (
+                                    )}
+                                    {item.type === 'image' && (
                                         <ImageDiscover
                                             item={item}
                                             navigateDetail={navigateDetail}
                                             quality={quality}
                                         />
                                     )}
+                                    {item.type === 'livestream' && (
+                                        <LiveDiscover
+                                            item={item}
+                                            isMute={isMute}
+                                            isPlay={shouldThisSpecificVideoPlay}
+                                            navigateDetail={navigateDetail}
+                                        />
+                                    )}
                                 </>
                             );
                         }}
                     />
-
                     {new Array(media.length).fill(0).map((el, index) => (
                         <View
                             style={{
