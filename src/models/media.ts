@@ -39,17 +39,24 @@ export class MediaManager {
                 parsedImageQuality = 'low';
                 break;
         }
-        if (media.type === 'image' || media.type === 'video') {
-            const file =
-                media.type == 'image'
-                    ? `${parsedImageQuality}.jpg`
-                    : `index${parsedVideoQuality ? `-${quality}p` : ''}.m3u8`;
 
-            const path = urlJoin(config.BASE_URL, 'media', media.type, media.id, file);
-            return path;
-        } else if (media.type === 'livestream') {
-            return `${config.NMS_HTTP_URL}/live/${media.id}/index.m3u8`;
-        }
+        const file =
+            media.type === 'image'
+                ? `${parsedImageQuality}.jpg`
+                : `index${
+                      media.type !== 'livestream' && parsedVideoQuality ? `-${quality}p` : ''
+                  }.m3u8`;
+
+        const path = urlJoin(
+            // media.type === 'livestream' ? config.NMS_HTTP_URL : config.BASE_URL,
+            config.BASE_URL,
+            'media',
+            media.type,
+            media.id,
+            file
+        );
+
+        return path;
     }
 
     static fromMediaResponse(response: MediaResponse): Media {
