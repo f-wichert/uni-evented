@@ -46,10 +46,6 @@ function EventDetailScreen({
     const [isOpenQuality, setIsOpenQuality] = useState<boolean>(false);
     const [quality, setQuality] = useState<'auto' | '1080' | '720' | '480' | '360'>('auto');
 
-    const [eventRelationship, setEventRelationship] = useState<
-        'left' | 'attending' | 'interested' | 'banned' | null
-    >(null);
-
     const [location, setLocation] = useState<LatLng | null>();
 
     const isPreview = preview ? preview : false;
