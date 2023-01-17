@@ -33,16 +33,12 @@ function VideoCamera({ route, navigation }: EventListStackNavProps<'MediaCapture
         }
     });
 
-    const appState = useRef(AppState.currentState);
-
     // make sure the stream stops when app closes or goes inactive
     useEffect(() => {
         const subscription = AppState.addEventListener('change', (nextState) => {
-            if (appState.current === 'active' && nextState === 'background') {
-                if (liveCameraRef.current) {
-                    liveCameraRef.current.stop();
-                    setLiveMode(false);
-                }
+            if (nextState === 'background' && liveCameraRef.current) {
+                liveCameraRef.current.stop();
+                setLiveMode(false);
             }
         });
 
