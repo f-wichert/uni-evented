@@ -3,3 +3,5 @@ dist/
 babel.config.js
 metro.config.js
 .expo/
+android/
+ios/

@@ -19,7 +19,9 @@ const extraConfig = loadConfig(process.env, true);
 const config: ExpoConfig = {
     name: 'Evented',
     slug: 'Evented',
+    owner: 'evented',
     version: '1.0.0',
+
     orientation: 'portrait',
     icon: './assets/icon.png',
     userInterfaceStyle: 'light',
@@ -40,11 +42,17 @@ const config: ExpoConfig = {
             foregroundImage: './assets/adaptive-icon.png',
             backgroundColor: '#FFFFFF',
         },
+        package: 'com.evented.Evented',
     },
     web: {
         favicon: './assets/favicon.png',
     },
-    extra: extraConfig,
+    extra: {
+        config: extraConfig,
+        eas: {
+            projectId: '46fceaba-71dc-42a1-9cdc-93095b670ddc',
+        },
+    },
 };
 
 export default config;
