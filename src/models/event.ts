@@ -120,8 +120,9 @@ export class EventManager {
     static async create(params: {
         name: string;
         tags: Tag[];
+        description: string;
         location: LatLng;
-        startDate?: Date | null;
+        startDate: Date | null;
         endDate?: Date | null;
     }) {
         const event = (await request('POST', '/event/create', {
@@ -129,6 +130,7 @@ export class EventManager {
             tags: params.tags,
             lat: params.location.latitude,
             lon: params.location.longitude,
+            description: params.description,
             startDateTime: params.startDate?.toJSON() ?? null,
             endDateTime: params.endDate?.toJSON() ?? null,
         })) as unknown as EventResponse;

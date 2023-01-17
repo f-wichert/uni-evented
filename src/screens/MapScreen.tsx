@@ -5,6 +5,7 @@ import { Dimensions, StyleSheet, View } from 'react-native';
 import MapView, { LatLng } from 'react-native-maps';
 import MapFilter from '../components/MapFilter';
 
+import { LocationObject } from 'expo-location';
 import EventMarker from '../components/EventMarker';
 import { TabNavProps } from '../nav/types';
 import { useFindEvents } from '../state/event';
@@ -22,21 +23,25 @@ function MapScreen({ navigation, route }: TabNavProps<'Map'>) {
     });
     const { events, refresh } = useFindEvents();
 
-    console.log('Selected Event:');
-    console.log(selectedEvent);
-
     // Filter options
     const [showCurrentEvents, setShowCurrentEvents] = useState(true);
     const [currentDayRange, setCurrentDayRange] = useState(1);
     const [showFutureEvents, setShowFutureEvents] = useState(true);
     const [futureDayRange, setFutureDayRange] = useState([2, 4]);
 
-    const getCurrentPosition = async () => {
-        const { status } = await Location.requestForegroundPermissionsAsync();
-        if (status !== 'granted') {
-            throw new Error('Location access not granted');
-        }
+    const getLastKnownPosition = async () => {
+        const { coords } =
+            (await Location.getLastKnownPositionAsync()) as unknown as LocationObject;
+        const lastLocation = { latitude: coords.latitude, longitude: coords.longitude };
 
+        setLocation(lastLocation);
+
+        mapRef.current?.animateCamera({
+            center: lastLocation,
+        });
+    };
+
+    const getCurrentPosition = async () => {
         const location = await Location.getCurrentPositionAsync();
         const latlng = { latitude: location.coords.latitude, longitude: location.coords.longitude };
         setLocation(latlng);
@@ -77,6 +82,11 @@ function MapScreen({ navigation, route }: TabNavProps<'Map'>) {
                     </View>
                 ),
             });
+            const { status } = await Location.requestForegroundPermissionsAsync();
+            if (status !== 'granted') {
+                throw new Error('Location access not granted');
+            }
+            getLastKnownPosition();
             await getCurrentPosition();
         }),
         [navigation]

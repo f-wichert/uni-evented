@@ -1,6 +1,8 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { HeaderBackButton } from '@react-navigation/elements';
 import { StackActions, useFocusEffect } from '@react-navigation/native';
+import * as Location from 'expo-location';
+import { LocationObject } from 'expo-location';
 import React, { useCallback, useEffect, useState } from 'react';
 import {
     BackHandler,
@@ -13,6 +15,7 @@ import {
     View,
 } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import MapView, { LatLng, Marker } from 'react-native-maps';
 import { Rating } from 'react-native-ratings';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
@@ -20,7 +23,8 @@ import MediaCarousel from '../components/MediaCarousel';
 import { Tag } from '../components/Tag';
 import { EventManager } from '../models';
 import { EventListStackNavProps } from '../nav/types';
-import { useEventFetch } from '../state/event';
+import { useEventFetch, useEventStore } from '../state/event';
+import { useCurrentUser } from '../state/user';
 import { asyncHandler } from '../util';
 
 function EventDetailScreen({
@@ -33,11 +37,20 @@ function EventDetailScreen({
     const eventId = evId ? evId : route.params.eventId;
     const origin = orig ? orig : route.params.origin;
     const { event: eventData, loading, refresh } = useEventFetch(eventId);
+    const user = useCurrentUser();
+    const userCurrentEventId = useEventStore((state) => state.currentEventId); // Get event ID of current event of currently logged in user
 
+    // MediaCarousel
     const [isPlay, setIsPlay] = useState<boolean>(true);
     const [isMute, setIsMute] = useState<boolean>(true);
     const [isOpenQuality, setIsOpenQuality] = useState<boolean>(false);
     const [quality, setQuality] = useState<'auto' | '1080' | '720' | '480' | '360'>('auto');
+
+    const [eventRelationship, setEventRelationship] = useState<
+        'left' | 'attending' | 'interested' | 'banned' | null
+    >(null);
+
+    const [location, setLocation] = useState<LatLng | null>();
 
     const isPreview = preview ? preview : false;
 
@@ -52,6 +65,9 @@ function EventDetailScreen({
                 />
             ),
         });
+
+        getLastKnownPosition();
+        getCurrentPosition();
     }, [navigation]);
 
     useFocusEffect(
@@ -60,8 +76,6 @@ function EventDetailScreen({
             refresh();
         }, [])
     );
-
-    // const eventID = useEventStore((state) => state.currentEventId) // Get event ID of current event of currently logged in user
 
     if (!eventData) {
         return (
@@ -78,6 +92,29 @@ function EventDetailScreen({
             </View>
         );
     }
+
+    const getEventRelationship = () => {
+        // return if loading or the event has no users
+        if (!loading || !eventData.users) return;
+        const eventUser = eventData.users.find((el) => el.id === user.id);
+        // return if user is not part of the event
+        if (!eventUser) return;
+        return eventUser.eventAttendee.status;
+    };
+
+    const getLastKnownPosition = async () => {
+        const { coords } =
+            (await Location.getLastKnownPositionAsync()) as unknown as LocationObject;
+        const lastLocation = { latitude: coords.latitude, longitude: coords.longitude };
+
+        setLocation(lastLocation);
+    };
+
+    const getCurrentPosition = async () => {
+        const location = await Location.getCurrentPositionAsync();
+        const latlng = { latitude: location.coords.latitude, longitude: location.coords.longitude };
+        setLocation(latlng);
+    };
 
     function getProfilePicture() {
         return {
@@ -110,45 +147,57 @@ function EventDetailScreen({
         return true;
     }
 
-    // console.log('DEBUG');
-    // console.log(eventData);
-    // console.log('DEBUG END');
+    const formatTime = (date: Date) => {
+        const hours = date.getHours().toString().padStart(2, '0');
+        const minutes = date.getMinutes().toString().padStart(2, '0');
+        return `${hours}:${minutes}`;
+    };
 
-    // Developement Values TODO: replace with request to real ones
-    const event = {
-        title: eventData.name,
-        tags: [
-            { name: 'Beer', color: 'orange' },
-            { name: 'Rave', color: 'green' },
-            { name: 'Techno', color: 'red' },
-        ],
-        numberOfAttendants: (eventData.users ?? []).length,
-        startingTime: '19:00',
-        endingTime: '23:30',
-        address: 'Schloßgartenstraße, 64289 Darmstadt',
-        musicStyle: 'Techno',
-        rating: 4,
-        description:
-            'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum.Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum.Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum.Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum.Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum.Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum.Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum.',
+    const formatDate = (date: Date) => {
+        const day = date.getDate().toString().padStart(2, '0');
+        const month = (date.getMonth() + 1).toString().padStart(2, '0');
+        const year = date.getFullYear();
+        return `${day}.${month}.${year}`;
     };
 
     const numberOfAttendants = (eventData.users ?? []).length;
 
-    const navigationBar = (
-        <>
+    const mainButton = () => {
+        let button = <Text style={styles.joinButtonText}>I'm here!</Text>;
+        let disabled = false;
+
+        const mainJsx = (
             <View style={styles.joinButtonContainer}>
                 <Pressable
-                    style={styles.joinButton}
+                    style={{ ...styles.joinButton, opacity: disabled ? 0.5 : 1 }}
                     onPress={asyncHandler(
                         async () => {
                             await EventManager.join(eventId, 0, 0);
                         },
                         { prefix: 'Failed to join event' }
                     )}
+                    disabled={disabled}
                 >
-                    <Text style={styles.joinButtonText}>{"I'm Here!"}</Text>
+                    {button}
                 </Pressable>
             </View>
+        );
+
+        // // User is Host and Event is active
+        // if (eventData.hostId === user.id && eventData.status === 'active') {
+        //     button = <Text style={styles.joinButtonText}>Stop event!</Text>;
+        // }
+        // // User is Host and Event is scheduled
+        // if (eventData.hostId === user.id && eventData.status === 'scheduled') {
+        //     button = <Text style={styles.joinButtonText}>Start event!</Text>;
+        // }
+        // if (getEventRelationship() === 'attending') {
+        //     button = <Text style={styles.joinButtonText}>Leave event!</Text>;
+        // }
+        return mainJsx;
+    };
+    const navigationBar = (
+        <>
             <View style={styles.chatButtonContainer}>
                 <Pressable
                     style={styles.chatButton}
@@ -157,7 +206,8 @@ function EventDetailScreen({
                     <Ionicons name={'chatbox-ellipses-outline'} size={37} color={'white'} />
                 </Pressable>
             </View>
-            <View style={styles.chatButtonContainer}>
+            {mainButton()}
+            <View style={styles.JoinCameraButtonContainer}>
                 {isPreview ? (
                     <Pressable
                         style={styles.chatButton}
@@ -223,24 +273,23 @@ function EventDetailScreen({
         <View style={styles.GeneralInformationArea}>
             <View style={{ maxWidth: '60%' }}>
                 <Text style={{ color: 'grey', fontSize: 16 }}>
-                    {`${eventData.startDate
-                        .getHours()
-                        .toString()
-                        .padStart(2, '0')}:${eventData.startDate
-                        .getMinutes()
-                        .toString()
-                        .padStart(2, '0')} - ${eventData.endDate
-                        ?.getHours()
-                        .toString()
-                        .padStart(2, '0')}:${eventData.endDate
-                        ?.getMinutes()
-                        .toString()
-                        .padStart(2, '0')}`}
+                    {`Start: ${formatDate(eventData.startDate)} - ${formatTime(
+                        eventData.startDate
+                    )}`}
                 </Text>
-                <Text style={{ fontSize: 18, fontWeight: 'bold' }}> </Text>
+                {eventData.endDate ? (
+                    <Text style={{ color: 'grey', fontSize: 16 }}>
+                        {`End:  ${formatDate(eventData.startDate)} - ${formatTime(
+                            eventData.startDate
+                        )}`}
+                    </Text>
+                ) : (
+                    <></>
+                )}
+                {/* <Text style={{ fontSize: 18, fontWeight: 'bold' }}> </Text> */}
             </View>
 
-            {eventData.musicStyle ? (
+            {/* {eventData.musicStyle ? (
                 <View
                     style={{
                         display: 'flex',
@@ -254,7 +303,7 @@ function EventDetailScreen({
                 </View>
             ) : (
                 <></>
-            )}
+            )} */}
         </View>
     );
 
@@ -282,6 +331,45 @@ function EventDetailScreen({
         </View>
     );
 
+    const mapView = (
+        <MapView
+            style={styles.locationPreviewMap}
+            // TODO: do something on press, or disable touch event instead?
+            zoomEnabled={true}
+            scrollEnabled={true}
+            pitchEnabled={true}
+            rotateEnabled={true}
+            region={{
+                latitude: eventData.lat,
+                longitude: eventData.lon,
+                latitudeDelta: 0.001,
+                longitudeDelta: 0.001,
+            }}
+        >
+            <Marker
+                key={1}
+                coordinate={{
+                    latitude: eventData.lat,
+                    longitude: eventData.lon,
+                }}
+                title={eventData.name}
+            />
+            {location ? (
+                <Marker
+                    key={2}
+                    coordinate={{
+                        latitude: location.latitude,
+                        longitude: location.longitude,
+                    }}
+                    title={'You'}
+                    pinColor={'orange'}
+                />
+            ) : (
+                <></>
+            )}
+        </MapView>
+    );
+
     return (
         <>
             <SafeAreaProvider>
@@ -306,6 +394,7 @@ function EventDetailScreen({
                                     {titleLine}
                                     {generalInformationArea}
                                     {descriptionArea}
+                                    {mapView}
                                 </View>
                             </>
                         )}
@@ -326,21 +415,6 @@ const styles = StyleSheet.create({
     },
     section: {},
     sectionBody: {},
-    column: {
-        flex: 1,
-        backgroundColor: 'transparent',
-        justifyContent: 'flex-end',
-        marginBottom: 10,
-    },
-    row: {
-        display: 'flex',
-        flexDirection: 'row',
-        justifyContent: 'space-evenly',
-    },
-    flexEl: {
-        flex: 0.5,
-        padding: 20,
-    },
     camera: {
         flex: 1,
         display: 'flex',
@@ -440,7 +514,7 @@ const styles = StyleSheet.create({
         display: 'flex',
     },
     joinButtonContainer: {
-        flex: 25,
+        flex: 3,
         // backgroundColor: 'yellow',
         marginLeft: 10,
         marginRight: 10,
@@ -462,7 +536,14 @@ const styles = StyleSheet.create({
         fontSize: 30,
     },
     chatButtonContainer: {
-        flex: 6,
+        flex: 1,
+        // backgroundColor: 'blue',
+        marginLeft: 10,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    JoinCameraButtonContainer: {
+        flex: 1,
         // backgroundColor: 'blue',
         marginRight: 10,
         justifyContent: 'center',
@@ -486,6 +567,11 @@ const styles = StyleSheet.create({
         flex: 1,
         flexDirection: 'row',
         display: 'flex',
+    },
+    locationPreviewMap: {
+        width: '100%',
+        height: 300,
+        borderRadius: 5,
     },
 });
 
