@@ -3,7 +3,7 @@ import urlJoin from 'url-join';
 import config from '../config';
 import { JSONObject } from '../types';
 
-export const MediaTypes = ['image', 'video'] as const;
+export const MediaTypes = ['image', 'video', 'livestream'] as const;
 export type MediaType = typeof MediaTypes[number];
 
 export interface MediaResponse extends JSONObject {
@@ -39,11 +39,19 @@ export class MediaManager {
                 parsedImageQuality = 'low';
                 break;
         }
+
+        if (media.type === 'livestream') {
+            console.log(`${config.NMS_RTMP_URL}/livestream/${media.id}`);
+            return `${config.NMS_RTMP_URL}/livestream/${media.id}`;
+        }
+
         const file =
-            media.type == 'image'
+            media.type === 'image'
                 ? `${parsedImageQuality}.jpg`
                 : `index${parsedVideoQuality ? `-${quality}p` : ''}.m3u8`;
+
         const path = urlJoin(config.BASE_URL, 'media', media.type, media.id, file);
+
         return path;
     }
 

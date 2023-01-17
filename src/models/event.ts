@@ -119,7 +119,7 @@ export class EventManager {
 
     static async create(params: {
         name: string;
-        tags: string[];
+        tags: Tag[];
         location: LatLng;
         startDate?: Date | null;
         endDate?: Date | null;
