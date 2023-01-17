@@ -43,6 +43,11 @@ const config: ExpoConfig = {
             backgroundColor: '#FFFFFF',
         },
         package: 'com.evented.Evented',
+        config: {
+            googleMaps: {
+                apiKey: 'AIzaSyChSdHjqhSGgVqGZV53oppwt4FjMSinlGk',
+            },
+        },
     },
     web: {
         favicon: './assets/favicon.png',
