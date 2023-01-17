@@ -110,6 +110,10 @@ function EventDetailScreen({
         return true;
     }
 
+    console.log('DEBUG');
+    console.log(eventData);
+    console.log('DEBUG END');
+
     // Developement Values TODO: replace with request to real ones
     const event = {
         title: eventData.name,
@@ -127,6 +131,8 @@ function EventDetailScreen({
         description:
             'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum.Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum.Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum.Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum.Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum.Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum.Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum.',
     };
+
+    const numberOfAttendants = (eventData.users ?? []).length;
 
     const navigationBar = (
         <>
@@ -170,15 +176,16 @@ function EventDetailScreen({
             </View>
         </>
     );
-
-    const tagArea = (
+    const tagArea = eventData.tags ? (
         <View style={styles.tagArea}>
-            {event.tags.map((tag) => (
-                <Tag style={{ ...styles.tag, backgroundColor: tag.color }} key={tag.name}>
-                    {tag.name}
+            {eventData.tags.map((tag) => (
+                <Tag style={{ ...styles.tag, backgroundColor: tag.color }} key={tag.label}>
+                    {tag.label}
                 </Tag>
             ))}
         </View>
+    ) : (
+        <View style={{ height: 10 }}></View>
     );
 
     const ratingArea = (
@@ -189,7 +196,9 @@ function EventDetailScreen({
 
     const titleLine = (
         <View style={styles.TitleLine}>
-            <Text style={{ fontSize: 25, fontWeight: 'bold', maxWidth: '70%' }}>{event.title}</Text>
+            <Text style={{ fontSize: 25, fontWeight: 'bold', maxWidth: '70%' }}>
+                {eventData.name}
+            </Text>
             <View
                 style={{
                     display: 'flex',
@@ -199,7 +208,7 @@ function EventDetailScreen({
             >
                 <Ionicons name="people" size={28} />
                 <Text style={{ fontSize: 25, fontWeight: 'bold', marginLeft: 2 }}>
-                    {event.numberOfAttendants}
+                    {numberOfAttendants}
                 </Text>
             </View>
             <Image
@@ -209,31 +218,49 @@ function EventDetailScreen({
         </View>
     );
 
+    // Replace blank with "{eventData.address}" as soon as it is properly availabe
     const generalInformationArea = (
         <View style={styles.GeneralInformationArea}>
             <View style={{ maxWidth: '60%' }}>
                 <Text style={{ color: 'grey', fontSize: 16 }}>
-                    {event.startingTime}-{event.endingTime}
+                    {`${eventData.startDate
+                        .getHours()
+                        .toString()
+                        .padStart(2, '0')}:${eventData.startDate
+                        .getMinutes()
+                        .toString()
+                        .padStart(2, '0')} - ${eventData.endDate
+                        ?.getHours()
+                        .toString()
+                        .padStart(2, '0')}:${eventData.endDate
+                        ?.getMinutes()
+                        .toString()
+                        .padStart(2, '0')}`}
                 </Text>
-                <Text style={{ fontSize: 18, fontWeight: 'bold' }}>{event.address}</Text>
+                <Text style={{ fontSize: 18, fontWeight: 'bold' }}> </Text>
             </View>
-            <View
-                style={{
-                    display: 'flex',
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    marginRight: 13,
-                }}
-            >
-                <Ionicons name="musical-notes-sharp" size={25}></Ionicons>
-                <Text style={{ fontSize: 23, fontWeight: '900' }}>{event.musicStyle}</Text>
-            </View>
+
+            {eventData.musicStyle ? (
+                <View
+                    style={{
+                        display: 'flex',
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        marginRight: 13,
+                    }}
+                >
+                    <Ionicons name="musical-notes-sharp" size={25}></Ionicons>
+                    <Text style={{ fontSize: 23, fontWeight: '900' }}>{eventData.musicStyle}</Text>
+                </View>
+            ) : (
+                <></>
+            )}
         </View>
     );
 
     const descriptionArea = (
         <View style={styles.DescriptionArea}>
-            <Text>{event.description}</Text>
+            <Text>{eventData.description}</Text>
         </View>
     );
 

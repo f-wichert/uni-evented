@@ -1,0 +1,23 @@
+{
+    "cli": {
+        "version": ">= 3.3.2"
+    },
+    "build": {
+        "_base": {
+            "android": {
+                "buildType": "apk"
+            },
+            "distribution": "internal"
+        },
+        "development": {
+            "extends": "_base",
+            "developmentClient": true
+        },
+        "production": {
+            "extends": "_base"
+        }
+    },
+    "submit": {
+        "production": {}
+    }
+}

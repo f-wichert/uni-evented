@@ -2,3 +2,5 @@ package-lock.json
 dist/
 *.yml
 .expo/
+android/
+ios/
