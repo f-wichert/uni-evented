@@ -5,6 +5,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { AppState, BackHandler, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { NodeCameraView } from 'react-native-nodemediaclient';
 import { useCallbackRef } from 'use-callback-ref';
+import config from '../config';
 
 import { EventListStackNavProps } from '../nav/types';
 import { asyncHandler, request } from '../util';
@@ -112,7 +113,7 @@ function VideoCamera({ route, navigation }: EventListStackNavProps<'MediaCapture
     const updateStreamUrl = async () => {
         const response = await request('POST', '/upload/livestream', { eventID: eventId });
         const { id, streamKey } = response as { id: string; streamKey: string };
-        const url = `rtmp://192.168.2.119:3003/live/${id}?key=${streamKey}`;
+        const url = `${config.NMS_RTMP_URL}/livestream/${id}?key=${streamKey}`;
         setStreamUrl(url);
     };
 

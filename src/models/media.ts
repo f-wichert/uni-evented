@@ -40,21 +40,17 @@ export class MediaManager {
                 break;
         }
 
+        if (media.type === 'livestream') {
+            console.log(`${config.NMS_RTMP_URL}/livestream/${media.id}`);
+            return `${config.NMS_RTMP_URL}/livestream/${media.id}`;
+        }
+
         const file =
             media.type === 'image'
                 ? `${parsedImageQuality}.jpg`
-                : `index${
-                      media.type !== 'livestream' && parsedVideoQuality ? `-${quality}p` : ''
-                  }.m3u8`;
+                : `index${parsedVideoQuality ? `-${quality}p` : ''}.m3u8`;
 
-        const path = urlJoin(
-            // media.type === 'livestream' ? config.NMS_HTTP_URL : config.BASE_URL,
-            config.BASE_URL,
-            'media',
-            media.type,
-            media.id,
-            file
-        );
+        const path = urlJoin(config.BASE_URL, 'media', media.type, media.id, file);
 
         return path;
     }
