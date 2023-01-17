@@ -21,7 +21,7 @@ import { Tag } from '../components/Tag';
 import { EventManager } from '../models';
 import { EventListStackNavProps } from '../nav/types';
 import { useEventFetch } from '../state/event';
-import { asyncHandler } from '../util';
+import { asyncHandler, request } from '../util';
 
 function EventDetailScreen({
     route,
@@ -110,9 +110,9 @@ function EventDetailScreen({
         return true;
     }
 
-    console.log('DEBUG');
-    console.log(eventData);
-    console.log('DEBUG END');
+    // console.log('DEBUG');
+    // console.log(eventData);
+    // console.log('DEBUG END');
 
     // Developement Values TODO: replace with request to real ones
     const event = {
@@ -190,9 +190,15 @@ function EventDetailScreen({
 
     const ratingArea = (
         <View style={styles.RatingArea}>
-            <Rating imageSize={28} />
+            <Rating imageSize={28} onFinishRating={onRating} />
         </View>
     );
+
+    function onRating(rating: number) {
+        request('POST', '/event/rate', { eventID: eventId, rating: rating }).catch((reason) =>
+            toast.show('Could not send rating. Please try again')
+        );
+    }
 
     const titleLine = (
         <View style={styles.TitleLine}>
@@ -490,3 +496,6 @@ const styles = StyleSheet.create({
 });
 
 export default EventDetailScreen;
+function ratedWith(rating: any, number: any) {
+    throw new Error('Function not implemented.');
+}
