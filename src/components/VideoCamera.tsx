@@ -219,7 +219,7 @@ function VideoCamera({ route, navigation }: EventListStackNavProps<'MediaCapture
                     </View>
                 </View>
             ) : (
-                <Camera style={[styles.camera]} type={cameraType} ref={cameraRef}>
+                <Camera style={[styles.camera]} type={cameraType} ref={cameraRef} ratio={'16:9'}>
                     <View style={[styles.column]}>
                         <View style={[styles.row]}>
                             <TouchableOpacity
