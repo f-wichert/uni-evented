@@ -11,7 +11,15 @@ export default (env: e.Environment, isBuild = false) => {
         }) as e.ValidatorSpec<'development' | 'production'>,
         BASE_URL: e.url({
             desc: 'The base API url',
-            example: 'http://10.0.2.2:3001/api (Android Emulator)',
+            example: 'http://10.0.2.2:3000/api (Android Emulator)',
+        }),
+        NMS_HTTP_URL: e.url({
+            desc: 'The NodeMediaServer http url',
+            example: 'http://10.0.2.2:3001/',
+        }),
+        NMS_RTMP_URL: e.url({
+            desc: 'The NodeMediaServer rtmp url',
+            example: 'rtmp://10.0.2.2:3003/',
         }),
         ENABLE_STATE_DEBUG: e.bool({
             default: false,

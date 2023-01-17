@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import DropDownPicker from 'react-native-dropdown-picker';
 // import DateTimePicker from '@react-native-community/datetimepicker';
+import Checkbox from 'expo-checkbox';
 import MapView, { LatLng, Marker } from 'react-native-maps';
 
 import { INPUT_BACKGR_COLOR } from '../constants';
@@ -21,22 +22,6 @@ import { IoniconsName, Tag } from '../types';
 import { asyncHandler, request } from '../util';
 
 const width = Dimensions.get('window').width;
-// const height = Dimensions.get('window').height;
-
-// const tags = [
-//     { label: 'Activity', value: 'activity' },
-//     { label: 'Party', value: 'party', parent: 'activity' },
-//     { label: 'Boardgames', value: 'boardgames', parent: 'activity' },
-//     { label: 'Sports', value: 'sports', parent: 'activity' },
-//     { label: 'Drinking', value: 'drinking', parent: 'activity' },
-//     { label: 'Chilling', value: 'chilling', parent: 'activity' },
-//     { label: 'Music', value: 'music' },
-//     { label: 'Jazz', value: 'jazz', parent: 'music' },
-//     { label: 'Techno', value: 'techno', parent: 'music' },
-//     { label: 'Rock', value: 'rock', parent: 'music' },
-//     { label: 'R&B', value: 'rnb', parent: 'music' },
-//     { label: 'Reggae', value: 'reggae', parent: 'music' },
-// ] as const;
 
 function CreateEventScreen({ navigation, route }: EventListStackNavProps<'CreateEvent'>) {
     // This is passed back from the map picker (https://reactnavigation.org/docs/params#passing-params-to-a-previous-screen).
@@ -47,8 +32,16 @@ function CreateEventScreen({ navigation, route }: EventListStackNavProps<'Create
     ]);
     useEffect(
         asyncHandler(async () => {
-            const response = await request('GET', '/info/all_tags');
-            setTags(response as unknown as Tag[]);
+            const response = (await request('GET', '/info/all_tags')) as unknown as Tag[];
+            const mappedTags = response.map((el: Tag) => ({
+                label: el.label,
+                color: el.color,
+                value: el.id,
+                parent: el.parent,
+                id: el.id,
+            }));
+            console.log(mappedTags);
+            setTags(mappedTags as unknown as Tag[]);
         }),
         []
     );
@@ -62,12 +55,15 @@ function CreateEventScreen({ navigation, route }: EventListStackNavProps<'Create
 
     const [name, setName] = useState('');
 
+    const [useEndtime, setUseEndtime] = useState<boolean>(false);
+
     // DatePickerState
     const [start, setStart] = useState(new Date());
+    const [end, setEnd] = useState(new Date());
 
     // Dropdown State
     const [open, setOpen] = useState(false);
-    const [value, setValue] = useState([]);
+    const [selectedTags, setSelectedTags] = useState([]);
 
     // Location State
     const [location, setLocation] = useState<LatLng | null>(null);
@@ -75,18 +71,35 @@ function CreateEventScreen({ navigation, route }: EventListStackNavProps<'Create
     // Location icon
     const [iconName, setIconName] = useState<IoniconsName>('location-outline');
 
-    const onChange = (event: DateTimePickerEvent, selectedDate?: Date) => {
+    const onChangeStart = (event: DateTimePickerEvent, selectedDate?: Date) => {
         if (!selectedDate) {
             return;
         }
         setStart(selectedDate);
     };
 
+    const onChangeEnd = (event: DateTimePickerEvent, selectedDate?: Date) => {
+        if (!selectedDate) {
+            return;
+        }
+        setEnd(selectedDate);
+    };
+
     const showModeStartPicker = (currentMode: 'date' | 'time') => {
         // TODO: not supported on ios, which technically isn't a requirement but would be nice
         DateTimePickerAndroid.open({
             value: start,
-            onChange,
+            onChange: onChangeStart,
+            mode: currentMode,
+            is24Hour: true,
+        });
+    };
+
+    const showModeEndPicker = (currentMode: 'date' | 'time') => {
+        // TODO: not supported on ios, which technically isn't a requirement but would be nice
+        DateTimePickerAndroid.open({
+            value: end,
+            onChange: onChangeEnd,
             mode: currentMode,
             is24Hour: true,
         });
@@ -100,22 +113,21 @@ function CreateEventScreen({ navigation, route }: EventListStackNavProps<'Create
         showModeStartPicker('time');
     };
 
-    const formatDate = (date: Date) => {
-        const day = date.getDate().toString().padStart(2, '0');
-        const month = (date.getMonth() + 1).toString().padStart(2, '0');
-        const year = date.getFullYear();
-        const hours = date.getHours().toString().padStart(2, '0');
-        const minutes = date.getMinutes().toString().padStart(2, '0');
-        return `${day}.${month}.${year} - ${hours}:${minutes}`;
+    const showDatepickerEndPicker = () => {
+        showModeEndPicker('date');
     };
 
-    const formatStartTime = (date: Date) => {
+    const showTimepickerEndPicker = () => {
+        showModeEndPicker('time');
+    };
+
+    const formatTime = (date: Date) => {
         const hours = date.getHours().toString().padStart(2, '0');
         const minutes = date.getMinutes().toString().padStart(2, '0');
         return `${hours}:${minutes}`;
     };
 
-    const formatStartDate = (date: Date) => {
+    const formatDate = (date: Date) => {
         const day = date.getDate().toString().padStart(2, '0');
         const month = (date.getMonth() + 1).toString().padStart(2, '0');
         const year = date.getFullYear();
@@ -124,17 +136,34 @@ function CreateEventScreen({ navigation, route }: EventListStackNavProps<'Create
 
     const onCreateButton = useCallback(async () => {
         // TODO: require these to be non-empty in the UI
-        if (!location || !name) {
-            throw new Error('Invalid name or location');
+        if (!location || !name || !start || selectedTags.length === 0) {
+            toast.show('Please input data for all the input fields.', { type: 'danger' });
+            return;
         }
 
-        // TODO: include tags
-        const eventId = await EventManager.create({
+        if (useEndtime && start >= end) {
+            toast.show('Change your start time so it is before your end time.', { type: 'danger' });
+            return;
+        }
+
+        const eventData: {
+            name: string;
+            tags: Tag[];
+            location: LatLng;
+            startDate?: Date | null;
+            endDate?: Date | null;
+        } = {
             name: name,
-            tags: [],
+            tags: selectedTags,
             location: location,
             startDate: start,
-        });
+        };
+
+        if (end && useEndtime) {
+            eventData.endDate = end;
+        }
+
+        const eventId = await EventManager.create(eventData);
 
         // TODO: this should replace the current screen in the stack
         navigation.navigate('EventDetail', {
@@ -205,7 +234,6 @@ function CreateEventScreen({ navigation, route }: EventListStackNavProps<'Create
 
             <View style={styles.section}>
                 <Text style={styles.sectionTitle}>Date & Time</Text>
-
                 <Text style={styles.sectionSubtitle}>Start</Text>
                 <View style={styles.sectionBody}>
                     <View style={styles.dateTimeWrapper}>
@@ -213,33 +241,49 @@ function CreateEventScreen({ navigation, route }: EventListStackNavProps<'Create
                             style={styles.timeInput}
                             onPress={showTimepickerStartPicker}
                         >
-                            <Text>{formatStartTime(start)}</Text>
+                            <Text>{formatTime(start)}</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity style={styles.dateInput}>
-                            <Text>{formatStartDate(start)}</Text>
+                        <TouchableOpacity
+                            style={styles.dateInput}
+                            onPress={showDatepickerStartPicker}
+                        >
+                            <Text>{formatDate(start)}</Text>
                         </TouchableOpacity>
                     </View>
                 </View>
+                <View style={styles.endRow}>
+                    <Text style={{ ...styles.sectionSubtitle, marginTop: 10 }}>
+                        {useEndtime ? 'Open End?' : 'Use end time?'}
+                    </Text>
+                    <Checkbox
+                        style={styles.checkbox}
+                        value={useEndtime}
+                        onValueChange={setUseEndtime}
+                    />
+                </View>
 
-                <Text style={{ ...styles.sectionSubtitle, marginTop: 10 }}>End...</Text>
-
-                {/* <Text style={styles.text}>Start: {formatDate(start)}</Text>
-                <Ionicons
-                    onPress={showDatepickerStartPicker}
-                    name={'calendar-outline'}
-                    size={32}
-                    color={'orange'}
-                />
-                <Ionicons
-                    onPress={showTimepickerStartPicker}
-                    name={'time-outline'}
-                    size={32}
-                    color={'orange'}
-                /> */}
+                {useEndtime ? (
+                    <View style={styles.sectionBody}>
+                        <View style={styles.dateTimeWrapper}>
+                            <TouchableOpacity
+                                style={styles.timeInput}
+                                onPress={showTimepickerEndPicker}
+                            >
+                                <Text>{formatTime(end)}</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                style={styles.dateInput}
+                                onPress={showDatepickerEndPicker}
+                            >
+                                <Text>{formatDate(end)}</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                ) : null}
             </View>
 
             <View style={styles.section}>
-                <Text style={styles.sectionTitle}>Tags</Text>
+                <Text style={styles.sectionTitle}>Tags (1-3)</Text>
 
                 <View style={styles.sectionBody}>
                     <DropDownPicker
@@ -248,10 +292,10 @@ function CreateEventScreen({ navigation, route }: EventListStackNavProps<'Create
                         min={1}
                         max={3}
                         open={open}
-                        value={value}
+                        value={selectedTags}
                         items={tags}
                         setOpen={setOpen}
-                        setValue={setValue}
+                        setValue={setSelectedTags}
                         setItems={setTags}
                         placeholder="Select up to three tags"
                         maxHeight={300}
@@ -280,6 +324,14 @@ function CreateEventScreen({ navigation, route }: EventListStackNavProps<'Create
 }
 
 const styles = StyleSheet.create({
+    endRow: {
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'baseline',
+    },
+    checkbox: {
+        marginLeft: 10,
+    },
     container: {
         // flex: 1,
         minHeight: '100%',
