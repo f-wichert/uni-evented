@@ -2,9 +2,10 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import * as Location from 'expo-location';
 import React, { useCallback, useEffect, useState } from 'react';
 import { Dimensions, StyleSheet, View } from 'react-native';
-import MapView, { LatLng, Marker } from 'react-native-maps';
+import MapView, { LatLng } from 'react-native-maps';
 import MapFilter from '../components/MapFilter';
 
+import EventMarker from '../components/EventMarker';
 import { TabNavProps } from '../nav/types';
 import { useFindEvents } from '../state/event';
 import { asyncHandler } from '../util';
@@ -20,6 +21,9 @@ function MapScreen({ navigation, route }: TabNavProps<'Map'>) {
         longitude: 8.652653,
     });
     const { events, refresh } = useFindEvents();
+
+    console.log('Selected Event:');
+    console.log(selectedEvent);
 
     // Filter options
     const [showCurrentEvents, setShowCurrentEvents] = useState(true);
@@ -131,7 +135,7 @@ function MapScreen({ navigation, route }: TabNavProps<'Map'>) {
                     >
                         <>
                             {events.map((el) => (
-                                <Marker
+                                <EventMarker
                                     key={el.id}
                                     coordinate={{
                                         latitude: el.lat,
