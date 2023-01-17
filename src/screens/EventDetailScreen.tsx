@@ -110,9 +110,9 @@ function EventDetailScreen({
         return true;
     }
 
-    console.log('DEBUG');
-    console.log(eventData);
-    console.log('DEBUG END');
+    // console.log('DEBUG');
+    // console.log(eventData);
+    // console.log('DEBUG END');
 
     // Developement Values TODO: replace with request to real ones
     const event = {
