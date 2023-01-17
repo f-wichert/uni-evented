@@ -22,14 +22,28 @@ function MapScreen({ navigation, route }: TabNavProps<'Map'>) {
     });
     const { events, refresh } = useFindEvents();
 
-    console.log('Selected Event:');
-    console.log(selectedEvent);
+    // console.log('Selected Event:');
+    // console.log(selectedEvent?.startDate.getDate());
+    // console.log(selectedEvent?.startDate.getMonth());
+    // console.log(new Date(Date.now()).getDate());
+    // if (selectedEvent) {
+    //     Object.keys(selectedEvent?.startDate).forEach((prop)=> console.log(prop));
+    // }
 
     // Filter options
     const [showCurrentEvents, setShowCurrentEvents] = useState(true);
-    const [currentDayRange, setCurrentDayRange] = useState(1);
+    const [currentDayRange, setCurrentDayRange] = useState(0);
     const [showFutureEvents, setShowFutureEvents] = useState(true);
-    const [futureDayRange, setFutureDayRange] = useState([2, 4]);
+    const [futureDayRange, setFutureDayRange] = useState(2);
+
+    const updateCurrentRange = (up) => {
+        setCurrentDayRange(up);
+    };
+
+    const updateFutureRange = (up) => {
+        setFutureDayRange(up);
+        setCurrentDayRange(up[0]);
+    };
 
     const getCurrentPosition = async () => {
         const { status } = await Location.requestForegroundPermissionsAsync();
@@ -101,6 +115,16 @@ function MapScreen({ navigation, route }: TabNavProps<'Map'>) {
         [navigation]
     );
 
+    // Credit to https://stackoverflow.com/questions/3224834/get-difference-between-2-dates-in-javascript
+    function dateDiffInDays(a, b) {
+        const _MS_PER_DAY = 1000 * 60 * 60 * 24;
+        // Discard the time and time-zone information.
+        const utc1 = Date.UTC(a.getFullYear(), a.getMonth(), a.getDate());
+        const utc2 = Date.UTC(b.getFullYear(), b.getMonth(), b.getDate());
+
+        return Math.floor(Math.abs(utc2 - utc1) / _MS_PER_DAY);
+    }
+
     return (
         <>
             <View style={styles.container}>
@@ -134,22 +158,44 @@ function MapScreen({ navigation, route }: TabNavProps<'Map'>) {
                         }}
                     >
                         <>
-                            {events.map((el) => (
-                                <EventMarker
-                                    key={el.id}
-                                    coordinate={{
-                                        latitude: el.lat,
-                                        longitude: el.lon,
-                                    }}
-                                    title={el.name}
-                                    pinColor="teal"
-                                    // TODO: this might re-render every time since the
-                                    // callback isn't memoized, not sure
-                                    onCalloutPress={() => {
-                                        navigateDetail(el.id);
-                                    }}
-                                />
-                            ))}
+                            {events.map((el) => {
+                                let status = 'current';
+                                // console.log(el.startDate);
+                                const today = new Date(Date.now());
+                                const date = new Date(el.startDate);
+                                const diff = dateDiffInDays(date, today);
+
+                                // Remove events that are not in our day range
+                                if (diff <= currentDayRange) {
+                                } else {
+                                    return;
+                                }
+
+                                // Remove events that are completed
+                                if (el.status == 'completed') {
+                                    return;
+                                }
+
+                                // console.log(`Date: ${date} - Diff: ${diff} - Curr: ${currentDayRange} - Fut[1]: ${futureDayRange} => ${status}`);
+                                // console.log(el.status);
+
+                                return (
+                                    <EventMarker
+                                        key={el.id}
+                                        coordinate={{
+                                            latitude: el.lat,
+                                            longitude: el.lon,
+                                        }}
+                                        title={el.name}
+                                        // TODO: this might re-render every time since the
+                                        // callback isn't memoized, not sure
+                                        onCalloutPress={() => {
+                                            navigateDetail(el.id);
+                                        }}
+                                        state={el.status}
+                                    />
+                                );
+                            })}
                         </>
                     </MapView>
                 ) : null}
@@ -175,11 +221,12 @@ function MapScreen({ navigation, route }: TabNavProps<'Map'>) {
                     showCurrentEvents={showCurrentEvents}
                     setShowCurrentEvents={setShowCurrentEvents}
                     currentDayRange={currentDayRange}
-                    setCurrentDayRange={setCurrentDayRange}
+                    setCurrentDayRange={updateCurrentRange}
                     showFutureEvents={showFutureEvents}
-                    setShowFutureEvents={setShowFutureEvents}
+                    setShowFutureEvents={updateFutureRange}
                     futureDayRange={futureDayRange}
                     setFutureDayRange={setFutureDayRange}
+                    refresh={refresh}
                 />
             ) : (
                 <></>
