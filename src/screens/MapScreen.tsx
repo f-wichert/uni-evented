@@ -7,12 +7,12 @@ import MapFilter from '../components/MapFilter';
 
 import { LocationObject } from 'expo-location';
 import EventMarker from '../components/EventMarker';
-import { TabNavProps } from '../nav/types';
+import { MapStackNavProps } from '../nav/types';
 import { useFindEvents } from '../state/event';
 import { asyncHandler } from '../util';
 import EventDetailScreen from './EventDetailScreen';
 
-function MapScreen({ navigation, route }: TabNavProps<'Map'>) {
+function MapScreen({ navigation, route }: MapStackNavProps<'MapView'>) {
     const mapRef = React.useRef<MapView>(null);
     const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
     // console.log(`Selected Event: ${JSON.stringify(selectedEvent)}`);

@@ -2,11 +2,11 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import React from 'react';
 
-import DiscoverScreen from '../screens/DiscoverScreen';
-import MapScreen from '../screens/MapScreen';
 import { useEventStore } from '../state/event';
 import { IoniconsName } from '../types';
+import DiscoverStack from './DiscoverStack';
 import EventListStack from './EventListStack';
+import MapStack from './MapStack';
 import ProfileStack from './ProfileStack';
 import { TabNavParams } from './types';
 
@@ -37,13 +37,14 @@ export default function TabNavigator() {
                 },
                 tabBarActiveTintColor: 'tomato',
                 tabBarInactiveTintColor: 'gray',
+                headerShown: false,
             })}
             initialRouteName={currentEventId ? 'Events' : 'Discover'}
         >
-            <Tab.Screen name="Discover" component={DiscoverScreen} />
-            <Tab.Screen name="Map" component={MapScreen} />
-            <Tab.Screen name="Events" component={EventListStack} options={{ headerShown: false }} />
-            <Tab.Screen name="Profile" component={ProfileStack} options={{ headerShown: false }} />
+            <Tab.Screen name="Discover" component={DiscoverStack} />
+            <Tab.Screen name="Map" component={MapStack} />
+            <Tab.Screen name="Events" component={EventListStack} />
+            <Tab.Screen name="Profile" component={ProfileStack} />
         </Tab.Navigator>
     );
 }

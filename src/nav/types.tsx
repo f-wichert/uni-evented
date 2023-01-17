@@ -53,6 +53,29 @@ export type TabNavProps<ScreenName extends keyof TabNavParams = keyof TabNavPara
     CompositeScreenProps<BottomTabScreenProps<TabNavParams, ScreenName>, RootNavProps>;
 
 // ==========
+// discover tab
+// ==========
+
+export type DiscoverStackNavParams = {
+    DiscoverView: undefined;
+};
+
+export type DiscoverStackNavProps<
+    T extends keyof DiscoverStackNavParams = keyof DiscoverStackNavParams
+> = CompositeScreenProps<NativeStackScreenProps<DiscoverStackNavParams, T>, TabNavProps>;
+
+// ==========
+// map tab
+// ==========
+
+export type MapStackNavParams = {
+    MapView: undefined;
+};
+
+export type MapStackNavProps<T extends keyof MapStackNavParams = keyof MapStackNavParams> =
+    CompositeScreenProps<NativeStackScreenProps<MapStackNavParams, T>, TabNavProps>;
+
+// ==========
 // event list tab
 // ==========
 

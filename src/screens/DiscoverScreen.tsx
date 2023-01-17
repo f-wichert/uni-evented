@@ -6,13 +6,10 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import EventCarousel from '../components/EventCarousel';
 import { Event } from '../models';
+import { DiscoverStackNavProps } from '../nav/types';
 import { asyncHandler, request } from '../util';
 
-declare type Props = {
-    navigation: NavigationProp<ParamListBase>;
-};
-
-function DiscoverScreen({ navigation }: Props) {
+function DiscoverScreen({ navigation }: DiscoverStackNavProps<'DiscoverView'>) {
     useEffect(() => {
         // Use `setOptions` to update the button that we previously specified
         // Now the button includes an `onPress` handler to update the discoverData
@@ -62,7 +59,7 @@ function DiscoverScreen({ navigation }: Props) {
 
     return (
         <View style={styles.container}>
-            {/* // wrap carousel in another safearea provider since the carousel 
+            {/* // wrap carousel in another safearea provider since the carousel
             // needs a pixel height and doesn't support `height: '100%'` */}
             <SafeAreaProvider>
                 <GestureHandlerRootView>
