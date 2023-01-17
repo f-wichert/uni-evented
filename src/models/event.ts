@@ -12,8 +12,8 @@ export interface EventResponse {
     readonly id: string;
     readonly name: string;
     readonly status: EventStatus;
-    readonly lat: number;
-    readonly lon: number;
+    readonly lat: string;
+    readonly lon: string;
     readonly hostId: string;
     readonly startDateTime: string;
     readonly endDateTime: string | null;
@@ -78,8 +78,16 @@ export class EventManager {
     }
 
     static fromEventResponse(response: EventResponse): EventExtra {
-        const { media, attendees, currentAttendees, startDateTime, endDateTime, ...fields } =
-            response;
+        const {
+            media,
+            attendees,
+            currentAttendees,
+            startDateTime,
+            endDateTime,
+            lat,
+            lon,
+            ...fields
+        } = response;
 
         // TODO: add these to user store
         const users = attendees
@@ -94,6 +102,8 @@ export class EventManager {
 
         return {
             ...fields,
+            lat: parseFloat(lat),
+            lon: parseFloat(lon),
             rad: 5,
             startDate: new Date(startDateTime),
             endDate: endDateTime ? new Date(endDateTime) : undefined,
