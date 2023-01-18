@@ -150,7 +150,7 @@ function VideoCamera({ route, navigation }: EventDetailProps<'MediaCapture'>) {
                         outputUrl={streamUrl}
                         camera={{
                             cameraId: cameraType === CameraType.back ? 0 : 1,
-                            cameraFrontMirror: true,
+                            cameraFrontMirror: false,
                         }}
                         audio={{ bitrate: 32000, profile: 1, samplerate: 44100 }}
                         video={{
