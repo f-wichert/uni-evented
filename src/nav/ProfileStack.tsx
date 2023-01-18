@@ -5,6 +5,7 @@ import EditProfileScreen from '../screens/EditProfileScreen';
 import ManageAccountScreen from '../screens/ManageAccountScreen';
 import MyEventsScreen from '../screens/MyEventsScreen';
 import ProfileScreen from '../screens/ProfileScreen';
+import createEventScreens from './eventDetailMixin';
 import { ProfileStackNavParams } from './types';
 
 const Stack = createNativeStackNavigator<ProfileStackNavParams>();
@@ -32,6 +33,7 @@ function ProfileStack() {
                 component={ManageAccountScreen}
                 options={{ title: 'Manage Account' }}
             />
+            {createEventScreens(Stack.Screen)}
         </Stack.Navigator>
     );
 }

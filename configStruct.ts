@@ -13,10 +13,6 @@ export default (env: e.Environment, isBuild = false) => {
             desc: 'The base API url',
             example: 'http://10.0.2.2:3000/api (Android Emulator)',
         }),
-        NMS_HTTP_URL: e.url({
-            desc: 'The NodeMediaServer http url',
-            example: 'http://10.0.2.2:3001/',
-        }),
         NMS_RTMP_URL: e.url({
             desc: 'The NodeMediaServer rtmp url',
             example: 'rtmp://10.0.2.2:3003/',

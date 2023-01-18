@@ -18,7 +18,7 @@ import MapView, { LatLng, Marker } from 'react-native-maps';
 import { INPUT_BACKGR_COLOR } from '../constants';
 import { EventManager } from '../models';
 import { EventListStackNavProps } from '../nav/types';
-import { IoniconsName, Tag } from '../types';
+import { Tag } from '../types';
 import { asyncHandler, request } from '../util';
 
 const width = Dimensions.get('window').width;
@@ -40,7 +40,6 @@ function CreateEventScreen({ navigation, route }: EventListStackNavProps<'Create
                 parent: el.parent,
                 id: el.id,
             }));
-            console.log(mappedTags);
             setTags(mappedTags as unknown as Tag[]);
         }),
         []
@@ -54,6 +53,7 @@ function CreateEventScreen({ navigation, route }: EventListStackNavProps<'Create
     }, [locationParam]);
 
     const [name, setName] = useState('');
+    const [description, setDescription] = useState('');
 
     const [useEndtime, setUseEndtime] = useState<boolean>(false);
 
@@ -67,9 +67,6 @@ function CreateEventScreen({ navigation, route }: EventListStackNavProps<'Create
 
     // Location State
     const [location, setLocation] = useState<LatLng | null>(null);
-
-    // Location icon
-    const [iconName, setIconName] = useState<IoniconsName>('location-outline');
 
     const onChangeStart = (event: DateTimePickerEvent, selectedDate?: Date) => {
         if (!selectedDate) {
@@ -136,7 +133,12 @@ function CreateEventScreen({ navigation, route }: EventListStackNavProps<'Create
 
     const onCreateButton = useCallback(async () => {
         // TODO: require these to be non-empty in the UI
-        if (!location || !name || !start || selectedTags.length === 0) {
+        console.log(`Location: ${location}`);
+        console.log(`start: ${start}`);
+        console.log(`name: ${name}`);
+        console.log(`description: ${description}`);
+        console.log(`selectedTags: ${selectedTags}`);
+        if (!location || !name || !start || !description || selectedTags.length === 0) {
             toast.show('Please input data for all the input fields.', { type: 'danger' });
             return;
         }
@@ -182,6 +184,7 @@ function CreateEventScreen({ navigation, route }: EventListStackNavProps<'Create
                             style={styles.textInput}
                             placeholder="Type out your event name..."
                             onChangeText={setName}
+                            maxLength={64}
                         />
                     </View>
                 </View>
@@ -194,7 +197,7 @@ function CreateEventScreen({ navigation, route }: EventListStackNavProps<'Create
                         // TODO: this always opens the map picker to the default location,
                         // even if the user already picked a location
                         onPress={() => navigation.navigate('MapPicker')}
-                        name={iconName}
+                        name={location ? 'location' : 'location-outline'}
                         size={26}
                         color={'orange'}
                     />
@@ -202,33 +205,48 @@ function CreateEventScreen({ navigation, route }: EventListStackNavProps<'Create
 
                 <View style={styles.sectionBody}>
                     {location ? (
-                        // TODO: no event handler, pressing this does nothing
-                        <TouchableOpacity>
-                            <MapView
-                                style={styles.locationPreviewMap}
-                                // TODO: do something on press, or disable touch event instead?
-                                zoomEnabled={false}
-                                scrollEnabled={false}
-                                pitchEnabled={false}
-                                rotateEnabled={false}
-                                region={{
+                        <MapView
+                            style={styles.locationPreviewMap}
+                            // TODO: do something on press, or disable touch event instead?
+                            zoomEnabled={false}
+                            scrollEnabled={false}
+                            pitchEnabled={false}
+                            rotateEnabled={false}
+                            region={{
+                                latitude: location.latitude,
+                                longitude: location.longitude,
+                                latitudeDelta: 0.001,
+                                longitudeDelta: 0.001,
+                            }}
+                        >
+                            <Marker
+                                key={1}
+                                coordinate={{
                                     latitude: location.latitude,
                                     longitude: location.longitude,
-                                    latitudeDelta: 0.001,
-                                    longitudeDelta: 0.001,
                                 }}
-                            >
-                                <Marker
-                                    key={1}
-                                    coordinate={{
-                                        latitude: location.latitude,
-                                        longitude: location.longitude,
-                                    }}
-                                    title="Your party location"
-                                />
-                            </MapView>
-                        </TouchableOpacity>
+                                title="Your party location"
+                            />
+                        </MapView>
                     ) : null}
+                </View>
+            </View>
+
+            <View style={styles.section}>
+                <Text style={styles.sectionTitle}>Description</Text>
+
+                <View style={styles.sectionBody}>
+                    <View style={styles.textInputWrapper}>
+                        <TextInput
+                            style={styles.textInput}
+                            placeholder="Type out your event description..."
+                            onChangeText={setDescription}
+                            maxLength={1000}
+                            multiline
+                            editable
+                            numberOfLines={4}
+                        />
+                    </View>
                 </View>
             </View>
 
@@ -283,14 +301,14 @@ function CreateEventScreen({ navigation, route }: EventListStackNavProps<'Create
             </View>
 
             <View style={styles.section}>
-                <Text style={styles.sectionTitle}>Tags (1-3)</Text>
+                <Text style={styles.sectionTitle}>Tags (1-5)</Text>
 
                 <View style={styles.sectionBody}>
                     <DropDownPicker
                         style={[styles.dropdown]}
                         multiple={true}
                         min={1}
-                        max={3}
+                        max={5}
                         open={open}
                         value={selectedTags}
                         items={tags}

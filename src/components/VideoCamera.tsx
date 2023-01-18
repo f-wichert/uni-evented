@@ -1,16 +1,15 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { useFocusEffect } from '@react-navigation/native';
 import { Camera, CameraType } from 'expo-camera';
 import React, { useEffect, useRef, useState } from 'react';
-import { AppState, BackHandler, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { AppState, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { NodeCameraView } from 'react-native-nodemediaclient';
 import { useCallbackRef } from 'use-callback-ref';
 import config from '../config';
 
-import { EventListStackNavProps } from '../nav/types';
+import { EventDetailProps } from '../nav/types';
 import { asyncHandler, request } from '../util';
 
-function VideoCamera({ route, navigation }: EventListStackNavProps<'MediaCapture'>) {
+function VideoCamera({ route, navigation }: EventDetailProps<'MediaCapture'>) {
     const eventId = route.params.eventId;
 
     const [hasPermission, setHasPermission] = useState(false);
@@ -33,16 +32,12 @@ function VideoCamera({ route, navigation }: EventListStackNavProps<'MediaCapture
         }
     });
 
-    const appState = useRef(AppState.currentState);
-
     // make sure the stream stops when app closes or goes inactive
     useEffect(() => {
         const subscription = AppState.addEventListener('change', (nextState) => {
-            if (appState.current === 'active' && nextState === 'background') {
-                if (liveCameraRef.current) {
-                    liveCameraRef.current.stop();
-                    setLiveMode(false);
-                }
+            if (nextState === 'background' && liveCameraRef.current) {
+                liveCameraRef.current.stop();
+                setLiveMode(false);
             }
         });
 
@@ -50,17 +45,6 @@ function VideoCamera({ route, navigation }: EventListStackNavProps<'MediaCapture
             subscription.remove();
         };
     }, []);
-
-    useFocusEffect(() => {
-        const subscription = BackHandler.addEventListener('hardwareBackPress', () => {
-            navigation.goBack();
-            return true;
-        });
-
-        return () => {
-            subscription.remove();
-        };
-    });
 
     const createFormData = (uri: string, type: string) => {
         const form = new FormData();
@@ -223,7 +207,7 @@ function VideoCamera({ route, navigation }: EventListStackNavProps<'MediaCapture
                     </View>
                 </View>
             ) : (
-                <Camera style={[styles.camera]} type={cameraType} ref={cameraRef}>
+                <Camera style={[styles.camera]} type={cameraType} ref={cameraRef} ratio={'16:9'}>
                     <View style={[styles.column]}>
                         <View style={[styles.row]}>
                             <TouchableOpacity

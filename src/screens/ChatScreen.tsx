@@ -3,10 +3,11 @@ import { useFocusEffect } from '@react-navigation/native';
 import React, { useEffect, useRef, useState } from 'react';
 import { SafeAreaView, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 import Message from '../components/Message';
+import { EventDetailProps } from '../nav/types';
 import { useUserStore } from '../state/user';
 import { asyncHandler, request } from '../util';
 
-function ChatScreen({ route, navigation }) {
+function ChatScreen({ route }: EventDetailProps<'Chat'>) {
     const eventId = route.params?.eventId ?? null;
     const userId = useUserStore((state) => state.currentUserId);
     const [messages, setMessages] = useState();

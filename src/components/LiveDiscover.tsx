@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { AppState, StyleSheet, View } from 'react-native';
 import { NodePlayerView } from 'react-native-nodemediaclient';
 import { useCallbackRef } from 'use-callback-ref';
 import { Media, MediaManager } from '../models';
@@ -17,8 +17,19 @@ function VideoDiscover({ item, navigateDetail, isPlay, isMute }: Props) {
     });
 
     useEffect(() => {
-        if (!nodePlayerViewRef) return;
-        nodePlayerViewRef.current[isPlay ? 'start' : 'pause']();
+        const subscription = AppState.addEventListener('change', (nextState) => {
+            if (nextState === 'background' && nodePlayerViewRef.current) {
+                nodePlayerViewRef.current.stop();
+            }
+        });
+
+        return () => {
+            subscription.remove();
+        };
+    }, []);
+
+    useEffect(() => {
+        nodePlayerViewRef.current?.[isPlay ? 'start' : 'stop']();
     }, [isPlay]);
 
     return (

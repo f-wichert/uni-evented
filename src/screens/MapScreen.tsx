@@ -5,13 +5,14 @@ import { Dimensions, StyleSheet, View } from 'react-native';
 import MapView, { LatLng } from 'react-native-maps';
 import MapFilter from '../components/MapFilter';
 
+import { LocationObject } from 'expo-location';
 import EventMarker from '../components/EventMarker';
-import { TabNavProps } from '../nav/types';
+import { MapStackNavProps } from '../nav/types';
 import { useFindEvents } from '../state/event';
 import { asyncHandler } from '../util';
 import EventDetailScreen from './EventDetailScreen';
 
-function MapScreen({ navigation, route }: TabNavProps<'Map'>) {
+function MapScreen({ navigation, route }: MapStackNavProps<'MapView'>) {
     const mapRef = React.useRef<MapView>(null);
     const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
     // console.log(`Selected Event: ${JSON.stringify(selectedEvent)}`);
@@ -21,14 +22,6 @@ function MapScreen({ navigation, route }: TabNavProps<'Map'>) {
         longitude: 8.652653,
     });
     const { events, refresh } = useFindEvents();
-
-    // console.log('Selected Event:');
-    // console.log(selectedEvent?.startDate.getDate());
-    // console.log(selectedEvent?.startDate.getMonth());
-    // console.log(new Date(Date.now()).getDate());
-    // if (selectedEvent) {
-    //     Object.keys(selectedEvent?.startDate).forEach((prop)=> console.log(prop));
-    // }
 
     // Filter options
     const [showCurrentEvents, setShowCurrentEvents] = useState(true);
@@ -45,12 +38,19 @@ function MapScreen({ navigation, route }: TabNavProps<'Map'>) {
         setCurrentDayRange(up[0]);
     };
 
-    const getCurrentPosition = async () => {
-        const { status } = await Location.requestForegroundPermissionsAsync();
-        if (status !== 'granted') {
-            throw new Error('Location access not granted');
-        }
+    const getLastKnownPosition = async () => {
+        const { coords } =
+            (await Location.getLastKnownPositionAsync()) as unknown as LocationObject;
+        const lastLocation = { latitude: coords.latitude, longitude: coords.longitude };
 
+        setLocation(lastLocation);
+
+        mapRef.current?.animateCamera({
+            center: lastLocation,
+        });
+    };
+
+    const getCurrentPosition = async () => {
         const location = await Location.getCurrentPositionAsync();
         const latlng = { latitude: location.coords.latitude, longitude: location.coords.longitude };
         setLocation(latlng);
@@ -91,6 +91,11 @@ function MapScreen({ navigation, route }: TabNavProps<'Map'>) {
                     </View>
                 ),
             });
+            const { status } = await Location.requestForegroundPermissionsAsync();
+            if (status !== 'granted') {
+                throw new Error('Location access not granted');
+            }
+            getLastKnownPosition();
             await getCurrentPosition();
         }),
         [navigation]
@@ -98,19 +103,7 @@ function MapScreen({ navigation, route }: TabNavProps<'Map'>) {
 
     const navigateDetail = useCallback(
         (id: string) => {
-            // TODO: pretty sure this error can be fixed using this? https://javascript.plainenglish.io/react-navigation-v6-with-typescript-nested-navigation-part-2-87844f643e37
-            // this shit is confusing af, send help
-            // same error in EventDetailScreen
-
-            // need to transition to another navigator here
-            navigation.navigate('Events', {
-                // captain, we're going deep
-                screen: 'EventDetail',
-                params: {
-                    eventId: id,
-                    origin: 'Map',
-                },
-            });
+            navigation.navigate('EventDetail', { eventId: id });
         },
         [navigation]
     );

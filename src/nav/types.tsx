@@ -53,16 +53,37 @@ export type TabNavProps<ScreenName extends keyof TabNavParams = keyof TabNavPara
     CompositeScreenProps<BottomTabScreenProps<TabNavParams, ScreenName>, RootNavProps>;
 
 // ==========
+// discover tab
+// ==========
+
+export type DiscoverStackNavParams = {
+    DiscoverView: undefined;
+} & EventDetailParams;
+
+export type DiscoverStackNavProps<
+    T extends keyof DiscoverStackNavParams = keyof DiscoverStackNavParams
+> = CompositeScreenProps<NativeStackScreenProps<DiscoverStackNavParams, T>, TabNavProps>;
+
+// ==========
+// map tab
+// ==========
+
+export type MapStackNavParams = {
+    MapView: undefined;
+} & EventDetailParams;
+
+export type MapStackNavProps<T extends keyof MapStackNavParams = keyof MapStackNavParams> =
+    CompositeScreenProps<NativeStackScreenProps<MapStackNavParams, T>, TabNavProps>;
+
+// ==========
 // event list tab
 // ==========
 
 export type EventListStackNavParams = {
     EventList: undefined;
-    EventDetail: { eventId: string; origin?: string };
     CreateEvent: { location?: LatLng } | undefined;
     MapPicker: undefined;
-    MediaCapture: { eventId: string };
-};
+} & EventDetailParams;
 
 export type EventListStackNavProps<
     T extends keyof EventListStackNavParams = keyof EventListStackNavParams
@@ -77,8 +98,21 @@ export type ProfileStackNavParams = {
     EditProfile: undefined;
     MyEvents: undefined;
     ManageAccount: undefined;
-};
+} & EventDetailParams;
 
 export type ProfileStackNavProps<
     T extends keyof ProfileStackNavParams = keyof ProfileStackNavParams
 > = CompositeScreenProps<NativeStackScreenProps<ProfileStackNavParams, T>, TabNavProps>;
+
+// ==========
+// event detail substack
+// ==========
+
+export type EventDetailParams = {
+    EventDetail: { eventId: string };
+    MediaCapture: { eventId: string };
+    Chat: { eventId: string };
+};
+
+export type EventDetailProps<T extends keyof EventDetailParams = keyof EventDetailParams> =
+    CompositeScreenProps<NativeStackScreenProps<EventDetailParams, T>, TabNavProps>;
