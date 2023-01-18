@@ -29,8 +29,7 @@ function VideoDiscover({ item, navigateDetail, isPlay, isMute }: Props) {
     }, []);
 
     useEffect(() => {
-        if (!nodePlayerViewRef) return;
-        nodePlayerViewRef.current[isPlay ? 'start' : 'stop']();
+        nodePlayerViewRef.current?.[isPlay ? 'start' : 'stop']();
     }, [isPlay]);
 
     return (
