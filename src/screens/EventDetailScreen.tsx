@@ -39,11 +39,18 @@ function EventDetailScreen({
 
     const isPreview = preview ? preview : false;
 
-    useEffect(() => {
-        // TODO: await
-        getLastKnownPosition();
-        getCurrentPosition();
-    }, []);
+    useEffect(
+        asyncHandler(async () => {
+            // TODO: await
+            const { status } = await Location.requestForegroundPermissionsAsync();
+            if (status !== 'granted') {
+                throw new Error('Location access not granted');
+            }
+            getLastKnownPosition();
+            getCurrentPosition();
+        }),
+        []
+    );
 
     if (!eventData) {
         return (
