@@ -115,22 +115,25 @@ function EventDetailScreen({
     // console.log('DEBUG END');
 
     // Developement Values TODO: replace with request to real ones
-    const event = {
-        title: eventData.name,
-        tags: [
-            { name: 'Beer', color: 'orange' },
-            { name: 'Rave', color: 'green' },
-            { name: 'Techno', color: 'red' },
-        ],
-        numberOfAttendants: (eventData.users ?? []).length,
-        startingTime: '19:00',
-        endingTime: '23:30',
-        address: 'Schloßgartenstraße, 64289 Darmstadt',
-        musicStyle: 'Techno',
-        rating: 4,
-        description:
-            'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum.Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum.Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum.Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum.Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum.Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum.Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum.',
-    };
+    // const event = {
+    //     title: eventData.name,
+    //     tags: [
+    //         { name: 'Beer', color: 'orange' },
+    //         { name: 'Rave', color: 'green' },
+    //         { name: 'Techno', color: 'red' },
+    //     ],
+    //     numberOfAttendants: (eventData.users ?? []).length,
+    //     startingTime: '19:00',
+    //     endingTime: '23:30',
+    //     address: 'Schloßgartenstraße, 64289 Darmstadt',
+    //     musicStyle: 'Techno',
+    //     rating: 4,
+    //     description:
+    //         'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum.Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum.Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum.Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum.Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum.Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum.Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum.',
+    // };
+
+    const rating = eventData.rating!;
+    console.log('Initial Rating: ' + rating);
 
     const numberOfAttendants = (eventData.users ?? []).length;
 
@@ -190,7 +193,23 @@ function EventDetailScreen({
 
     const ratingArea = (
         <View style={styles.RatingArea}>
-            <Rating imageSize={28} onFinishRating={onRating} />
+            <Rating
+                imageSize={28}
+                onFinishRating={onRating}
+                startingValue={eventData.rating ? eventData.rating! : 0}
+            />
+            <Text
+                style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    marginLeft: 3,
+                    fontSize: 25,
+                }}
+            >
+                {' '}
+                {eventData.rating ? eventData.rating! : 0}/5
+            </Text>
         </View>
     );
 
@@ -373,7 +392,6 @@ const styles = StyleSheet.create({
         display: 'flex',
         flexDirection: 'row',
         alignSelf: 'stretch', // Float elements to the left
-        flexWrap: 'wrap',
         backgroundColor: 'white',
         padding: 5,
         paddingLeft: 7,
