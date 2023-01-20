@@ -32,7 +32,6 @@ export const useAuthStore = createStore<State>('auth', { skipReset: true })(
     persist(
         (set) => ({
             token: null,
-            userId: null,
 
             signin: async (params) => {
                 const data = await request<AuthResponse>('POST', '/auth/login', params, {
