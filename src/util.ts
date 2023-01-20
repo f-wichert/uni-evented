@@ -4,7 +4,6 @@ import urlJoin from 'url-join';
 import { useCallback, useEffect, useState } from 'react';
 import config from './config';
 import { getToken } from './state/auth';
-import { JSONObject } from './types';
 
 export const baseHeaders = Object.freeze({
     // Currently required to access main API
@@ -14,7 +13,7 @@ export const baseHeaders = Object.freeze({
 export async function request<ResponseType>(
     method: string,
     route: string,
-    data?: JSONObject | FormData | null,
+    data?: FormData | object | null,
     options?: {
         // Whether to not send an auth token.
         // (by default, all requests are sent with the token)

@@ -1,75 +1,47 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useFocusEffect } from '@react-navigation/native';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import { SafeAreaView, ScrollView, StyleSheet, TextInput, View } from 'react-native';
+
 import Message from '../components/Message';
+import { Message as MessageModel, MessageManager } from '../models/message';
 import { EventDetailProps } from '../nav/types';
 import { useUserStore } from '../state/user';
-import { asyncHandler, request } from '../util';
+import { asyncHandler } from '../util';
 
 function ChatScreen({ route }: EventDetailProps<'Chat'>) {
     const eventId = route.params?.eventId ?? null;
     const userId = useUserStore((state) => state.currentUserId);
-    const [messages, setMessages] = useState();
+    const [messages, setMessages] = useState<MessageModel[]>();
     const [text, setText] = useState();
     const textInputRef = React.createRef();
 
     const scrollViewRef = useRef();
 
-    // console.log(`User: ${useUserStore((state) => state.fetchCurrentUser())}`);
-
-    useEffect(() => {
-        setMessages(getMessages());
-    }, []);
-
-    useFocusEffect(
-        React.useCallback(() => {
-            const id = setInterval(() => {
-                const newMessages = getMessages();
-                if (JSON.stringify(newMessages) === JSON.stringify(messages)) {
-                    // TODO: Figure out why this is not printed but it somehow seems to work
-                    console.log('new');
-                    setMessages(messages);
-                    // scrollRef.current.scrollToEnd({ animated: true })
-                    // console.log(`Ref: ${JSON.stringify(scrollRef)}`);
-                } else {
-                    // console.log('old');
-                }
-            }, 1000);
-            return () => clearInterval(id);
-        }, [messages])
-    );
-
-    function getMessages() {
-        // console.log('Get Messages');
+    const refreshMessages = useCallback(() => {
         asyncHandler(
             async () => {
-                const data = await request('POST', '/event/getMessages', {
-                    eventId: eventId,
-                });
-
-                // console.log();
-                // console.log(`Messages: ${JSON.stringify(data.messages)}`);
-                setMessages(data.messages);
+                // TODO: scroll to end if new message added
+                const data = await MessageManager.fetchMessages(eventId);
+                setMessages(data);
             },
             { prefix: 'Failed to load messages' }
         )();
-    }
+    }, [eventId]);
 
-    function sendMessage(text: String) {
-        asyncHandler(
-            async () => {
-                console.log('Message sent');
+    useFocusEffect(
+        useCallback(() => {
+            // initial load
+            refreshMessages();
 
-                const data = await request('POST', '/event/sendMessage', {
-                    eventId: eventId,
-                    messageContent: text,
-                });
-            },
-            { prefix: 'Failed to do stuff' }
-        )();
+            // set up continuous refresh
+            const id = setInterval(refreshMessages, 1000);
+            return () => clearInterval(id);
+        }, [refreshMessages])
+    );
 
-        // setMessages(getMessages());
+    async function sendMessage(text: string) {
+        return await MessageManager.sendMessage(eventId, text);
     }
 
     return (
@@ -106,10 +78,13 @@ function ChatScreen({ route }: EventDetailProps<'Chat'>) {
                         name="send"
                         size={25}
                         color={'#fcba03'}
-                        onPress={() => {
-                            sendMessage(text);
-                            textInputRef.current.clear();
-                        }}
+                        onPress={asyncHandler(
+                            async () => {
+                                await sendMessage(text);
+                                textInputRef.current.clear();
+                            },
+                            { prefix: 'Failed to send message' }
+                        )}
                     ></Ionicons>
                 </View>
             </View>

@@ -26,6 +26,10 @@ export interface CurrentUserResponse extends CurrentUser {
     readonly currentEventId: string | null;
 }
 
+export interface AuthResponse {
+    token: string;
+}
+
 export class UserManager {
     static fromUserResponse(response: UserResponse): User {
         // currently just a no-op
@@ -47,11 +51,7 @@ export class UserManager {
         email?: string;
         password?: string;
     }) {
-        const user = (await request(
-            'PATCH',
-            '/user/@me',
-            params
-        )) as unknown as CurrentUserResponse;
+        const user = await request<CurrentUserResponse>('PATCH', '/user/@me', params);
 
         useUserStore.setState((state) => {
             addUsers(state, this.fromUserResponse(user));
