@@ -57,19 +57,6 @@ function ChatScreen({ route }: EventDetailProps<'Chat'>) {
     }
 
     function sendMessage(text: String) {
-        // const message = {
-        //     id:"new",
-        //     messageContent:text,
-        //     // "sendTime":"2023-01-15T16:33:36.199Z",
-        //     messageCorrespondent:"b4dd7b74-e531-4b42-b683-f2a9ec92f59b",
-        //     eventId:eventId,
-        //     createdAt:"2023-01-15T16:33:36.200Z",
-        //     updatedAt:"2023-01-15T16:33:36.200Z",
-        //     displayname:"Notlorenzo"
-        // }
-
-        // setMessages([...messages, message]);
-
         asyncHandler(
             async () => {
                 console.log('Message sent');
