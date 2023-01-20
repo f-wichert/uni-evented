@@ -11,7 +11,7 @@ export const baseHeaders = Object.freeze({
     'Client-ID': `evented/${Constants.expoConfig?.version}`,
 });
 
-export async function request(
+export async function request<ResponseType>(
     method: string,
     route: string,
     data?: JSONObject | FormData | null,
@@ -20,7 +20,7 @@ export async function request(
         // (by default, all requests are sent with the token)
         noAuth?: true;
     }
-): Promise<JSONObject> {
+): Promise<ResponseType> {
     // join given route to base url, removing leading `/` if exists
     const url = urlJoin(config.BASE_URL, 'api', route.replace(/^\//, ''));
 
@@ -56,7 +56,8 @@ export async function request(
         throw new Error(`invalid response status for '${method} ${route}': ${response.status}`);
     }
 
-    return (await response.json()) as JSONObject;
+    // NOTE: this is not valiated at runtime
+    return (await response.json()) as ResponseType;
 }
 
 export interface ErrorHandlerParams {
