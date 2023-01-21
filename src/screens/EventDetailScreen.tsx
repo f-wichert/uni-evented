@@ -1,13 +1,13 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import * as Location from 'expo-location';
-import { LocationObject } from 'expo-location';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Image, Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import MapView, { LatLng, Marker } from 'react-native-maps';
 import { Rating } from 'react-native-ratings';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
+import { useFocusEffect } from '@react-navigation/native';
 import MediaCarousel from '../components/MediaCarousel';
 import { Tag } from '../components/Tag';
 import { EventManager } from '../models';
@@ -16,15 +16,13 @@ import { useEventFetch, useEventStore } from '../state/event';
 import { useCurrentUser } from '../state/user';
 import { asyncHandler } from '../util';
 
-function EventDetailScreen({
-    route,
-    navigation,
-    preview,
-    evId,
-    orig,
-}: EventDetailProps<'EventDetail'>) {
+interface Props extends EventDetailProps<'EventDetail'> {
+    preview?: boolean;
+    evId?: string;
+}
+
+function EventDetailScreen({ route, navigation, preview, evId }: Props) {
     const eventId = evId ? evId : route.params.eventId;
-    const origin = orig ? orig : route.params.origin;
     const { event: eventData, loading, refresh } = useEventFetch(eventId);
     const user = useCurrentUser();
     const userCurrentEventId = useEventStore((state) => state.currentEventId); // Get event ID of current event of currently logged in user
@@ -35,7 +33,7 @@ function EventDetailScreen({
     const [isOpenQuality, setIsOpenQuality] = useState<boolean>(false);
     const [quality, setQuality] = useState<'auto' | '1080' | '720' | '480' | '360'>('auto');
 
-    const [location, setLocation] = useState<LatLng | null>();
+    const [location, setLocation] = useState<LatLng | null>(null);
 
     const isPreview = preview ? preview : false;
 
@@ -51,6 +49,8 @@ function EventDetailScreen({
         }),
         []
     );
+
+    useFocusEffect(useCallback(() => void refresh(), [refresh]));
 
     if (!eventData) {
         return (
@@ -70,17 +70,17 @@ function EventDetailScreen({
 
     const getEventRelationship = () => {
         // return if loading or the event has no users
-        if (!loading || !eventData.users) return;
-        const eventUser = eventData.users.find((el) => el.id === user.id);
-        // return if user is not part of the event
-        if (!eventUser) return;
-        return eventUser.eventAttendee.status;
+        const eventUser = eventData.users?.find((el) => el.id === user.id);
+        return eventUser?.eventAttendee?.status;
     };
 
     const getLastKnownPosition = async () => {
-        const { coords } =
-            (await Location.getLastKnownPositionAsync()) as unknown as LocationObject;
-        const lastLocation = { latitude: coords.latitude, longitude: coords.longitude };
+        const location = await Location.getLastKnownPositionAsync();
+        if (!location) return;
+        const lastLocation = {
+            latitude: location.coords.latitude,
+            longitude: location.coords.longitude,
+        };
 
         setLocation(lastLocation);
     };
@@ -290,6 +290,7 @@ function EventDetailScreen({
             scrollEnabled={true}
             pitchEnabled={true}
             rotateEnabled={true}
+            showsUserLocation={true}
             region={{
                 latitude: eventData.lat,
                 longitude: eventData.lon,

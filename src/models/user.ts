@@ -4,11 +4,19 @@ import config from '../config';
 import { addUsers, useUserStore } from '../state/user';
 import { request } from '../util';
 
+export const EventAttendeeStatuses = ['interested', 'attending', 'left', 'banned'] as const;
+type EventAttendeeStatus = typeof EventAttendeeStatuses[number];
+
+export interface PartialAttendee {
+    status: EventAttendeeStatus;
+}
+
 export interface UserResponse {
     readonly id: string;
     readonly username: string;
     readonly displayName: string;
     readonly avatarHash: string | null;
+    readonly eventAttendee?: PartialAttendee;
 }
 
 export interface User {
@@ -16,6 +24,7 @@ export interface User {
     readonly username: string;
     readonly displayName: string;
     readonly avatarHash: string | null;
+    readonly eventAttendee?: PartialAttendee;
 }
 
 export interface CurrentUser extends User {
