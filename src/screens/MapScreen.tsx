@@ -1,15 +1,15 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import * as Location from 'expo-location';
-import React, { useCallback, useEffect, useState } from 'react';
+import { LocationObject } from 'expo-location';
+import React, { useCallback, useState } from 'react';
 import { Dimensions, StyleSheet, View } from 'react-native';
 import MapView, { LatLng } from 'react-native-maps';
-import MapFilter from '../components/MapFilter';
 
-import { LocationObject } from 'expo-location';
 import EventMarker from '../components/EventMarker';
+import MapFilter from '../components/MapFilter';
 import { MapStackNavProps } from '../nav/types';
 import { useFindEvents } from '../state/event';
-import { asyncHandler } from '../util';
+import { useAsyncEffects } from '../util';
 import EventDetailScreen from './EventDetailScreen';
 
 function MapScreen({ navigation, route }: MapStackNavProps<'MapView'>) {
@@ -60,46 +60,43 @@ function MapScreen({ navigation, route }: MapStackNavProps<'MapView'>) {
         });
     };
 
-    useEffect(
-        asyncHandler(async () => {
-            setMenuVisible(false);
-            navigation.setOptions({
-                headerRight: () => (
-                    <View style={{ flexDirection: 'row' }}>
-                        <Ionicons
-                            name="refresh-outline"
-                            size={32}
-                            color="black"
-                            onPress={refresh}
-                            style={{
-                                marginRight: 10,
-                            }}
-                        />
-                        <Ionicons
-                            name="menu-outline"
-                            size={32}
-                            color="black"
-                            onPress={() => {
-                                // TODO: herausfinden warum das hier funktioniert?
-                                console.log('Value toggled.');
-                                setMenuVisible((val) => !val);
-                            }}
-                            style={{
-                                marginRight: 10,
-                            }}
-                        />
-                    </View>
-                ),
-            });
-            const { status } = await Location.requestForegroundPermissionsAsync();
-            if (status !== 'granted') {
-                throw new Error('Location access not granted');
-            }
-            getLastKnownPosition();
-            await getCurrentPosition();
-        }),
-        [navigation]
-    );
+    useAsyncEffects(async () => {
+        setMenuVisible(false);
+        navigation.setOptions({
+            headerRight: () => (
+                <View style={{ flexDirection: 'row' }}>
+                    <Ionicons
+                        name="refresh-outline"
+                        size={32}
+                        color="black"
+                        onPress={refresh}
+                        style={{
+                            marginRight: 10,
+                        }}
+                    />
+                    <Ionicons
+                        name="menu-outline"
+                        size={32}
+                        color="black"
+                        onPress={() => {
+                            // TODO: herausfinden warum das hier funktioniert?
+                            console.log('Value toggled.');
+                            setMenuVisible((val) => !val);
+                        }}
+                        style={{
+                            marginRight: 10,
+                        }}
+                    />
+                </View>
+            ),
+        });
+        const { status } = await Location.requestForegroundPermissionsAsync();
+        if (status !== 'granted') {
+            throw new Error('Location access not granted');
+        }
+        getLastKnownPosition();
+        await getCurrentPosition();
+    }, [navigation]);
 
     const navigateDetail = useCallback(
         (id: string) => {

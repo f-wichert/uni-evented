@@ -8,7 +8,7 @@ import config from '../config';
 
 import { MediaManager } from '../models';
 import { EventDetailProps } from '../nav/types';
-import { asyncHandler } from '../util';
+import { asyncHandler, useAsyncEffects } from '../util';
 
 function VideoCamera({ route, navigation }: EventDetailProps<'MediaCapture'>) {
     const eventId = route.params.eventId;
@@ -120,26 +120,22 @@ function VideoCamera({ route, navigation }: EventDetailProps<'MediaCapture'>) {
         }
     }, [liveMode]);
 
-    useEffect(
-        asyncHandler(
-            async () => {
-                const { status } = await Camera.requestCameraPermissionsAsync();
-                setHasPermission(status === 'granted');
-            },
-            { prefix: 'requestCameraPermissionsAsync failed' }
-        ),
-        []
+    useAsyncEffects(
+        async () => {
+            const { status } = await Camera.requestCameraPermissionsAsync();
+            setHasPermission(status === 'granted');
+        },
+        [],
+        { prefix: 'requestCameraPermissionsAsync failed' }
     );
 
-    useEffect(
-        asyncHandler(
-            async () => {
-                const { status } = await Camera.requestMicrophonePermissionsAsync();
-                setHasPermission(status === 'granted');
-            },
-            { prefix: 'requestMicrophonePermissionsAsync failed' }
-        ),
-        []
+    useAsyncEffects(
+        async () => {
+            const { status } = await Camera.requestMicrophonePermissionsAsync();
+            setHasPermission(status === 'granted');
+        },
+        [],
+        { prefix: 'requestMicrophonePermissionsAsync failed' }
     );
 
     return (

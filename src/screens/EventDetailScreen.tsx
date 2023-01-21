@@ -15,7 +15,7 @@ import { EventManager } from '../models';
 import { EventDetailProps } from '../nav/types';
 import { useEventFetch, useEventStore } from '../state/event';
 import { useCurrentUser } from '../state/user';
-import { asyncHandler } from '../util';
+import { asyncHandler, useAsyncEffects } from '../util';
 
 const MAX_JOIN_RADIUS_METERS = 50;
 
@@ -42,15 +42,16 @@ function EventDetailScreen({ route, navigation, preview, evId }: Props) {
 
     const isPreview = preview ? preview : false;
 
-    useEffect(
-        asyncHandler(async () => {
+    useAsyncEffects(
+        async () => {
             const { status } = await Location.requestForegroundPermissionsAsync();
             if (status !== 'granted') {
                 throw new Error('Location access not granted');
             }
             await Promise.all([getLastKnownPosition(), getCurrentPosition()]);
-        }),
-        []
+        },
+        [],
+        { prefix: 'Failed to fetch location' }
     );
 
     useEffect(() => {

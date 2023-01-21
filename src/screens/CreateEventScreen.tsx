@@ -19,7 +19,7 @@ import { INPUT_BACKGR_COLOR } from '../constants';
 import { EventManager } from '../models';
 import { Tag } from '../models/event';
 import { EventListStackNavProps } from '../nav/types';
-import { asyncHandler } from '../util';
+import { asyncHandler, useAsyncEffects } from '../util';
 
 const width = Dimensions.get('window').width;
 
@@ -28,16 +28,17 @@ function CreateEventScreen({ navigation, route }: EventListStackNavProps<'Create
     // If `params.location` changed, we call `setLocation` with the new value.
 
     const [tags, setTags] = useState<Tag[]>([]);
-    useEffect(
-        asyncHandler(async () => {
+    useAsyncEffects(
+        async () => {
             const response = await EventManager.fetchAllTags();
             const mappedTags = response.map((tag: Tag) => ({
                 ...tag,
                 value: tag.id,
             }));
             setTags(mappedTags);
-        }),
-        []
+        },
+        [],
+        { prefix: 'Failed to fetch tags' }
     );
 
     const locationParam = route.params?.location;

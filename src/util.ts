@@ -1,7 +1,7 @@
 import Constants from 'expo-constants';
 import urlJoin from 'url-join';
 
-import { useCallback, useEffect, useState } from 'react';
+import { DependencyList, useCallback, useEffect, useState } from 'react';
 import config from './config';
 import { getToken } from './state/auth';
 
@@ -106,6 +106,16 @@ export function useAsync<T>(func: () => Promise<T>, immediate = true) {
     }, [refresh, immediate]);
 
     return { loading, error, value, refresh };
+}
+
+// can't name this `useAsyncEffect` since the eslint plugin checks for /Effect($|[^a-z])/ and we don't want to match that
+export function useAsyncEffects(
+    handler: () => Promise<void>,
+    deps: DependencyList,
+    opts: ErrorHandlerParams = {}
+): void {
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    useEffect(() => asyncHandler(handler, opts)(), deps);
 }
 
 export function notEmpty<T>(value: T | null | undefined): value is T {

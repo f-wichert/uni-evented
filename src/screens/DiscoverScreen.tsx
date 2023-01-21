@@ -7,7 +7,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import EventCarousel from '../components/EventCarousel';
 import { Event, EventManager } from '../models';
 import { DiscoverStackNavProps } from '../nav/types';
-import { asyncHandler } from '../util';
+import { asyncHandler, useAsyncEffects } from '../util';
 
 function DiscoverScreen({ navigation }: DiscoverStackNavProps<'DiscoverView'>) {
     useEffect(() => {
@@ -28,7 +28,7 @@ function DiscoverScreen({ navigation }: DiscoverStackNavProps<'DiscoverView'>) {
         });
     }, [navigation]);
 
-    useEffect(asyncHandler(updateMedia), []);
+    useAsyncEffects(updateMedia, [], { prefix: 'Failed to update media' });
 
     // TODO: change this to use ExtendedMedia[] instead of Media[]
     const [eventData, setEventData] = useState<Event[]>([]);
