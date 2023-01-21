@@ -5,12 +5,11 @@ import { useUserStore } from '../state/user';
 function Message(props) {
     const message = props.message;
     const userId = useUserStore((state) => state.currentUserId);
-    var left = props.message.messageCorrespondent == userId ? true : false;
+    const left = props.message.senderId == userId;
 
-    // const user = useUserStore((state) => state.fetchCurrentUser());
-    // console.log(`User: ${JSON.stringify(user)}`);
-
-    // console.log(`Messages: ${JSON.stringify(message)}`);
+    const nameChar = (message.sender.displayName || message.sender.username)
+        .charAt(0)
+        .toUpperCase();
 
     return (
         <>
@@ -18,7 +17,7 @@ function Message(props) {
                 <View style={styles.container}>
                     <View style={styles.userArea}>
                         <View style={styles.userCircle}>
-                            <Text style={styles.userText}>{message.displayname.charAt(0)}</Text>
+                            <Text style={styles.userText}>{nameChar}</Text>
                         </View>
                     </View>
                     <View style={styles.messageArea}>
@@ -54,7 +53,7 @@ function Message(props) {
                     </View>
                     <View style={styles.userArea}>
                         <View style={styles.userCircle}>
-                            <Text style={styles.userText}>{message.displayname.charAt(0)}</Text>
+                            <Text style={styles.userText}>{nameChar}</Text>
                         </View>
                     </View>
                 </View>

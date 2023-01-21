@@ -6,8 +6,9 @@ import { NodeCameraView } from 'react-native-nodemediaclient';
 import { useCallbackRef } from 'use-callback-ref';
 import config from '../config';
 
+import { MediaManager } from '../models';
 import { EventDetailProps } from '../nav/types';
-import { asyncHandler, request } from '../util';
+import { asyncHandler } from '../util';
 
 function VideoCamera({ route, navigation }: EventDetailProps<'MediaCapture'>) {
     const eventId = route.params.eventId;
@@ -71,7 +72,7 @@ function VideoCamera({ route, navigation }: EventDetailProps<'MediaCapture'>) {
         const type = extensionMatch ? `image/${extensionMatch[1]}` : `image`;
 
         // upload media
-        await request('POST', '/upload/image', createFormData(uri, type));
+        await MediaManager.uploadImage(createFormData(uri, type));
     };
 
     const onVideoButton = async () => {
@@ -91,12 +92,13 @@ function VideoCamera({ route, navigation }: EventDetailProps<'MediaCapture'>) {
         toast.show('Video was successfully uploaded.');
 
         // upload media
-        await request('POST', '/upload/clip', createFormData(uri, 'video/mp4'));
+        await MediaManager.uploadClip(createFormData(uri, 'video/mp4'));
     };
 
     const updateStreamUrl = async () => {
-        const response = await request('POST', '/upload/livestream', { eventID: eventId });
-        const { id, streamKey } = response as { id: string; streamKey: string };
+        const { id, streamKey } = await MediaManager.uploadLivestream(eventId);
+        if (!streamKey) throw new Error('No stream key received');
+
         const url = `${config.NMS_RTMP_URL}/livestream/${id}?key=${streamKey}`;
         setStreamUrl(url);
     };

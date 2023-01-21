@@ -17,9 +17,9 @@ import MapView, { LatLng, Marker } from 'react-native-maps';
 
 import { INPUT_BACKGR_COLOR } from '../constants';
 import { EventManager } from '../models';
+import { Tag } from '../models/event';
 import { EventListStackNavProps } from '../nav/types';
-import { Tag } from '../types';
-import { asyncHandler, request } from '../util';
+import { asyncHandler } from '../util';
 
 const width = Dimensions.get('window').width;
 
@@ -27,20 +27,15 @@ function CreateEventScreen({ navigation, route }: EventListStackNavProps<'Create
     // This is passed back from the map picker (https://reactnavigation.org/docs/params#passing-params-to-a-previous-screen).
     // If `params.location` changed, we call `setLocation` with the new value.
 
-    const [tags, setTags] = useState<Tag[]>([
-        { id: 'TestID', label: 'TestLabel', color: 'red', parent: 'TestID', value: 'testValue' },
-    ]);
+    const [tags, setTags] = useState<Tag[]>([]);
     useEffect(
         asyncHandler(async () => {
-            const response = (await request('GET', '/info/all_tags')) as unknown as Tag[];
-            const mappedTags = response.map((el: Tag) => ({
-                label: el.label,
-                color: el.color,
-                value: el.id,
-                parent: el.parent,
-                id: el.id,
+            const response = await EventManager.fetchAllTags();
+            const mappedTags = response.map((tag: Tag) => ({
+                ...tag,
+                value: tag.id,
             }));
-            setTags(mappedTags as unknown as Tag[]);
+            setTags(mappedTags);
         }),
         []
     );

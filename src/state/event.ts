@@ -54,7 +54,7 @@ export function useEventFetch(id: string) {
     if (!id) throw new Error(`Invalid event ID: ${id}`);
 
     const fetchFunc = useCallback(async () => {
-        const eventData = (await request('GET', `event/info/${id}`)) as unknown as EventResponse;
+        const eventData = await request<EventResponse>('GET', `event/info/${id}`);
 
         useEventStore.setState((state) =>
             addEvents(state, EventManager.fromEventResponse(eventData))
@@ -82,10 +82,7 @@ export function useMediaFetch(eventId: string) {
     if (!eventId) throw new Error(`Invalid event ID: ${eventId}`);
 
     const fetchFunc = useCallback(async () => {
-        const mediaData = (await request(
-            'GET',
-            `event/info/${eventId}/media`
-        )) as unknown as MediaResponse[];
+        const mediaData = await request<MediaResponse[]>('GET', `event/info/${eventId}/media`);
 
         useEventStore.setState((state) => {
             state.eventMedia[eventId] = mediaData.map((m) => MediaManager.fromMediaResponse(m));
@@ -107,10 +104,7 @@ export function useMediaFetch(eventId: string) {
 
 export function useRelevantEvents() {
     const fetchFunc = useCallback(async () => {
-        const data = (await request(
-            'GET',
-            'event/relevantEvents'
-        )) as unknown as RelevantEventsResponse;
+        const data = await request<RelevantEventsResponse>('GET', 'event/relevantEvents');
 
         // add event objects to store
         useEventStore.setState((state) => {
@@ -149,8 +143,7 @@ export function useFindEvents(options?: {
     maxRadius?: number;
 }) {
     const fetchFunc = useCallback(async () => {
-        const eventsData = (await request('GET', 'event/find', options))
-            .events as unknown as EventResponse[];
+        const eventsData = await request<EventResponse[]>('GET', 'event/find', options);
 
         // add event objects to store
         useEventStore.setState((state) => {

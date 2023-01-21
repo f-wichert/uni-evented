@@ -19,7 +19,7 @@ export const useUserStore = createStore<State>('user')((set, get) => ({
 
     fetchUser: async (id: string | '@me') => {
         // TODO: validate types
-        const user = (await request('GET', `/user/${id}`)) as unknown as UserResponse;
+        const user = await request<UserResponse>('GET', `/user/${id}`);
 
         set((state) => {
             addUsers(state, user);

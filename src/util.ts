@@ -4,23 +4,22 @@ import urlJoin from 'url-join';
 import { useCallback, useEffect, useState } from 'react';
 import config from './config';
 import { getToken } from './state/auth';
-import { JSONObject } from './types';
 
 export const baseHeaders = Object.freeze({
     // Currently required to access main API
     'Client-ID': `evented/${Constants.expoConfig?.version}`,
 });
 
-export async function request(
+export async function request<ResponseType>(
     method: string,
     route: string,
-    data?: JSONObject | FormData | null,
+    data?: FormData | object | null,
     options?: {
         // Whether to not send an auth token.
         // (by default, all requests are sent with the token)
         noAuth?: true;
     }
-): Promise<JSONObject> {
+): Promise<ResponseType> {
     // join given route to base url, removing leading `/` if exists
     const url = urlJoin(config.BASE_URL, 'api', route.replace(/^\//, ''));
 
@@ -56,7 +55,8 @@ export async function request(
         throw new Error(`invalid response status for '${method} ${route}': ${response.status}`);
     }
 
-    return (await response.json()) as JSONObject;
+    // NOTE: this is not valiated at runtime
+    return (await response.json()) as ResponseType;
 }
 
 export interface ErrorHandlerParams {
