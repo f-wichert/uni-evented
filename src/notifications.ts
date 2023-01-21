@@ -18,7 +18,7 @@ export function useNotifications() {
     const userId = useUserStore((state) => state.currentUserId);
     const authToken = useAuthStore((state) => state.token);
 
-    // re-runs any time the current user ID changes
+    // re-runs any time the current user ID or auth token changes
     useEffect(() => {
         const inner = asyncHandler(async () => {
             const token = await registerForPushNotificationsAsync();
@@ -43,7 +43,7 @@ export function useNotifications() {
             handleNotificationResponse
         );
         return () => Notifications.removeNotificationSubscription(responseListener);
-    });
+    }, []);
 }
 
 async function registerForPushNotificationsAsync(): Promise<string | null> {
