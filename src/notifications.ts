@@ -22,10 +22,13 @@ export function useNotifications() {
 
     // create + send push token; re-runs any time the current user ID or auth token changes
     useEffect(() => {
-        const inner = asyncHandler(async () => {
-            const token = await registerForPushNotificationsAsync();
-            if (token) await updateBackend(token);
-        });
+        const inner = asyncHandler(
+            async () => {
+                const token = await registerForPushNotificationsAsync();
+                if (token) await updateBackend(token);
+            },
+            { prefix: 'Failed to register push notifications' }
+        );
         void inner();
     }, [updateBackend]);
 
