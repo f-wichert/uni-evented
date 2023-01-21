@@ -1,5 +1,7 @@
 import * as Notifications from 'expo-notifications';
 import { useEffect } from 'react';
+import { Platform } from 'react-native';
+
 import { UserManager } from './models';
 import { useAuthStore } from './state/auth';
 import { useUserStore } from './state/user';
@@ -11,6 +13,7 @@ Notifications.setNotificationHandler({
         shouldShowAlert: true,
         shouldPlaySound: false,
         shouldSetBadge: false,
+        priority: Notifications.AndroidNotificationPriority.MAX,
     }),
 });
 
@@ -47,6 +50,15 @@ export function useNotifications() {
 }
 
 async function registerForPushNotificationsAsync(): Promise<string | null> {
+    // Android requires at least one channel to be set up for notifications, otherwise the
+    // permission prompt won't be shown
+    if (Platform.OS === 'android') {
+        await Notifications.setNotificationChannelAsync('default', {
+            name: 'Notifications',
+            importance: Notifications.AndroidImportance.MAX,
+        });
+    }
+
     const { status } = await Notifications.requestPermissionsAsync();
     if (status !== 'granted') {
         console.info('notification permissions not granted');
