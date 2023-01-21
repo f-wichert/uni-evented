@@ -68,9 +68,9 @@ export class EventManager {
         return event.users ? event.users.find((user) => user.id == event.hostId) : undefined;
     }
 
-    static async join(eventId: string, lat: number, lon: number) {
+    static async join(eventId: string) {
         // TODO: client side validation
-        await request<EmptyObject>('POST', '/event/join', { eventId, lat, lon });
+        await request<EmptyObject>('POST', '/event/join', { eventId });
 
         useEventStore.setState((state) => {
             // TODO: add self as attendee? alternatively, return full event from server and just overwrite local state entirely here

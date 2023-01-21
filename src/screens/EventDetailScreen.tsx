@@ -1,5 +1,6 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import * as Location from 'expo-location';
+import { getDistance } from 'geolib';
 import React, { useCallback, useEffect, useState } from 'react';
 import { Image, Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -15,6 +16,8 @@ import { EventDetailProps } from '../nav/types';
 import { useEventFetch, useEventStore } from '../state/event';
 import { useCurrentUser } from '../state/user';
 import { asyncHandler } from '../util';
+
+const MAX_JOIN_RADIUS_METERS = 50;
 
 interface Props extends EventDetailProps<'EventDetail'> {
     preview?: boolean;
@@ -35,20 +38,29 @@ function EventDetailScreen({ route, navigation, preview, evId }: Props) {
 
     const [location, setLocation] = useState<LatLng | null>(null);
 
+    const [inRange, setInRange] = useState(false);
+
     const isPreview = preview ? preview : false;
 
     useEffect(
         asyncHandler(async () => {
-            // TODO: await
             const { status } = await Location.requestForegroundPermissionsAsync();
             if (status !== 'granted') {
                 throw new Error('Location access not granted');
             }
-            getLastKnownPosition();
-            getCurrentPosition();
+            await Promise.all([getLastKnownPosition(), getCurrentPosition()]);
         }),
         []
     );
+
+    useEffect(() => {
+        if (!location || !eventData) return;
+
+        const eventLocation = { latitude: eventData.lat, longitude: eventData.lon };
+        const distance = getDistance(location, eventLocation);
+        console.log('distance', distance);
+        setInRange(distance < MAX_JOIN_RADIUS_METERS);
+    }, [location, eventData]);
 
     useFocusEffect(useCallback(() => void refresh(), [refresh]));
 
@@ -114,8 +126,39 @@ function EventDetailScreen({ route, navigation, preview, evId }: Props) {
     const numberOfAttendants = (eventData.users ?? []).length;
 
     const mainButton = () => {
-        let button = <Text style={styles.joinButtonText}>I'm here!</Text>;
-        let disabled = false;
+        let buttonText = "I'm here!";
+        let disabled = loading;
+
+        if (eventData.status === 'completed') {
+            disabled = true;
+            buttonText = 'Event done.';
+        } else if (eventData.hostId === user.id) {
+            if (eventData.status === 'active') {
+                buttonText = 'Stop event!';
+            } else if (eventData.status === 'scheduled') {
+                buttonText = 'Start event!';
+            }
+        } else {
+            const relationship = getEventRelationship();
+            console.debug(relationship);
+            if (relationship === 'attending') {
+                buttonText = 'Leave event!';
+            } else if (relationship === 'interested') {
+                if (!inRange || eventData.status !== 'active') {
+                    buttonText = 'Not interested?';
+                    // TODO: add subtitle: `Not close enough to join (xx m)`
+                }
+                // else, if in range and event is active, show "I'm here"
+            } else if (relationship === undefined || relationship === 'left') {
+                if (!inRange || eventData.status !== 'active') {
+                    buttonText = "I'm interested!";
+                }
+                // else, if in range and event is active, show "I'm here"
+            } else if (relationship === 'banned') {
+                disabled = true;
+                buttonText = 'Banned.';
+            }
+        }
 
         const mainJsx = (
             <View style={styles.joinButtonContainer}>
@@ -123,28 +166,16 @@ function EventDetailScreen({ route, navigation, preview, evId }: Props) {
                     style={{ ...styles.joinButton, opacity: disabled ? 0.5 : 1 }}
                     onPress={asyncHandler(
                         async () => {
-                            await EventManager.join(eventId, 0, 0);
+                            await EventManager.join(eventId);
                         },
                         { prefix: 'Failed to join event' }
                     )}
                     disabled={disabled}
                 >
-                    {button}
+                    <Text style={styles.joinButtonText}>{buttonText}</Text>
                 </Pressable>
             </View>
         );
-
-        // // User is Host and Event is active
-        // if (eventData.hostId === user.id && eventData.status === 'active') {
-        //     button = <Text style={styles.joinButtonText}>Stop event!</Text>;
-        // }
-        // // User is Host and Event is scheduled
-        // if (eventData.hostId === user.id && eventData.status === 'scheduled') {
-        //     button = <Text style={styles.joinButtonText}>Start event!</Text>;
-        // }
-        // if (getEventRelationship() === 'attending') {
-        //     button = <Text style={styles.joinButtonText}>Leave event!</Text>;
-        // }
         return mainJsx;
     };
     const navigationBar = (
@@ -306,19 +337,6 @@ function EventDetailScreen({ route, navigation, preview, evId }: Props) {
                 }}
                 title={eventData.name}
             />
-            {location ? (
-                <Marker
-                    key={2}
-                    coordinate={{
-                        latitude: location.latitude,
-                        longitude: location.longitude,
-                    }}
-                    title={'You'}
-                    pinColor={'orange'}
-                />
-            ) : (
-                <></>
-            )}
         </MapView>
     );
 
