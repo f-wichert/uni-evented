@@ -1,5 +1,5 @@
 import * as Notifications from 'expo-notifications';
-import { useEffect } from 'react';
+import { useCallback, useEffect } from 'react';
 import { Platform } from 'react-native';
 
 import { UserManager } from './models';
@@ -11,22 +11,40 @@ Notifications.setNotificationHandler({
     // eslint-disable-next-line @typescript-eslint/require-await
     handleNotification: async () => ({
         shouldShowAlert: true,
-        shouldPlaySound: false,
+        shouldPlaySound: true,
         shouldSetBadge: false,
         priority: Notifications.AndroidNotificationPriority.MAX,
     }),
 });
 
 export function useNotifications() {
-    const userId = useUserStore((state) => state.currentUserId);
-    const authToken = useAuthStore((state) => state.token);
+    const updateBackend = useUpdateBackend();
 
-    // re-runs any time the current user ID or auth token changes
+    // create + send push token; re-runs any time the current user ID or auth token changes
     useEffect(() => {
         const inner = asyncHandler(async () => {
             const token = await registerForPushNotificationsAsync();
-            if (!token) return;
+            if (token) await updateBackend(token);
+        });
+        void inner();
+    }, [updateBackend]);
 
+    // register user action listener, will be called whenever a user taps a notification
+    useEffect(() => {
+        const responseListener = Notifications.addNotificationResponseReceivedListener(
+            handleNotificationResponse
+        );
+        return () => Notifications.removeNotificationSubscription(responseListener);
+    }, []);
+}
+
+/** Returns a function to call for sending push tokens to the backend */
+function useUpdateBackend() {
+    const userId = useUserStore((state) => state.currentUserId);
+    const authToken = useAuthStore((state) => state.token);
+
+    return useCallback(
+        async (token: string) => {
             if (userId) {
                 // once we're logged in, register the push token
                 await UserManager.registerPush(token);
@@ -36,19 +54,12 @@ export function useNotifications() {
             }
             // else, if we're not logged in but have an auth token,
             // that means we're currently loading; in that case, do nothing
-        });
-        void inner();
-    }, [userId, authToken]);
-
-    useEffect(() => {
-        // called whenever a user taps on a notification
-        const responseListener = Notifications.addNotificationResponseReceivedListener(
-            handleNotificationResponse
-        );
-        return () => Notifications.removeNotificationSubscription(responseListener);
-    }, []);
+        },
+        [userId, authToken]
+    );
 }
 
+/** Requests notification permissions and creates an Expo notification token */
 async function registerForPushNotificationsAsync(): Promise<string | null> {
     // Android requires at least one channel to be set up for notifications, otherwise the
     // permission prompt won't be shown
@@ -68,7 +79,9 @@ async function registerForPushNotificationsAsync(): Promise<string | null> {
     return (await Notifications.getExpoPushTokenAsync()).data;
 }
 
+/** Callback when a user taps a notification */
 function handleNotificationResponse(event: Notifications.NotificationResponse) {
     // TODO: navigate somewhere depending on what type of notification the user tapped
+    // https://docs.expo.dev/versions/latest/sdk/notifications/#handle-push-notifications-with-react-navigation
     console.debug('notification response', event);
 }
