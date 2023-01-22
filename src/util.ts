@@ -109,22 +109,25 @@ export function useAsync<T>(func: () => Promise<T>, immediate = true) {
 }
 
 // can't name this `useAsyncEffect` since the eslint plugin checks for /Effect($|[^a-z])/ and we don't want to match that
+
+/** Like `useEffect`, but automatically wraps given function in `asyncHandler`. */
 export function useAsyncEffects(
-    handler: () => Promise<void>,
+    effect: () => Promise<void>,
     deps: DependencyList,
     opts: ErrorHandlerParams = {}
 ): void {
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    useEffect(() => asyncHandler(handler, opts)(), deps);
+    useEffect(() => asyncHandler(effect, opts)(), deps);
 }
 
+/** Like `useCallback`, but automatically wraps given function in `asyncHandler`. */
 export function useAsyncCallback<Args extends unknown[]>(
-    handler: (...args: Args) => Promise<void>,
+    callback: (...args: Args) => Promise<void>,
     deps: DependencyList,
     opts: ErrorHandlerParams = {}
 ): (...args: Args) => void {
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    return useCallback((...args: Args) => asyncHandler(handler, opts)(...args), deps);
+    return useCallback((...args: Args) => asyncHandler(callback, opts)(...args), deps);
 }
 
 export function notEmpty<T>(value: T | null | undefined): value is T {
