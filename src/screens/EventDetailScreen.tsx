@@ -16,7 +16,7 @@ import { EventManager } from '../models';
 import { EventDetailProps } from '../nav/types';
 import { useEventFetch } from '../state/event';
 import { useCurrentUser } from '../state/user';
-import { useAsyncCallback, useAsyncEffects } from '../util';
+import { UnreachableCaseError, useAsyncCallback, useAsyncEffects } from '../util';
 
 const MAX_JOIN_RADIUS_METERS = 50;
 
@@ -72,7 +72,7 @@ function EventDetailScreen({ route, navigation, preview, evId }: Props) {
                     break;
                 // TODO: implement other actions
                 default:
-                    throw new Error(`Unknown event action: '${state}'`);
+                    throw new UnreachableCaseError(state, 'Unknown event action');
             }
         },
         [eventId]

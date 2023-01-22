@@ -133,3 +133,24 @@ export function useAsyncCallback<Args extends unknown[]>(
 export function notEmpty<T>(value: T | null | undefined): value is T {
     return value !== null && value !== undefined;
 }
+
+/**
+ * To be used in switch statements, to check exhaustiveness:
+ *
+ * ```
+ * switch (val) {
+ *     case 'a': ...
+ *     case 'b': ...
+ *     default:
+ *         throw new UnreachableCaseError(val);
+ * }
+ * ```
+ *
+ * If `val` is a union type but the switch statement is missing a case, this will
+ * throw both a compile-time and runtime error.
+ */
+export class UnreachableCaseError extends Error {
+    constructor(val: never, prefix = 'Unreachable case') {
+        super(`${prefix}: ${JSON.stringify(val)}`);
+    }
+}

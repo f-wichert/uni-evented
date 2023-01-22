@@ -3,6 +3,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useCallback } from 'react';
 import { EventStatus } from '../models';
 import { EventAttendeeStatus } from '../models/user';
+import { UnreachableCaseError } from '../util';
 
 interface Props {
     loading: boolean;
@@ -45,6 +46,8 @@ export default function DetailActionButton({
             case 'scheduled':
                 state = EventActionState.HostStart;
                 break;
+            default:
+                throw new UnreachableCaseError(eventStatus);
         }
     } else {
         switch (userStatus) {
@@ -69,6 +72,8 @@ export default function DetailActionButton({
             case 'banned':
                 state = EventActionState.AttendeeBanned;
                 break;
+            default:
+                throw new UnreachableCaseError(userStatus);
         }
     }
 
