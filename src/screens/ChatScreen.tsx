@@ -11,10 +11,10 @@ import { useAsyncCallback } from '../util';
 function ChatScreen({ route }: EventDetailProps<'Chat'>) {
     const eventId = route.params?.eventId ?? null;
     const [messages, setMessages] = useState<MessageModel[]>();
-    const [text, setText] = useState();
-    const textInputRef = React.createRef();
+    const [text, setText] = useState('');
 
-    const scrollViewRef = useRef();
+    const textInputRef = useRef<TextInput | null>(null);
+    const scrollViewRef = useRef<ScrollView | null>(null);
 
     const refreshMessages = useAsyncCallback(
         async () => {
@@ -39,8 +39,9 @@ function ChatScreen({ route }: EventDetailProps<'Chat'>) {
 
     const sendMessage = useAsyncCallback(
         async () => {
+            if (!text) return;
             await MessageManager.sendMessage(eventId, text);
-            textInputRef.current.clear();
+            textInputRef.current?.clear();
         },
         [eventId, text, textInputRef],
         { prefix: 'Failed to send message' }
@@ -70,11 +71,10 @@ function ChatScreen({ route }: EventDetailProps<'Chat'>) {
                 <TextInput
                     style={styles.textInput}
                     placeholder="Message..."
-                    onChangeText={(t) => {
-                        setText(t);
-                    }}
+                    onChangeText={setText}
                     ref={textInputRef}
                 />
+                {/* TODO: disable button if input field empty */}
                 <View style={styles.sendButton}>
                     <Ionicons
                         name="send"
