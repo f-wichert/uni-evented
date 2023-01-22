@@ -5,7 +5,7 @@ import { addUsers, useUserStore } from '../state/user';
 import { request } from '../util';
 
 export const EventAttendeeStatuses = ['interested', 'attending', 'left', 'banned'] as const;
-type EventAttendeeStatus = typeof EventAttendeeStatuses[number];
+export type EventAttendeeStatus = typeof EventAttendeeStatuses[number];
 
 export interface PartialAttendee {
     status: EventAttendeeStatus;

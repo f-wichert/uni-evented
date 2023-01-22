@@ -1,0 +1,105 @@
+import { Pressable, StyleSheet, Text, View } from 'react-native';
+
+import { useCallback } from 'react';
+import { EventStatus } from '../models';
+import { EventAttendeeStatus } from '../models/user';
+
+interface Props {
+    loading: boolean;
+    inRange: boolean;
+    isHost: boolean;
+    eventStatus: EventStatus;
+    userStatus: EventAttendeeStatus | undefined;
+    onAction: (action: EventActionState) => void;
+}
+
+export enum EventActionState {
+    Completed = 'Event done.',
+    HostStart = 'Start event!',
+    HostEnd = 'Stop event!',
+    AttendeeJoin = "I'm here!",
+    AttendeeLeave = 'Leave event!',
+    AttendeeInterested = "I'm interested!",
+    AttendeeNotInterested = 'Not interested?',
+    AttendeeBanned = 'Banned.',
+}
+
+export default function DetailActionButton({
+    loading,
+    inRange,
+    isHost,
+    eventStatus,
+    userStatus,
+    onAction,
+}: Props) {
+    let state = EventActionState.AttendeeJoin; // default/fallback state
+    let disabled = loading;
+
+    if (eventStatus === 'completed') {
+        state = EventActionState.Completed;
+    } else if (isHost) {
+        if (eventStatus === 'active') {
+            state = EventActionState.HostEnd;
+        } else if (eventStatus === 'scheduled') {
+            state = EventActionState.HostStart;
+        }
+    } else {
+        if (userStatus === 'attending') {
+            state = EventActionState.AttendeeLeave;
+        } else if (userStatus === 'interested') {
+            if (!inRange || eventStatus !== 'active') {
+                state = EventActionState.AttendeeNotInterested;
+                // TODO: add subtitle: `Not close enough to join (xx m)`
+            }
+            // else, if in range and event is active, show "I'm here"
+        } else if (userStatus === undefined || userStatus === 'left') {
+            if (!inRange || eventStatus !== 'active') {
+                state = EventActionState.AttendeeInterested;
+            }
+            // else, if in range and event is active, show "I'm here"
+        } else if (userStatus === 'banned') {
+            state = EventActionState.AttendeeBanned;
+        }
+    }
+
+    if ([EventActionState.Completed, EventActionState.AttendeeBanned].includes(state)) {
+        disabled = true;
+    }
+
+    const onButtonPress = useCallback(() => onAction(state), [onAction, state]);
+
+    return (
+        <View style={styles.joinButtonContainer}>
+            <Pressable
+                style={{ ...styles.joinButton, opacity: disabled ? 0.5 : 1 }}
+                onPress={onButtonPress}
+                disabled={disabled}
+            >
+                <Text style={styles.joinButtonText}>{state}</Text>
+            </Pressable>
+        </View>
+    );
+}
+
+const styles = StyleSheet.create({
+    joinButtonContainer: {
+        flex: 3,
+        marginLeft: 10,
+        marginRight: 10,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    joinButton: {
+        backgroundColor: 'black',
+        borderRadius: 7,
+        flex: 1,
+        alignSelf: 'stretch',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    joinButtonText: {
+        color: 'white',
+        fontWeight: 'bold',
+        fontSize: 30,
+    },
+});
