@@ -38,27 +38,37 @@ export default function DetailActionButton({
     if (eventStatus === 'completed') {
         state = EventActionState.Completed;
     } else if (isHost) {
-        if (eventStatus === 'active') {
-            state = EventActionState.HostEnd;
-        } else if (eventStatus === 'scheduled') {
-            state = EventActionState.HostStart;
+        switch (eventStatus) {
+            case 'active':
+                state = EventActionState.HostEnd;
+                break;
+            case 'scheduled':
+                state = EventActionState.HostStart;
+                break;
         }
     } else {
-        if (userStatus === 'attending') {
-            state = EventActionState.AttendeeLeave;
-        } else if (userStatus === 'interested') {
-            if (!inRange || eventStatus !== 'active') {
-                state = EventActionState.AttendeeNotInterested;
-                // TODO: add subtitle: `Not close enough to join (xx m)`
-            }
-            // else, if in range and event is active, show "I'm here"
-        } else if (userStatus === undefined || userStatus === 'left') {
-            if (!inRange || eventStatus !== 'active') {
-                state = EventActionState.AttendeeInterested;
-            }
-            // else, if in range and event is active, show "I'm here"
-        } else if (userStatus === 'banned') {
-            state = EventActionState.AttendeeBanned;
+        switch (userStatus) {
+            case 'attending':
+                state = EventActionState.AttendeeLeave;
+                break;
+            case 'interested':
+                if (!inRange || eventStatus !== 'active') {
+                    state = EventActionState.AttendeeNotInterested;
+                    // TODO: add subtitle: `Not close enough to join (xx m)`
+                }
+                // else, if in range and event is active, show "I'm here"
+                break;
+            case 'left':
+            // fallthrough
+            case undefined:
+                if (!inRange || eventStatus !== 'active') {
+                    state = EventActionState.AttendeeInterested;
+                }
+                // else, if in range and event is active, show "I'm here"
+                break;
+            case 'banned':
+                state = EventActionState.AttendeeBanned;
+                break;
         }
     }
 
