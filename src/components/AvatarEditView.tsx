@@ -7,7 +7,7 @@ import { Image, StyleProp, StyleSheet, TouchableHighlight, View, ViewStyle } fro
 import CustomButton from '../components/Button';
 import { UserManager } from '../models';
 import { useCurrentUser } from '../state/user';
-import { asyncHandler } from '../util';
+import { useAsyncCallback } from '../util';
 
 // px, width and height
 const AVATAR_SIZE = 100;
@@ -32,33 +32,30 @@ export default function AvatarEditView({ avatarUrl, setAvatarUrl, setAvatarData,
     // update url in state once user's avatar changes
     useEffect(() => setAvatarUrl(currentAvatarUrl), [setAvatarUrl, currentAvatarUrl]);
 
-    const pickAvatar = useCallback(
-        (useCamera: boolean) => {
-            const inner = asyncHandler(async () => {
-                const pickerOptions: ImagePicker.ImagePickerOptions = {
-                    allowsEditing: true,
-                    aspect: [1, 1],
-                    base64: true,
-                };
+    const pickAvatar = useAsyncCallback(
+        async (useCamera: boolean) => {
+            const pickerOptions: ImagePicker.ImagePickerOptions = {
+                allowsEditing: true,
+                aspect: [1, 1],
+                base64: true,
+            };
 
-                let result: ImagePicker.ImagePickerResult;
-                if (useCamera) {
-                    await ImagePicker.requestCameraPermissionsAsync();
-                    result = await ImagePicker.launchCameraAsync(pickerOptions);
-                } else {
-                    await ImagePicker.requestMediaLibraryPermissionsAsync();
-                    result = await ImagePicker.launchImageLibraryAsync(pickerOptions);
-                }
+            let result: ImagePicker.ImagePickerResult;
+            if (useCamera) {
+                await ImagePicker.requestCameraPermissionsAsync();
+                result = await ImagePicker.launchCameraAsync(pickerOptions);
+            } else {
+                await ImagePicker.requestMediaLibraryPermissionsAsync();
+                result = await ImagePicker.launchImageLibraryAsync(pickerOptions);
+            }
 
-                const asset = result.assets?.pop();
-                if (!asset || !asset.base64) {
-                    return;
-                }
+            const asset = result.assets?.pop();
+            if (!asset || !asset.base64) {
+                return;
+            }
 
-                setAvatarUrl(asset.uri);
-                setAvatarData(asset.base64);
-            });
-            inner();
+            setAvatarUrl(asset.uri);
+            setAvatarData(asset.base64);
         },
         [setAvatarUrl, setAvatarData]
     );

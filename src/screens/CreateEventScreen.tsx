@@ -1,6 +1,6 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { DateTimePickerAndroid, DateTimePickerEvent } from '@react-native-community/datetimepicker';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     Button,
     Dimensions,
@@ -127,47 +127,53 @@ function CreateEventScreen({ navigation, route }: EventListStackNavProps<'Create
         return `${day}.${month}.${year}`;
     };
 
-    const onCreateButton = useCallback(async () => {
-        // TODO: require these to be non-empty in the UI
-        console.log(`Location: ${location}`);
-        console.log(`start: ${start}`);
-        console.log(`name: ${name}`);
-        console.log(`description: ${description}`);
-        console.log(`selectedTags: ${selectedTags}`);
-        if (!location || !name || !start || !description || selectedTags.length === 0) {
-            toast.show('Please input data for all the input fields.', { type: 'danger' });
-            return;
-        }
+    // not using `useCallback` here, since this would re-render almost every time anyway
+    const onCreateButton = asyncHandler(
+        async () => {
+            // TODO: require these to be non-empty in the UI
+            console.log(`Location: ${location}`);
+            console.log(`start: ${start}`);
+            console.log(`name: ${name}`);
+            console.log(`description: ${description}`);
+            console.log(`selectedTags: ${selectedTags}`);
+            if (!location || !name || !start || !description || selectedTags.length === 0) {
+                toast.show('Please input data for all the input fields.', { type: 'danger' });
+                return;
+            }
 
-        if (useEndtime && start >= end) {
-            toast.show('Change your start time so it is before your end time.', { type: 'danger' });
-            return;
-        }
+            if (useEndtime && start >= end) {
+                toast.show('Change your start time so it is before your end time.', {
+                    type: 'danger',
+                });
+                return;
+            }
 
-        const eventData: {
-            name: string;
-            tags: Tag[];
-            location: LatLng;
-            startDate?: Date | null;
-            endDate?: Date | null;
-        } = {
-            name: name,
-            tags: selectedTags,
-            location: location,
-            startDate: start,
-        };
+            const eventData: {
+                name: string;
+                tags: Tag[];
+                location: LatLng;
+                startDate?: Date | null;
+                endDate?: Date | null;
+            } = {
+                name: name,
+                tags: selectedTags,
+                location: location,
+                startDate: start,
+            };
 
-        if (end && useEndtime) {
-            eventData.endDate = end;
-        }
+            if (end && useEndtime) {
+                eventData.endDate = end;
+            }
 
-        const eventId = await EventManager.create(eventData);
+            const eventId = await EventManager.create(eventData);
 
-        // TODO: this should replace the current screen in the stack
-        navigation.navigate('EventDetail', {
-            eventId,
-        });
-    }, [location, name, start, navigation]);
+            // TODO: this should replace the current screen in the stack
+            navigation.navigate('EventDetail', {
+                eventId,
+            });
+        },
+        { prefix: 'Failed to create event' }
+    );
 
     return (
         <View style={styles.container}>
@@ -328,11 +334,7 @@ function CreateEventScreen({ navigation, route }: EventListStackNavProps<'Create
                 </View>
             </View>
 
-            <Button
-                color="orange"
-                title="Create event!"
-                onPress={asyncHandler(onCreateButton, { prefix: 'Failed to create event' })}
-            />
+            <Button color="orange" title="Create event!" onPress={onCreateButton} />
         </View>
     );
 }

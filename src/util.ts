@@ -118,6 +118,15 @@ export function useAsyncEffects(
     useEffect(() => asyncHandler(handler, opts)(), deps);
 }
 
+export function useAsyncCallback<Args extends unknown[]>(
+    handler: (...args: Args) => Promise<void>,
+    deps: DependencyList,
+    opts: ErrorHandlerParams = {}
+): (...args: Args) => void {
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    return useCallback((...args: Args) => asyncHandler(handler, opts)(...args), deps);
+}
+
 export function notEmpty<T>(value: T | null | undefined): value is T {
     return value !== null && value !== undefined;
 }

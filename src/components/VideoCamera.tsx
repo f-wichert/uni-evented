@@ -1,6 +1,6 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { Camera, CameraType } from 'expo-camera';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { AppState, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { NodeCameraView } from 'react-native-nodemediaclient';
 import { useCallbackRef } from 'use-callback-ref';
@@ -8,7 +8,7 @@ import config from '../config';
 
 import { MediaManager } from '../models';
 import { EventDetailProps } from '../nav/types';
-import { asyncHandler, useAsyncEffects } from '../util';
+import { useAsyncCallback, useAsyncEffects } from '../util';
 
 function VideoCamera({ route, navigation }: EventDetailProps<'MediaCapture'>) {
     const eventId = route.params.eventId;
@@ -47,72 +47,91 @@ function VideoCamera({ route, navigation }: EventDetailProps<'MediaCapture'>) {
         };
     }, []);
 
-    const createFormData = (uri: string, type: string) => {
-        const form = new FormData();
-        form.append('File', {
-            name: uri.split('/').pop() || 'sample.dat',
-            uri: uri,
-            type: type,
-        });
-        form.append('eventID', eventId);
-        return form;
-    };
+    const createFormData = useCallback(
+        (uri: string, type: string) => {
+            const form = new FormData();
+            form.append('File', {
+                name: uri.split('/').pop() || 'sample.dat',
+                uri: uri,
+                type: type,
+            });
+            form.append('eventID', eventId);
+            return form;
+        },
+        [eventId]
+    );
 
-    const onPhotoButton = async () => {
-        if (!cameraRef.current) return;
-        // capture image
-        const { uri } = await cameraRef.current.takePictureAsync();
+    const onPhotoButton = useAsyncCallback(
+        async () => {
+            if (!cameraRef.current) return;
+            // capture image
+            const { uri } = await cameraRef.current.takePictureAsync();
 
-        // close camera
-        navigation.goBack();
-        toast.show('Picture was successfully uploaded.');
+            // close camera
+            navigation.goBack();
+            toast.show('Picture was successfully uploaded.');
 
-        // infer mime type based on extension
-        const extensionMatch = /\.(\w+)$/.exec(uri);
-        const type = extensionMatch ? `image/${extensionMatch[1]}` : `image`;
+            // infer mime type based on extension
+            const extensionMatch = /\.(\w+)$/.exec(uri);
+            const type = extensionMatch ? `image/${extensionMatch[1]}` : `image`;
 
-        // upload media
-        await MediaManager.uploadImage(createFormData(uri, type));
-    };
-
-    const onVideoButton = async () => {
-        if (!cameraRef.current) return;
-
-        if (recording) {
-            setRecording(false);
-            cameraRef.current.stopRecording();
-            return;
+            // upload media
+            await MediaManager.uploadImage(createFormData(uri, type));
+        },
+        [createFormData, navigation],
+        {
+            prefix: 'Failed to take picture',
         }
+    );
 
-        // start recording
-        setRecording(true);
-        const { uri } = await cameraRef.current.recordAsync();
-        // close camera
-        navigation.goBack();
-        toast.show('Video was successfully uploaded.');
+    const onVideoButton = useAsyncCallback(
+        async () => {
+            if (!cameraRef.current) return;
 
-        // upload media
-        await MediaManager.uploadClip(createFormData(uri, 'video/mp4'));
-    };
+            if (recording) {
+                setRecording(false);
+                cameraRef.current.stopRecording();
+                return;
+            }
 
-    const updateStreamUrl = async () => {
+            // start recording
+            setRecording(true);
+            const { uri } = await cameraRef.current.recordAsync();
+            // close camera
+            navigation.goBack();
+            toast.show('Video was successfully uploaded.');
+
+            // upload media
+            await MediaManager.uploadClip(createFormData(uri, 'video/mp4'));
+        },
+        [createFormData, navigation, recording],
+        {
+            prefix: 'Failed to record video',
+        }
+    );
+
+    const updateStreamUrl = useCallback(async () => {
         const { id, streamKey } = await MediaManager.uploadLivestream(eventId);
         if (!streamKey) throw new Error('No stream key received');
 
         const url = `${config.NMS_RTMP_URL}/livestream/${id}?key=${streamKey}`;
         setStreamUrl(url);
-    };
+    }, [eventId]);
 
-    const onLiveModeButton = async () => {
-        if (!liveMode) {
-            try {
-                await updateStreamUrl();
-            } catch {
-                return;
+    const onLiveModeButton = useAsyncCallback(
+        async () => {
+            if (!liveMode) {
+                try {
+                    await updateStreamUrl();
+                } catch {
+                    return;
+                }
             }
-        }
-        setLiveMode(!liveMode);
-    };
+            setLiveMode(!liveMode);
+        },
+        [liveMode, updateStreamUrl],
+        { prefix: 'Failed to change live mode' }
+    );
 
     useEffect(() => {
         if (liveMode && liveCameraRef.current) {
@@ -194,12 +213,7 @@ function VideoCamera({ route, navigation }: EventDetailProps<'MediaCapture'>) {
                                 <View style={[styles.innerCirclePhoto]}></View>
                             </View>
                         </TouchableOpacity>
-                        <TouchableOpacity
-                            style={[styles.flexEl]}
-                            onPress={asyncHandler(onLiveModeButton, {
-                                prefix: 'Failed to leave live mode',
-                            })}
-                        >
+                        <TouchableOpacity style={[styles.flexEl]} onPress={onLiveModeButton}>
                             <Ionicons name="videocam" size={32} color="red" />
                         </TouchableOpacity>
                     </View>
@@ -224,12 +238,7 @@ function VideoCamera({ route, navigation }: EventDetailProps<'MediaCapture'>) {
                             >
                                 <Ionicons name="camera-reverse-outline" size={32} color="white" />
                             </TouchableOpacity>
-                            <TouchableOpacity
-                                style={[styles.flexEl]}
-                                onPress={asyncHandler(onVideoButton, {
-                                    prefix: 'Failed to record video',
-                                })}
-                            >
+                            <TouchableOpacity style={[styles.flexEl]} onPress={onVideoButton}>
                                 <View style={[styles.outerCircleVideo]}>
                                     <View
                                         style={{
@@ -245,9 +254,7 @@ function VideoCamera({ route, navigation }: EventDetailProps<'MediaCapture'>) {
                                     ...styles.flexEl,
                                     opacity: recording ? 0.25 : 1,
                                 }}
-                                onPress={asyncHandler(onPhotoButton, {
-                                    prefix: 'Failed to take picture',
-                                })}
+                                onPress={onPhotoButton}
                             >
                                 <View style={[styles.outerCirclePhoto]}>
                                     <View style={[styles.innerCirclePhoto]}></View>
@@ -256,9 +263,7 @@ function VideoCamera({ route, navigation }: EventDetailProps<'MediaCapture'>) {
                             <TouchableOpacity
                                 style={styles.flexEl}
                                 disabled={recording}
-                                onPress={asyncHandler(onLiveModeButton, {
-                                    prefix: 'Failed to enter live mode',
-                                })}
+                                onPress={onLiveModeButton}
                             >
                                 <Ionicons name="videocam-outline" size={32} color="white" />
                             </TouchableOpacity>

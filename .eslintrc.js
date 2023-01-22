@@ -33,7 +33,7 @@ module.exports = {
         'react-hooks/exhaustive-deps': [
             'warn',
             {
-                additionalHooks: '\\b(useAsyncEffects)\\b',
+                additionalHooks: '\\b(useAsyncEffects|useAsyncCallback)\\b',
             },
         ],
     },
