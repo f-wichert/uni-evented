@@ -1,5 +1,6 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { DateTimePickerAndroid, DateTimePickerEvent } from '@react-native-community/datetimepicker';
+import Checkbox from 'expo-checkbox';
 import React, { useEffect, useState } from 'react';
 import {
     Button,
@@ -11,23 +12,24 @@ import {
     View,
 } from 'react-native';
 import DropDownPicker from 'react-native-dropdown-picker';
-// import DateTimePicker from '@react-native-community/datetimepicker';
-import Checkbox from 'expo-checkbox';
 import MapView, { LatLng, Marker } from 'react-native-maps';
 
 import { INPUT_BACKGR_COLOR } from '../constants';
 import { EventManager } from '../models';
-import { Tag } from '../models/event';
+import { EventCreateParams, Tag } from '../models/event';
 import { EventListStackNavProps } from '../nav/types';
 import { asyncHandler, useAsyncEffects } from '../util';
 
 const width = Dimensions.get('window').width;
 
+// dropdown uses `value` prop on items, we put the tag's ID there
+type TagWithValue = Tag & { value: string };
+
 function CreateEventScreen({ navigation, route }: EventListStackNavProps<'CreateEvent'>) {
     // This is passed back from the map picker (https://reactnavigation.org/docs/params#passing-params-to-a-previous-screen).
     // If `params.location` changed, we call `setLocation` with the new value.
 
-    const [tags, setTags] = useState<Tag[]>([]);
+    const [tags, setTags] = useState<TagWithValue[]>([]);
     useAsyncEffects(
         async () => {
             const response = await EventManager.fetchAllTags();
@@ -59,7 +61,8 @@ function CreateEventScreen({ navigation, route }: EventListStackNavProps<'Create
 
     // Dropdown State
     const [open, setOpen] = useState(false);
-    const [selectedTags, setSelectedTags] = useState([]);
+    // (list of tag IDs)
+    const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
     // Location State
     const [location, setLocation] = useState<LatLng | null>(null);
@@ -136,6 +139,7 @@ function CreateEventScreen({ navigation, route }: EventListStackNavProps<'Create
             console.log(`name: ${name}`);
             console.log(`description: ${description}`);
             console.log(`selectedTags: ${selectedTags}`);
+
             if (!location || !name || !start || !description || selectedTags.length === 0) {
                 toast.show('Please input data for all the input fields.', { type: 'danger' });
                 return;
@@ -148,22 +152,15 @@ function CreateEventScreen({ navigation, route }: EventListStackNavProps<'Create
                 return;
             }
 
-            const eventData: {
-                name: string;
-                tags: Tag[];
-                location: LatLng;
-                startDate?: Date | null;
-                endDate?: Date | null;
-            } = {
+            const eventData: EventCreateParams = {
                 name: name,
                 tags: selectedTags,
+                description: description,
                 location: location,
                 startDate: start,
             };
 
-            if (end && useEndtime) {
-                eventData.endDate = end;
-            }
+            if (useEndtime) eventData.endDate = end;
 
             const eventId = await EventManager.create(eventData);
 
@@ -303,7 +300,7 @@ function CreateEventScreen({ navigation, route }: EventListStackNavProps<'Create
             </View>
 
             <View style={styles.section}>
-                <Text style={styles.sectionTitle}>Tags (1-5)</Text>
+                <Text style={styles.sectionTitle}>Tags (up to 5)</Text>
 
                 <View style={styles.sectionBody}>
                     <DropDownPicker
@@ -317,7 +314,7 @@ function CreateEventScreen({ navigation, route }: EventListStackNavProps<'Create
                         setOpen={setOpen}
                         setValue={setSelectedTags}
                         setItems={setTags}
-                        placeholder="Select up to three tags"
+                        placeholder="Select up to five tags"
                         maxHeight={300}
                         categorySelectable={false}
                         mode="BADGE"
