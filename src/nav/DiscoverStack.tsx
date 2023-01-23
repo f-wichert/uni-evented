@@ -10,7 +10,11 @@ const Stack = createNativeStackNavigator<DiscoverStackNavParams>();
 export default function DiscoverStack() {
     return (
         <Stack.Navigator>
-            <Stack.Screen name="DiscoverView" component={DiscoverScreen} />
+            <Stack.Screen
+                name="DiscoverView"
+                component={DiscoverScreen}
+                options={{ title: 'Discover' }}
+            />
             {createEventScreens(Stack.Screen)}
         </Stack.Navigator>
     );
