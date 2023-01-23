@@ -1,5 +1,6 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useFocusEffect } from '@react-navigation/native';
+import dayjs from 'dayjs';
 import * as Location from 'expo-location';
 import { getDistance } from 'geolib';
 import React, { useCallback, useEffect, useState } from 'react';
@@ -124,17 +125,9 @@ function EventDetailScreen({ route, navigation, preview, evId }: Props) {
         };
     }
 
-    const formatTime = (date: Date) => {
-        const hours = date.getHours().toString().padStart(2, '0');
-        const minutes = date.getMinutes().toString().padStart(2, '0');
-        return `${hours}:${minutes}`;
-    };
-
-    const formatDate = (date: Date) => {
-        const day = date.getDate().toString().padStart(2, '0');
-        const month = (date.getMonth() + 1).toString().padStart(2, '0');
-        const year = date.getFullYear();
-        return `${day}.${month}.${year}`;
+    const formatDateTime = (date: Date) => {
+        const d = dayjs(date);
+        return d.format('ddd, DD.MM.YYYY - HH:mm');
     };
 
     const numberOfAttendants = (eventData.users ?? []).length;
@@ -223,19 +216,13 @@ function EventDetailScreen({ route, navigation, preview, evId }: Props) {
         <View style={styles.GeneralInformationArea}>
             <View style={{ maxWidth: '60%' }}>
                 <Text style={{ color: 'grey', fontSize: 16 }}>
-                    {`Start: ${formatDate(eventData.startDate)} - ${formatTime(
-                        eventData.startDate
-                    )}`}
+                    {`Start: ${formatDateTime(eventData.startDate)}`}
                 </Text>
                 {eventData.endDate ? (
                     <Text style={{ color: 'grey', fontSize: 16 }}>
-                        {`End:  ${formatDate(eventData.startDate)} - ${formatTime(
-                            eventData.startDate
-                        )}`}
+                        {`End: ${formatDateTime(eventData.endDate)}`}
                     </Text>
-                ) : (
-                    <></>
-                )}
+                ) : null}
                 {/* <Text style={{ fontSize: 18, fontWeight: 'bold' }}> </Text> */}
             </View>
 

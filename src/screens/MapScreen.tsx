@@ -1,4 +1,5 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
+import dayjs from 'dayjs';
 import * as Location from 'expo-location';
 import { LocationObject } from 'expo-location';
 import React, { useCallback, useState } from 'react';
@@ -105,14 +106,10 @@ function MapScreen({ navigation, route }: MapStackNavProps<'MapView'>) {
         [navigation]
     );
 
-    // Credit to https://stackoverflow.com/questions/3224834/get-difference-between-2-dates-in-javascript
-    function dateDiffInDays(a, b) {
-        const _MS_PER_DAY = 1000 * 60 * 60 * 24;
-        // Discard the time and time-zone information.
-        const utc1 = Date.UTC(a.getFullYear(), a.getMonth(), a.getDate());
-        const utc2 = Date.UTC(b.getFullYear(), b.getMonth(), b.getDate());
-
-        return Math.floor(Math.abs(utc2 - utc1) / _MS_PER_DAY);
+    function dateDiffInDays(a: Date, b: Date) {
+        const aDay = dayjs(a).startOf('day');
+        const bDay = dayjs(b).startOf('day');
+        return aDay.diff(bDay, 'days');
     }
 
     return (
@@ -149,15 +146,10 @@ function MapScreen({ navigation, route }: MapStackNavProps<'MapView'>) {
                     >
                         <>
                             {events.map((el) => {
-                                let status = 'current';
-                                // console.log(el.startDate);
-                                const today = new Date(Date.now());
-                                const date = new Date(el.startDate);
-                                const diff = dateDiffInDays(date, today);
+                                const diffDays = dateDiffInDays(el.startDate, new Date());
 
                                 // Remove events that are not in our day range
-                                if (diff <= currentDayRange) {
-                                } else {
+                                if (diffDays > currentDayRange) {
                                     return;
                                 }
 
@@ -165,9 +157,6 @@ function MapScreen({ navigation, route }: MapStackNavProps<'MapView'>) {
                                 if (el.status == 'completed') {
                                     return;
                                 }
-
-                                // console.log(`Date: ${date} - Diff: ${diff} - Curr: ${currentDayRange} - Fut[1]: ${futureDayRange} => ${status}`);
-                                // console.log(el.status);
 
                                 return (
                                     <EventMarker

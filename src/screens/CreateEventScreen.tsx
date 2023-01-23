@@ -1,4 +1,5 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
+import dayjs from 'dayjs';
 import Checkbox from 'expo-checkbox';
 import React, { useCallback, useEffect, useState } from 'react';
 import {
@@ -61,8 +62,9 @@ function CreateEventScreen({ navigation, route }: EventListStackNavProps<'Create
     const [pickerMode, setPickerMode] = useState<'time' | 'date'>('time');
     const [pickerTarget, setPickerTarget] = useState<'start' | 'end'>('start');
 
-    const [start, setStart] = useState(new Date());
-    const [end, setEnd] = useState(new Date());
+    // default start to next minute, and default end to "start + 2h"
+    const [start, setStart] = useState<Date>(dayjs().add(1, 'minute').startOf('minute').toDate());
+    const [end, setEnd] = useState<Date>(dayjs(start).add(2, 'hours').toDate());
 
     // Dropdown State
     const [open, setOpen] = useState(false);
@@ -96,16 +98,13 @@ function CreateEventScreen({ navigation, route }: EventListStackNavProps<'Create
     );
 
     const formatTime = (date: Date) => {
-        const hours = date.getHours().toString().padStart(2, '0');
-        const minutes = date.getMinutes().toString().padStart(2, '0');
-        return `${hours}:${minutes}`;
+        const d = dayjs(date);
+        return d.format('HH:mm');
     };
 
     const formatDate = (date: Date) => {
-        const day = date.getDate().toString().padStart(2, '0');
-        const month = (date.getMonth() + 1).toString().padStart(2, '0');
-        const year = date.getFullYear();
-        return `${day}.${month}.${year}`;
+        const d = dayjs(date);
+        return d.format('ddd, DD.MM.YYYY');
     };
 
     // not using `useCallback` here, since this would re-render almost every time anyway
