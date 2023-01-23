@@ -13,7 +13,7 @@ import { useAuthStore } from '../state/auth';
 import { useCurrentUser } from '../state/user';
 import { IoniconsName } from '../types';
 
-export default function ProfileScreen({ navigation }: ProfileStackNavProps<'ProfileView'>) {
+export default function MyProfileScreen({ navigation }: ProfileStackNavProps<'MyProfileView'>) {
     const user = useCurrentUser();
     const signout = useAuthStore((state) => state.signout);
 

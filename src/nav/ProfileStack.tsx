@@ -4,7 +4,7 @@ import React from 'react';
 import EditProfileScreen from '../screens/EditProfileScreen';
 import ManageAccountScreen from '../screens/ManageAccountScreen';
 import MyEventsScreen from '../screens/MyEventsScreen';
-import ProfileScreen from '../screens/ProfileScreen';
+import MyProfileScreen from '../screens/MyProfileScreen';
 import createCommonScreens from './commonScreensMixin';
 import { ProfileStackNavParams } from './types';
 
@@ -14,8 +14,8 @@ function ProfileStack() {
     return (
         <Stack.Navigator>
             <Stack.Screen
-                name="ProfileView"
-                component={ProfileScreen}
+                name="MyProfileView"
+                component={MyProfileScreen}
                 options={{ headerShown: false }}
             />
             <Stack.Screen
