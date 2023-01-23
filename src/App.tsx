@@ -8,6 +8,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import ToastRoot from './components/ToastRoot';
 import TabNavigator from './nav/TabNavigator';
 import { AnyRootNavParams } from './nav/types';
+import { useNotifications } from './notifications';
 import LoadingScreen from './screens/LoadingScreen';
 import LoginScreen from './screens/LoginScreen';
 import RegisterScreen from './screens/RegisterScreen';
@@ -37,6 +38,8 @@ function useRootNavigationState(): 'login' | 'loading' | 'main' {
 }
 
 function App() {
+    useNotifications();
+
     const navState = useRootNavigationState();
 
     // https://reactnavigation.org/docs/auth-flow

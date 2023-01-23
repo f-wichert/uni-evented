@@ -66,4 +66,12 @@ export class UserManager {
             addUsers(state, this.fromUserResponse(user));
         });
     }
+
+    static async registerPush(token: string) {
+        await request('POST', '/auth/registerPush', { token });
+    }
+
+    static async unregisterPush(token: string) {
+        await request('POST', '/auth/unregisterPush', { token }, { noAuth: true });
+    }
 }
