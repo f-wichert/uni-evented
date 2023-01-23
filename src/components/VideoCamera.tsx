@@ -7,10 +7,10 @@ import { useCallbackRef } from 'use-callback-ref';
 import config from '../config';
 
 import { MediaManager } from '../models';
-import { EventDetailProps } from '../nav/types';
+import { CommonStackProps } from '../nav/types';
 import { useAsyncCallback, useAsyncEffects } from '../util';
 
-function VideoCamera({ route, navigation }: EventDetailProps<'MediaCapture'>) {
+function VideoCamera({ route, navigation }: CommonStackProps<'MediaCapture'>) {
     const eventId = route.params.eventId;
 
     const [hasPermission, setHasPermission] = useState(false);

@@ -58,7 +58,7 @@ export type TabNavProps<ScreenName extends keyof TabNavParams = keyof TabNavPara
 
 export type DiscoverStackNavParams = {
     DiscoverView: undefined;
-} & EventDetailParams;
+} & CommonStackParams;
 
 export type DiscoverStackNavProps<
     T extends keyof DiscoverStackNavParams = keyof DiscoverStackNavParams
@@ -70,7 +70,7 @@ export type DiscoverStackNavProps<
 
 export type MapStackNavParams = {
     MapView: undefined;
-} & EventDetailParams;
+} & CommonStackParams;
 
 export type MapStackNavProps<T extends keyof MapStackNavParams = keyof MapStackNavParams> =
     CompositeScreenProps<NativeStackScreenProps<MapStackNavParams, T>, TabNavProps>;
@@ -83,7 +83,7 @@ export type EventListStackNavParams = {
     EventList: undefined;
     CreateEvent: { location?: LatLng } | undefined;
     MapPicker: undefined;
-} & EventDetailParams;
+} & CommonStackParams;
 
 export type EventListStackNavProps<
     T extends keyof EventListStackNavParams = keyof EventListStackNavParams
@@ -98,21 +98,21 @@ export type ProfileStackNavParams = {
     EditProfile: undefined;
     MyEvents: undefined;
     ManageAccount: undefined;
-} & EventDetailParams;
+} & CommonStackParams;
 
 export type ProfileStackNavProps<
     T extends keyof ProfileStackNavParams = keyof ProfileStackNavParams
 > = CompositeScreenProps<NativeStackScreenProps<ProfileStackNavParams, T>, TabNavProps>;
 
 // ==========
-// event detail substack
+// stack mixin for common views on all tabs
 // ==========
 
-export type EventDetailParams = {
+export type CommonStackParams = {
     EventDetail: { eventId: string };
     MediaCapture: { eventId: string };
     Chat: { eventId: string };
 };
 
-export type EventDetailProps<T extends keyof EventDetailParams = keyof EventDetailParams> =
-    CompositeScreenProps<NativeStackScreenProps<EventDetailParams, T>, TabNavProps>;
+export type CommonStackProps<T extends keyof CommonStackParams = keyof CommonStackParams> =
+    CompositeScreenProps<NativeStackScreenProps<CommonStackParams, T>, TabNavProps>;

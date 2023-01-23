@@ -4,7 +4,7 @@ import React from 'react';
 import CreateEventScreen from '../screens/CreateEventScreen';
 import EventListScreen from '../screens/EventListScreen';
 import MapPickerScreen from '../screens/MapPickerScreen';
-import createEventScreens from './eventDetailMixin';
+import createCommonScreens from './commonScreensMixin';
 import { EventListStackNavParams } from './types';
 
 const Stack = createNativeStackNavigator<EventListStackNavParams>();
@@ -27,7 +27,7 @@ function EventListStack() {
                 component={MapPickerScreen}
                 options={{ title: 'Pick a Location!' }}
             />
-            {createEventScreens(Stack.Screen)}
+            {createCommonScreens(Stack.Screen)}
         </Stack.Navigator>
     );
 }

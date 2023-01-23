@@ -14,7 +14,7 @@ import DetailActionButton, { EventActionState } from '../components/DetailAction
 import MediaCarousel from '../components/MediaCarousel';
 import { Tag } from '../components/Tag';
 import { EventManager } from '../models';
-import { EventDetailProps } from '../nav/types';
+import { CommonStackProps } from '../nav/types';
 import { useEventFetch } from '../state/event';
 import { useCurrentUser } from '../state/user';
 import { EmptyObject } from '../types';
@@ -22,7 +22,7 @@ import { request, UnreachableCaseError, useAsyncCallback, useAsyncEffects } from
 
 const MAX_JOIN_RADIUS_METERS = 50;
 
-interface Props extends EventDetailProps<'EventDetail'> {
+interface Props extends CommonStackProps<'EventDetail'> {
     preview?: boolean;
     evId?: string;
 }

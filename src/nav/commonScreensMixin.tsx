@@ -4,11 +4,11 @@ import React from 'react';
 import VideoCamera from '../components/VideoCamera';
 import ChatScreen from '../screens/ChatScreen';
 import EventDetailScreen from '../screens/EventDetailScreen';
-import { EventDetailParams } from './types';
+import { CommonStackParams } from './types';
 
-type ScreenType = ReturnType<typeof createNativeStackNavigator<EventDetailParams>>['Screen'];
+type ScreenType = ReturnType<typeof createNativeStackNavigator<CommonStackParams>>['Screen'];
 
-export default function createEventScreens(Screen: ScreenType) {
+export default function createCommonScreens(Screen: ScreenType) {
     return (
         <>
             <Screen
