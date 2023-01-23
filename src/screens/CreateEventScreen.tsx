@@ -1,10 +1,10 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { DateTimePickerAndroid, DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import Checkbox from 'expo-checkbox';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
     Button,
     Dimensions,
+    Platform,
     StyleSheet,
     Text,
     TextInput,
@@ -13,6 +13,7 @@ import {
 } from 'react-native';
 import DropDownPicker from 'react-native-dropdown-picker';
 import MapView, { LatLng, Marker } from 'react-native-maps';
+import DateTimePickerModal from 'react-native-modal-datetime-picker';
 
 import { INPUT_BACKGR_COLOR } from '../constants';
 import { EventManager } from '../models';
@@ -55,7 +56,11 @@ function CreateEventScreen({ navigation, route }: EventListStackNavProps<'Create
 
     const [useEndtime, setUseEndtime] = useState<boolean>(false);
 
-    // DatePickerState
+    // date/time picker state
+    const [isPickerVisible, setPickerVisible] = useState(false);
+    const [pickerMode, setPickerMode] = useState<'time' | 'date'>('time');
+    const [pickerTarget, setPickerTarget] = useState<'start' | 'end'>('start');
+
     const [start, setStart] = useState(new Date());
     const [end, setEnd] = useState(new Date());
 
@@ -67,55 +72,28 @@ function CreateEventScreen({ navigation, route }: EventListStackNavProps<'Create
     // Location State
     const [location, setLocation] = useState<LatLng | null>(null);
 
-    const onChangeStart = (event: DateTimePickerEvent, selectedDate?: Date) => {
-        if (!selectedDate) {
-            return;
-        }
-        setStart(selectedDate);
-    };
+    // date/time picker callbacks
+    const hidePicker = useCallback(() => setPickerVisible(false), []);
+    const showPicker = useCallback((mode: 'time' | 'date', target: 'start' | 'end') => {
+        setPickerMode(mode);
+        setPickerTarget(target);
+        setPickerVisible(true);
+    }, []);
 
-    const onChangeEnd = (event: DateTimePickerEvent, selectedDate?: Date) => {
-        if (!selectedDate) {
-            return;
-        }
-        setEnd(selectedDate);
-    };
+    const showStartTimePicker = useCallback(() => showPicker('time', 'start'), [showPicker]);
+    const showStartDatePicker = useCallback(() => showPicker('date', 'start'), [showPicker]);
+    const showEndTimePicker = useCallback(() => showPicker('time', 'end'), [showPicker]);
+    const showEndDatePicker = useCallback(() => showPicker('date', 'end'), [showPicker]);
 
-    const showModeStartPicker = (currentMode: 'date' | 'time') => {
-        // TODO: not supported on ios, which technically isn't a requirement but would be nice
-        DateTimePickerAndroid.open({
-            value: start,
-            onChange: onChangeStart,
-            mode: currentMode,
-            is24Hour: true,
-        });
-    };
+    const onPickerConfirm = useCallback(
+        (date: Date) => {
+            hidePicker();
 
-    const showModeEndPicker = (currentMode: 'date' | 'time') => {
-        // TODO: not supported on ios, which technically isn't a requirement but would be nice
-        DateTimePickerAndroid.open({
-            value: end,
-            onChange: onChangeEnd,
-            mode: currentMode,
-            is24Hour: true,
-        });
-    };
-
-    const showDatepickerStartPicker = () => {
-        showModeStartPicker('date');
-    };
-
-    const showTimepickerStartPicker = () => {
-        showModeStartPicker('time');
-    };
-
-    const showDatepickerEndPicker = () => {
-        showModeEndPicker('date');
-    };
-
-    const showTimepickerEndPicker = () => {
-        showModeEndPicker('time');
-    };
+            const setState = pickerTarget === 'start' ? setStart : setEnd;
+            setState(date);
+        },
+        [pickerTarget, hidePicker]
+    );
 
     const formatTime = (date: Date) => {
         const hours = date.getHours().toString().padStart(2, '0');
@@ -254,16 +232,10 @@ function CreateEventScreen({ navigation, route }: EventListStackNavProps<'Create
                 <Text style={styles.sectionSubtitle}>Start</Text>
                 <View style={styles.sectionBody}>
                     <View style={styles.dateTimeWrapper}>
-                        <TouchableOpacity
-                            style={styles.timeInput}
-                            onPress={showTimepickerStartPicker}
-                        >
+                        <TouchableOpacity style={styles.timeInput} onPress={showStartTimePicker}>
                             <Text>{formatTime(start)}</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity
-                            style={styles.dateInput}
-                            onPress={showDatepickerStartPicker}
-                        >
+                        <TouchableOpacity style={styles.dateInput} onPress={showStartDatePicker}>
                             <Text>{formatDate(start)}</Text>
                         </TouchableOpacity>
                     </View>
@@ -282,21 +254,28 @@ function CreateEventScreen({ navigation, route }: EventListStackNavProps<'Create
                 {useEndtime ? (
                     <View style={styles.sectionBody}>
                         <View style={styles.dateTimeWrapper}>
-                            <TouchableOpacity
-                                style={styles.timeInput}
-                                onPress={showTimepickerEndPicker}
-                            >
+                            <TouchableOpacity style={styles.timeInput} onPress={showEndTimePicker}>
                                 <Text>{formatTime(end)}</Text>
                             </TouchableOpacity>
-                            <TouchableOpacity
-                                style={styles.dateInput}
-                                onPress={showDatepickerEndPicker}
-                            >
+                            <TouchableOpacity style={styles.dateInput} onPress={showEndDatePicker}>
                                 <Text>{formatDate(end)}</Text>
                             </TouchableOpacity>
                         </View>
                     </View>
                 ) : null}
+
+                <DateTimePickerModal
+                    isVisible={isPickerVisible}
+                    mode={pickerMode}
+                    date={pickerTarget === 'start' ? start : end}
+                    onConfirm={onPickerConfirm}
+                    onCancel={hidePicker}
+                    is24Hour={true}
+                    // force theme on iOS because reasons
+                    themeVariant="light"
+                    // show calendar instead of spinner for date picker on iOS
+                    display={pickerMode === 'date' && Platform.OS === 'ios' ? 'inline' : undefined}
+                />
             </View>
 
             <View style={styles.section}>
