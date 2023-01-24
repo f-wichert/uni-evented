@@ -98,6 +98,9 @@ export type ProfileStackNavParams = {
     EditProfile: undefined;
     MyEvents: undefined;
     ManageAccount: undefined;
+    AdminMainScreen: undefined;
+    AdminUsersScreen: undefined;
+    // AdminEventsScreen: undefined;
 } & EventDetailParams;
 
 export type ProfileStackNavProps<

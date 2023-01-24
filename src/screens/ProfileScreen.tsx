@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import React, { useCallback } from 'react';
 import { Alert, ScrollView, StyleSheet, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { Cell, Section, TableView } from 'react-native-tableview-simple';
 
 import yellowSplash from '../../assets/yellow_splash.png';
@@ -32,7 +32,7 @@ export default function ProfileScreen({ navigation }: ProfileStackNavProps<'Prof
     );
 
     return (
-        <SafeAreaView>
+        <SafeAreaProvider>
             <View style={styles.profileHeader}>
                 <ProfileHeader
                     imageUri={UserManager.getAvatarUrl(user)}
@@ -72,6 +72,16 @@ export default function ProfileScreen({ navigation }: ProfileStackNavProps<'Prof
                     </Section>
                     <Section sectionPaddingTop={0}>
                         <Cell
+                            image={getCellIcon('construct-outline')}
+                            title="Moderation"
+                            accessory="DisclosureIndicator"
+                            onPress={useCallback(() => {
+                                navigation.navigate('AdminMainScreen');
+                            }, [navigation])}
+                        />
+                    </Section>
+                    <Section sectionPaddingTop={0}>
+                        <Cell
                             image={getCellIcon('build-outline')}
                             title="Manage Account"
                             accessory="DisclosureIndicator"
@@ -88,7 +98,7 @@ export default function ProfileScreen({ navigation }: ProfileStackNavProps<'Prof
                     </Section>
                 </TableView>
             </ScrollView>
-        </SafeAreaView>
+        </SafeAreaProvider>
     );
 }
 
