@@ -81,9 +81,38 @@ export class EventManager {
         });
     }
 
-    static async close(eventId: string) {
+    static async leave(eventId: string) {
         // TODO: client side validation
+        await request<EmptyObject>('POST', '/event/leave', { eventId });
+
+        useEventStore.setState((state) => {
+            state.currentEventId = null;
+        });
+    }
+
+    static async follow(eventId: string) {
+        await request<EmptyObject>('POST', '/event/follow', { eventId });
+    }
+
+    static async unfollow(eventId: string) {
+        await request<EmptyObject>('POST', '/event/unfollow', { eventId });
+    }
+
+    static async start(eventId: string) {
         await request<EmptyObject>('POST', '/event/close', { eventId });
+
+        useEventStore.setState((state) => {
+            // update status of event
+            const event = state.events[eventId];
+            if (event) event.status = 'active';
+
+            state.currentEventId = eventId;
+        });
+    }
+
+    static async stop(eventId: string) {
+        // TODO: client side validation
+        await request<EmptyObject>('POST', '/event/stop', { eventId });
 
         useEventStore.setState((state) => {
             // update status of event
@@ -99,9 +128,7 @@ export class EventManager {
         const { media, attendees, startDateTime, endDateTime, lat, lon, ...fields } = response;
 
         // TODO: add these to user store
-        const users = attendees
-            ? attendees.map((user) => UserManager.fromUserResponse(user))
-            : null;
+        const users = attendees?.map((user) => UserManager.fromUserResponse(user)) ?? null;
 
         return {
             ...fields,
