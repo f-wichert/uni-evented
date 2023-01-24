@@ -32,6 +32,7 @@
         "expo-av": "~13.0.2",
         "expo-camera": "^13.1.0",
         "expo-checkbox": "~2.2.2",
+        "expo-cli": "^6.1.0",
         "expo-image-picker": "~14.0.2",
         "expo-location": "^15.0.1",
         "expo-notifications": "^0.17.0",
