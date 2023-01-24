@@ -1,9 +1,11 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { DateTimePickerAndroid, DateTimePickerEvent } from '@react-native-community/datetimepicker';
+import dayjs from 'dayjs';
+import Checkbox from 'expo-checkbox';
 import React, { useCallback, useEffect, useState } from 'react';
 import {
     Button,
     Dimensions,
+    Platform,
     StyleSheet,
     Text,
     TextInput,
@@ -11,38 +13,36 @@ import {
     View,
 } from 'react-native';
 import DropDownPicker from 'react-native-dropdown-picker';
-// import DateTimePicker from '@react-native-community/datetimepicker';
-import Checkbox from 'expo-checkbox';
 import MapView, { LatLng, Marker } from 'react-native-maps';
+import DateTimePickerModal from 'react-native-modal-datetime-picker';
 
 import { INPUT_BACKGR_COLOR } from '../constants';
 import { EventManager } from '../models';
+import { EventCreateParams, Tag } from '../models/event';
 import { EventListStackNavProps } from '../nav/types';
-import { Tag } from '../types';
-import { asyncHandler, request } from '../util';
+import { asyncHandler, useAsyncEffects } from '../util';
 
 const width = Dimensions.get('window').width;
+
+// dropdown uses `value` prop on items, we put the tag's ID there
+type TagWithValue = Tag & { value: string };
 
 function CreateEventScreen({ navigation, route }: EventListStackNavProps<'CreateEvent'>) {
     // This is passed back from the map picker (https://reactnavigation.org/docs/params#passing-params-to-a-previous-screen).
     // If `params.location` changed, we call `setLocation` with the new value.
 
-    const [tags, setTags] = useState<Tag[]>([
-        { id: 'TestID', label: 'TestLabel', color: 'red', parent: 'TestID', value: 'testValue' },
-    ]);
-    useEffect(
-        asyncHandler(async () => {
-            const response = (await request('GET', '/info/all_tags')) as unknown as Tag[];
-            const mappedTags = response.map((el: Tag) => ({
-                label: el.label,
-                color: el.color,
-                value: el.id,
-                parent: el.parent,
-                id: el.id,
+    const [tags, setTags] = useState<TagWithValue[]>([]);
+    useAsyncEffects(
+        async () => {
+            const response = await EventManager.fetchAllTags();
+            const mappedTags = response.map((tag: Tag) => ({
+                ...tag,
+                value: tag.id,
             }));
-            setTags(mappedTags as unknown as Tag[]);
-        }),
-        []
+            setTags(mappedTags);
+        },
+        [],
+        { prefix: 'Failed to fetch tags' }
     );
 
     const locationParam = route.params?.location;
@@ -57,121 +57,97 @@ function CreateEventScreen({ navigation, route }: EventListStackNavProps<'Create
 
     const [useEndtime, setUseEndtime] = useState<boolean>(false);
 
-    // DatePickerState
-    const [start, setStart] = useState(new Date());
-    const [end, setEnd] = useState(new Date());
+    // date/time picker state
+    const [isPickerVisible, setPickerVisible] = useState(false);
+    const [pickerMode, setPickerMode] = useState<'time' | 'date'>('time');
+    const [pickerTarget, setPickerTarget] = useState<'start' | 'end'>('start');
+
+    // default start to next minute, and default end to "start + 2h"
+    const [start, setStart] = useState<Date>(dayjs().add(1, 'minute').startOf('minute').toDate());
+    const [end, setEnd] = useState<Date>(dayjs(start).add(2, 'hours').toDate());
 
     // Dropdown State
     const [open, setOpen] = useState(false);
-    const [selectedTags, setSelectedTags] = useState([]);
+    // (list of tag IDs)
+    const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
     // Location State
     const [location, setLocation] = useState<LatLng | null>(null);
 
-    const onChangeStart = (event: DateTimePickerEvent, selectedDate?: Date) => {
-        if (!selectedDate) {
-            return;
-        }
-        setStart(selectedDate);
-    };
+    // date/time picker callbacks
+    const hidePicker = useCallback(() => setPickerVisible(false), []);
+    const showPicker = useCallback((mode: 'time' | 'date', target: 'start' | 'end') => {
+        setPickerMode(mode);
+        setPickerTarget(target);
+        setPickerVisible(true);
+    }, []);
 
-    const onChangeEnd = (event: DateTimePickerEvent, selectedDate?: Date) => {
-        if (!selectedDate) {
-            return;
-        }
-        setEnd(selectedDate);
-    };
+    const showStartTimePicker = useCallback(() => showPicker('time', 'start'), [showPicker]);
+    const showStartDatePicker = useCallback(() => showPicker('date', 'start'), [showPicker]);
+    const showEndTimePicker = useCallback(() => showPicker('time', 'end'), [showPicker]);
+    const showEndDatePicker = useCallback(() => showPicker('date', 'end'), [showPicker]);
 
-    const showModeStartPicker = (currentMode: 'date' | 'time') => {
-        // TODO: not supported on ios, which technically isn't a requirement but would be nice
-        DateTimePickerAndroid.open({
-            value: start,
-            onChange: onChangeStart,
-            mode: currentMode,
-            is24Hour: true,
-        });
-    };
+    const onPickerConfirm = useCallback(
+        (date: Date) => {
+            hidePicker();
 
-    const showModeEndPicker = (currentMode: 'date' | 'time') => {
-        // TODO: not supported on ios, which technically isn't a requirement but would be nice
-        DateTimePickerAndroid.open({
-            value: end,
-            onChange: onChangeEnd,
-            mode: currentMode,
-            is24Hour: true,
-        });
-    };
-
-    const showDatepickerStartPicker = () => {
-        showModeStartPicker('date');
-    };
-
-    const showTimepickerStartPicker = () => {
-        showModeStartPicker('time');
-    };
-
-    const showDatepickerEndPicker = () => {
-        showModeEndPicker('date');
-    };
-
-    const showTimepickerEndPicker = () => {
-        showModeEndPicker('time');
-    };
+            const setState = pickerTarget === 'start' ? setStart : setEnd;
+            setState(date);
+        },
+        [pickerTarget, hidePicker]
+    );
 
     const formatTime = (date: Date) => {
-        const hours = date.getHours().toString().padStart(2, '0');
-        const minutes = date.getMinutes().toString().padStart(2, '0');
-        return `${hours}:${minutes}`;
+        const d = dayjs(date);
+        return d.format('HH:mm');
     };
 
     const formatDate = (date: Date) => {
-        const day = date.getDate().toString().padStart(2, '0');
-        const month = (date.getMonth() + 1).toString().padStart(2, '0');
-        const year = date.getFullYear();
-        return `${day}.${month}.${year}`;
+        const d = dayjs(date);
+        return d.format('ddd, DD.MM.YYYY');
     };
 
-    const onCreateButton = useCallback(async () => {
-        // TODO: require these to be non-empty in the UI
-        console.log(`Location: ${location}`);
-        console.log(`start: ${start}`);
-        console.log(`name: ${name}`);
-        console.log(`description: ${description}`);
-        console.log(`selectedTags: ${selectedTags}`);
-        if (!location || !name || !start || !description || selectedTags.length === 0) {
-            toast.show('Please input data for all the input fields.', { type: 'danger' });
-            return;
-        }
+    // not using `useCallback` here, since this would re-render almost every time anyway
+    const onCreateButton = asyncHandler(
+        async () => {
+            // TODO: require these to be non-empty in the UI
+            console.log(`Location: ${location}`);
+            console.log(`start: ${start}`);
+            console.log(`name: ${name}`);
+            console.log(`description: ${description}`);
+            console.log(`selectedTags: ${selectedTags}`);
 
-        if (useEndtime && start >= end) {
-            toast.show('Change your start time so it is before your end time.', { type: 'danger' });
-            return;
-        }
+            if (!location || !name || !start || !description || selectedTags.length === 0) {
+                toast.show('Please input data for all the input fields.', { type: 'danger' });
+                return;
+            }
 
-        const eventData: {
-            name: string;
-            tags: Tag[];
-            location: LatLng;
-            startDate?: Date | null;
-            endDate?: Date | null;
-        } = {
-            name: name,
-            tags: selectedTags,
-            location: location,
-            startDate: start,
-        };
+            if (useEndtime && start >= end) {
+                toast.show('Change your start time so it is before your end time.', {
+                    type: 'danger',
+                });
+                return;
+            }
 
-        if (end && useEndtime) {
-            eventData.endDate = end;
-        }
+            const eventData: EventCreateParams = {
+                name: name,
+                tags: selectedTags,
+                description: description,
+                location: location,
+                startDate: start,
+            };
 
-        const eventId = await EventManager.create(eventData);
+            if (useEndtime) eventData.endDate = end;
 
-        // TODO: this should replace the current screen in the stack
-        navigation.navigate('EventDetail', {
-            eventId,
-        });
-    }, [location, name, start, navigation]);
+            const eventId = await EventManager.create(eventData);
+
+            // TODO: this should replace the current screen in the stack
+            navigation.navigate('EventDetail', {
+                eventId,
+            });
+        },
+        { prefix: 'Failed to create event' }
+    );
 
     return (
         <View style={styles.container}>
@@ -255,16 +231,10 @@ function CreateEventScreen({ navigation, route }: EventListStackNavProps<'Create
                 <Text style={styles.sectionSubtitle}>Start</Text>
                 <View style={styles.sectionBody}>
                     <View style={styles.dateTimeWrapper}>
-                        <TouchableOpacity
-                            style={styles.timeInput}
-                            onPress={showTimepickerStartPicker}
-                        >
+                        <TouchableOpacity style={styles.timeInput} onPress={showStartTimePicker}>
                             <Text>{formatTime(start)}</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity
-                            style={styles.dateInput}
-                            onPress={showDatepickerStartPicker}
-                        >
+                        <TouchableOpacity style={styles.dateInput} onPress={showStartDatePicker}>
                             <Text>{formatDate(start)}</Text>
                         </TouchableOpacity>
                     </View>
@@ -283,25 +253,32 @@ function CreateEventScreen({ navigation, route }: EventListStackNavProps<'Create
                 {useEndtime ? (
                     <View style={styles.sectionBody}>
                         <View style={styles.dateTimeWrapper}>
-                            <TouchableOpacity
-                                style={styles.timeInput}
-                                onPress={showTimepickerEndPicker}
-                            >
+                            <TouchableOpacity style={styles.timeInput} onPress={showEndTimePicker}>
                                 <Text>{formatTime(end)}</Text>
                             </TouchableOpacity>
-                            <TouchableOpacity
-                                style={styles.dateInput}
-                                onPress={showDatepickerEndPicker}
-                            >
+                            <TouchableOpacity style={styles.dateInput} onPress={showEndDatePicker}>
                                 <Text>{formatDate(end)}</Text>
                             </TouchableOpacity>
                         </View>
                     </View>
                 ) : null}
+
+                <DateTimePickerModal
+                    isVisible={isPickerVisible}
+                    mode={pickerMode}
+                    date={pickerTarget === 'start' ? start : end}
+                    onConfirm={onPickerConfirm}
+                    onCancel={hidePicker}
+                    is24Hour={true}
+                    // force theme on iOS because reasons
+                    themeVariant="light"
+                    // show calendar instead of spinner for date picker on iOS
+                    display={pickerMode === 'date' && Platform.OS === 'ios' ? 'inline' : undefined}
+                />
             </View>
 
             <View style={styles.section}>
-                <Text style={styles.sectionTitle}>Tags (1-5)</Text>
+                <Text style={styles.sectionTitle}>Tags (up to 5)</Text>
 
                 <View style={styles.sectionBody}>
                     <DropDownPicker
@@ -315,7 +292,7 @@ function CreateEventScreen({ navigation, route }: EventListStackNavProps<'Create
                         setOpen={setOpen}
                         setValue={setSelectedTags}
                         setItems={setTags}
-                        placeholder="Select up to three tags"
+                        placeholder="Select up to five tags"
                         maxHeight={300}
                         categorySelectable={false}
                         mode="BADGE"
@@ -332,11 +309,7 @@ function CreateEventScreen({ navigation, route }: EventListStackNavProps<'Create
                 </View>
             </View>
 
-            <Button
-                color="orange"
-                title="Create event!"
-                onPress={asyncHandler(onCreateButton, { prefix: 'Failed to create event' })}
-            />
+            <Button color="orange" title="Create event!" onPress={onCreateButton} />
         </View>
     );
 }

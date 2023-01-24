@@ -1,7 +1,7 @@
 import { LatLng } from 'react-native-maps';
 
 import { addEvents, useEventStore } from '../state/event';
-import { Tag } from '../types';
+import { EmptyObject } from '../types';
 import { request } from '../util';
 import { Media, MediaManager, MediaResponse } from './media';
 import { User, UserManager, UserResponse } from './user';
@@ -16,12 +16,15 @@ export interface EventResponse {
     readonly lat: string;
     readonly lon: string;
     readonly rating?: number;
-    readonly hostId: string;
     readonly startDateTime: string;
     readonly endDateTime: string | null;
+    readonly address: string | null;
+    readonly description: string | null;
+    readonly musicStyle: string | null;
+    readonly hostId: string;
     readonly media: MediaResponse[] | null;
     readonly attendees: UserResponse[] | null;
-    readonly currentAttendees: UserResponse[] | null;
+    readonly tags: Tag[];
 }
 
 export interface Event {
@@ -32,19 +35,26 @@ export interface Event {
     readonly lon: number;
     readonly rad: number;
     readonly rating?: number;
-    readonly hostId: string;
     readonly startDate: Date;
-    readonly endDate?: Date | null;
-    readonly users?: User[] | null;
-    readonly currentUsers?: User[] | null;
-    readonly description: string;
+    readonly endDate: Date | null;
+    readonly address: string | null;
+    readonly description: string | null;
+    readonly musicStyle: string | null;
+    readonly hostId: string;
+    readonly users: User[] | null;
     readonly tags: Tag[];
-    readonly musicStyle?: string;
 }
 
 // transient type for processed API responses by `fromEventResponse`
 export interface EventExtra extends Event {
     media?: Media[];
+}
+
+export interface Tag {
+    id: string;
+    label: string;
+    color: string;
+    parent: string;
 }
 
 export interface RelevantEventsResponse {
@@ -54,14 +64,16 @@ export interface RelevantEventsResponse {
     followerEvents: EventResponse[];
 }
 
+export type EventCreateParams = Parameters<typeof EventManager.create>[0];
+
 export class EventManager {
     static host(event: Event): User | undefined {
         return event.users ? event.users.find((user) => user.id == event.hostId) : undefined;
     }
 
-    static async join(eventId: string, lat: number, lon: number) {
+    static async join(eventId: string) {
         // TODO: client side validation
-        await request('POST', '/event/join', { eventId, lat, lon });
+        await request<EmptyObject>('POST', '/event/join', { eventId });
 
         useEventStore.setState((state) => {
             // TODO: add self as attendee? alternatively, return full event from server and just overwrite local state entirely here
@@ -71,7 +83,7 @@ export class EventManager {
 
     static async close(eventId: string) {
         // TODO: client side validation
-        await request('POST', '/event/close', { eventId });
+        await request<EmptyObject>('POST', '/event/close', { eventId });
 
         useEventStore.setState((state) => {
             // update status of event
@@ -84,27 +96,12 @@ export class EventManager {
     }
 
     static fromEventResponse(response: EventResponse): EventExtra {
-        const {
-            media,
-            attendees,
-            currentAttendees,
-            startDateTime,
-            endDateTime,
-            lat,
-            lon,
-            ...fields
-        } = response;
+        const { media, attendees, startDateTime, endDateTime, lat, lon, ...fields } = response;
 
         // TODO: add these to user store
         const users = attendees
             ? attendees.map((user) => UserManager.fromUserResponse(user))
             : null;
-        const currentUsers =
-            users && currentAttendees
-                ? currentAttendees.map((curUser) => {
-                      return users.find((user) => user.id == curUser.id)!;
-                  })
-                : null;
 
         return {
             ...fields,
@@ -112,22 +109,21 @@ export class EventManager {
             lon: parseFloat(lon),
             rad: 5,
             startDate: new Date(startDateTime),
-            endDate: endDateTime ? new Date(endDateTime) : undefined,
+            endDate: endDateTime ? new Date(endDateTime) : null,
             users,
-            currentUsers,
             media: media?.map((med) => MediaManager.fromMediaResponse(med)),
         };
     }
 
     static async create(params: {
         name: string;
-        tags: Tag[];
+        tags: string[]; // tag IDs
         description: string;
         location: LatLng;
         startDate: Date | null;
         endDate?: Date | null;
-    }) {
-        const event = (await request('POST', '/event/create', {
+    }): Promise<string> {
+        const event = await request<EventResponse>('POST', '/event/create', {
             name: params.name,
             tags: params.tags,
             lat: params.location.latitude,
@@ -135,12 +131,21 @@ export class EventManager {
             description: params.description,
             startDateTime: params.startDate?.toJSON() ?? null,
             endDateTime: params.endDate?.toJSON() ?? null,
-        })) as unknown as EventResponse;
+        });
 
         useEventStore.setState((state) => {
             addEvents(state, this.fromEventResponse(event));
             state.currentEventId = event.id;
         });
         return event.id;
+    }
+
+    static async fetchAllTags(): Promise<Tag[]> {
+        return await request<Tag[]>('GET', '/info/all_tags');
+    }
+
+    static async fetchDiscoverData(): Promise<Event[]> {
+        const data = await request<EventResponse[]>('GET', '/discover');
+        return data.map((e) => this.fromEventResponse(e));
     }
 }

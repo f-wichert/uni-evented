@@ -1,6 +1,8 @@
 import * as SecureStore from 'expo-secure-store';
 import { persist, StateStorage } from 'zustand/middleware';
 
+import { AuthResponse } from '../models/user';
+import { EmptyObject } from '../types';
 import { handleError, request } from '../util';
 import { useUserStore } from './user';
 import { createStore, resetAllStores } from './utils/createStore';
@@ -30,22 +32,25 @@ export const useAuthStore = createStore<State>('auth', { skipReset: true })(
     persist(
         (set) => ({
             token: null,
-            userId: null,
 
             signin: async (params) => {
-                const data = await request('POST', '/auth/login', params, { noAuth: true });
+                const data = await request<AuthResponse>('POST', '/auth/login', params, {
+                    noAuth: true,
+                });
 
                 // TODO: validate types
                 set((state) => {
-                    state.token = data.token as string;
+                    state.token = data.token;
                 });
             },
             signup: async (params) => {
-                const data = await request('POST', '/auth/register', params, { noAuth: true });
+                const data = await request<AuthResponse>('POST', '/auth/register', params, {
+                    noAuth: true,
+                });
 
                 // TODO: validate types
                 set((state) => {
-                    state.token = data.token as string;
+                    state.token = data.token;
                 });
             },
             signout: () => {
@@ -54,7 +59,7 @@ export const useAuthStore = createStore<State>('auth', { skipReset: true })(
                 });
             },
             reset: async (params) => {
-                await request('POST', '/auth/reset', params, { noAuth: true });
+                await request<EmptyObject>('POST', '/auth/reset', params, { noAuth: true });
 
                 set((state) => {
                     state.token = null;

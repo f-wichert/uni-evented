@@ -1,10 +1,10 @@
 import * as Location from 'expo-location';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import MapView, { LatLng, Marker } from 'react-native-maps';
 
 import { EventListStackNavProps } from '../nav/types';
-import { asyncHandler } from '../util';
+import { useAsyncEffects } from '../util';
 
 export default function MapPickerScreen({ navigation }: EventListStackNavProps<'MapPicker'>) {
     const mapRef = React.useRef<MapView>(null);
@@ -18,17 +18,14 @@ export default function MapPickerScreen({ navigation }: EventListStackNavProps<'
         longitude: 8.652653,
     });
 
-    useEffect(
-        asyncHandler(async () => {
-            await getCurrentPosition();
-            // TODO: add repeating location checks and updates. This might also be implemented in MapScreen
-            // Location.watchPositionAsync({
-            //     accuracy: Location.Accuracy.Balanced,
-            //     timeInterval: 2000
-            // }, (loc) => {setLocation(loc);})
-        }),
-        []
-    );
+    useAsyncEffects(async () => {
+        await getCurrentPosition();
+        // TODO: add repeating location checks and updates. This might also be implemented in MapScreen
+        // Location.watchPositionAsync({
+        //     accuracy: Location.Accuracy.Balanced,
+        //     timeInterval: 2000
+        // }, (loc) => {setLocation(loc);})
+    }, []);
 
     const getCurrentPosition = async () => {
         const { status } = await Location.requestForegroundPermissionsAsync();

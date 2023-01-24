@@ -1,21 +1,25 @@
 import urlJoin from 'url-join';
 
 import config from '../config';
-import { JSONObject } from '../types';
+import { request } from '../util';
 
 export const MediaTypes = ['image', 'video', 'livestream'] as const;
 export type MediaType = typeof MediaTypes[number];
 
-export interface MediaResponse extends JSONObject {
+// ref: formatMediaForResponse
+export interface MediaResponse {
     readonly id: string;
     readonly type: MediaType;
     readonly fileAvailable: boolean;
+    // only included in `/upload/livestream` responses
+    readonly streamKey?: string | null;
 }
 
 export interface Media {
     readonly id: string;
     readonly type: MediaType;
     readonly fileAvailable: boolean;
+    readonly streamKey?: string | null;
 }
 
 export class MediaManager {
@@ -57,5 +61,19 @@ export class MediaManager {
 
     static fromMediaResponse(response: MediaResponse): Media {
         return { ...response };
+    }
+
+    static async uploadImage(data: FormData): Promise<Media> {
+        return this.fromMediaResponse(await request<MediaResponse>('POST', '/upload/image', data));
+    }
+
+    static async uploadClip(data: FormData): Promise<Media> {
+        return this.fromMediaResponse(await request<MediaResponse>('POST', '/upload/clip', data));
+    }
+
+    static async uploadLivestream(eventId: string): Promise<Media> {
+        return this.fromMediaResponse(
+            await request<MediaResponse>('POST', '/upload/livestream', { eventID: eventId })
+        );
     }
 }

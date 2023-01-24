@@ -1,26 +1,25 @@
 import Constants from 'expo-constants';
 import urlJoin from 'url-join';
 
-import { useCallback, useEffect, useState } from 'react';
+import { DependencyList, useCallback, useEffect, useState } from 'react';
 import config from './config';
 import { getToken } from './state/auth';
-import { JSONObject } from './types';
 
 export const baseHeaders = Object.freeze({
     // Currently required to access main API
     'Client-ID': `evented/${Constants.expoConfig?.version}`,
 });
 
-export async function request(
+export async function request<ResponseType>(
     method: string,
     route: string,
-    data?: JSONObject | FormData | null,
+    data?: FormData | object | null,
     options?: {
         // Whether to not send an auth token.
         // (by default, all requests are sent with the token)
         noAuth?: true;
     }
-): Promise<JSONObject> {
+): Promise<ResponseType> {
     // join given route to base url, removing leading `/` if exists
     const url = urlJoin(config.BASE_URL, 'api', route.replace(/^\//, ''));
 
@@ -56,7 +55,8 @@ export async function request(
         throw new Error(`invalid response status for '${method} ${route}': ${response.status}`);
     }
 
-    return (await response.json()) as JSONObject;
+    // NOTE: this is not valiated at runtime
+    return (await response.json()) as ResponseType;
 }
 
 export interface ErrorHandlerParams {
@@ -108,6 +108,49 @@ export function useAsync<T>(func: () => Promise<T>, immediate = true) {
     return { loading, error, value, refresh };
 }
 
+// can't name this `useAsyncEffect` since the eslint plugin checks for /Effect($|[^a-z])/ and we don't want to match that
+
+/** Like `useEffect`, but automatically wraps given function in `asyncHandler`. */
+export function useAsyncEffects(
+    effect: () => Promise<void>,
+    deps: DependencyList,
+    opts: ErrorHandlerParams = {}
+): void {
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    useEffect(() => asyncHandler(effect, opts)(), deps);
+}
+
+/** Like `useCallback`, but automatically wraps given function in `asyncHandler`. */
+export function useAsyncCallback<Args extends unknown[]>(
+    callback: (...args: Args) => Promise<void>,
+    deps: DependencyList,
+    opts: ErrorHandlerParams = {}
+): (...args: Args) => void {
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    return useCallback((...args: Args) => asyncHandler(callback, opts)(...args), deps);
+}
+
 export function notEmpty<T>(value: T | null | undefined): value is T {
     return value !== null && value !== undefined;
+}
+
+/**
+ * To be used in switch statements, to check exhaustiveness:
+ *
+ * ```
+ * switch (val) {
+ *     case 'a': ...
+ *     case 'b': ...
+ *     default:
+ *         throw new UnreachableCaseError(val);
+ * }
+ * ```
+ *
+ * If `val` is a union type but the switch statement is missing a case, this will
+ * throw both a compile-time and runtime error.
+ */
+export class UnreachableCaseError extends Error {
+    constructor(val: never, prefix = 'Unreachable case') {
+        super(`${prefix}: ${JSON.stringify(val)}`);
+    }
 }

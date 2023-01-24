@@ -5,11 +5,26 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import EventCarousel from '../components/EventCarousel';
-import { Event } from '../models';
+import { Event, EventManager } from '../models';
 import { DiscoverStackNavProps } from '../nav/types';
-import { asyncHandler, request } from '../util';
+import { useAsyncCallback } from '../util';
 
 function DiscoverScreen({ navigation }: DiscoverStackNavProps<'DiscoverView'>) {
+    // TODO: change this to use ExtendedMedia[] instead of Media[]
+    const [eventData, setEventData] = useState<Event[]>([]);
+
+    const updateMedia = useAsyncCallback(
+        async () => {
+            // TODO: use `EventStore.eventMedia`
+            setEventData(await EventManager.fetchDiscoverData());
+        },
+        [],
+        { prefix: 'Failed to update media' }
+    );
+
+    // update once on load
+    useEffect(updateMedia, [updateMedia]);
+
     useEffect(() => {
         // Use `setOptions` to update the button that we previously specified
         // Now the button includes an `onPress` handler to update the discoverData
@@ -19,25 +34,15 @@ function DiscoverScreen({ navigation }: DiscoverStackNavProps<'DiscoverView'>) {
                     name="refresh-outline"
                     size={32}
                     color="black"
-                    onPress={asyncHandler(updateMedia, { prefix: 'Failed to update media' })}
+                    onPress={updateMedia}
                     style={{
                         marginRight: 10,
                     }}
                 />
             ),
         });
-    }, [navigation]);
+    }, [navigation, updateMedia]);
 
-    useEffect(asyncHandler(updateMedia), []);
-
-    // TODO: change this to use ExtendedMedia[] instead of Media[]
-    const [eventData, setEventData] = useState<Event[]>([]);
-
-    async function updateMedia() {
-        // TODO: use `EventStore.eventMedia`
-        const responseData = (await request('GET', 'discover/')) as unknown as Event[];
-        setEventData(responseData);
-    }
     const navigateDetail = useCallback(
         (id: string) => {
             navigation.navigate('EventDetail', { eventId: id });
