@@ -26,6 +26,10 @@ function EventDetailScreen({
     const eventId = evId ? evId : route.params.eventId;
     const origin = orig ? orig : route.params.origin;
     const { event: eventData, loading, refresh } = useEventFetch(eventId);
+
+    console.log('Our Event Data =======================================================');
+    console.log(eventData);
+
     const user = useCurrentUser();
     const userCurrentEventId = useEventStore((state) => state.currentEventId); // Get event ID of current event of currently logged in user
 
