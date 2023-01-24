@@ -1,4 +1,6 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { useFocusEffect } from '@react-navigation/native';
+import dayjs from 'dayjs';
 import * as Location from 'expo-location';
 import { getDistance } from 'geolib';
 import React, { useCallback, useEffect, useState } from 'react';
@@ -8,14 +10,14 @@ import MapView, { LatLng, Marker } from 'react-native-maps';
 import { Rating } from 'react-native-ratings';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
-import { useFocusEffect } from '@react-navigation/native';
+import DetailActionButton, { EventActionState } from '../components/DetailActionButton';
 import MediaCarousel from '../components/MediaCarousel';
 import { Tag } from '../components/Tag';
 import { EventManager } from '../models';
 import { EventDetailProps } from '../nav/types';
-import { useEventFetch, useEventStore } from '../state/event';
+import { useEventFetch } from '../state/event';
 import { useCurrentUser } from '../state/user';
-import { asyncHandler } from '../util';
+import { UnreachableCaseError, useAsyncCallback, useAsyncEffects } from '../util';
 
 const MAX_JOIN_RADIUS_METERS = 50;
 
@@ -28,7 +30,6 @@ function EventDetailScreen({ route, navigation, preview, evId }: Props) {
     const eventId = evId ? evId : route.params.eventId;
     const { event: eventData, loading, refresh } = useEventFetch(eventId);
     const user = useCurrentUser();
-    const userCurrentEventId = useEventStore((state) => state.currentEventId); // Get event ID of current event of currently logged in user
 
     // MediaCarousel
     const [isPlay, setIsPlay] = useState<boolean>(true);
@@ -42,15 +43,16 @@ function EventDetailScreen({ route, navigation, preview, evId }: Props) {
 
     const isPreview = preview ? preview : false;
 
-    useEffect(
-        asyncHandler(async () => {
+    useAsyncEffects(
+        async () => {
             const { status } = await Location.requestForegroundPermissionsAsync();
             if (status !== 'granted') {
                 throw new Error('Location access not granted');
             }
             await Promise.all([getLastKnownPosition(), getCurrentPosition()]);
-        }),
-        []
+        },
+        [],
+        { prefix: 'Failed to fetch location' }
     );
 
     useEffect(() => {
@@ -58,11 +60,24 @@ function EventDetailScreen({ route, navigation, preview, evId }: Props) {
 
         const eventLocation = { latitude: eventData.lat, longitude: eventData.lon };
         const distance = getDistance(location, eventLocation);
-        console.log('distance', distance);
         setInRange(distance < MAX_JOIN_RADIUS_METERS);
     }, [location, eventData]);
 
     useFocusEffect(useCallback(() => void refresh(), [refresh]));
+
+    const onButtonAction = useAsyncCallback(
+        async (state: EventActionState) => {
+            switch (state) {
+                case EventActionState.AttendeeJoin:
+                    await EventManager.join(eventId);
+                    break;
+                // TODO: implement other actions
+                default:
+                    throw new UnreachableCaseError(state, 'Unknown event action');
+            }
+        },
+        [eventId]
+    );
 
     if (!eventData) {
         return (
@@ -110,74 +125,13 @@ function EventDetailScreen({ route, navigation, preview, evId }: Props) {
         };
     }
 
-    const formatTime = (date: Date) => {
-        const hours = date.getHours().toString().padStart(2, '0');
-        const minutes = date.getMinutes().toString().padStart(2, '0');
-        return `${hours}:${minutes}`;
-    };
-
-    const formatDate = (date: Date) => {
-        const day = date.getDate().toString().padStart(2, '0');
-        const month = (date.getMonth() + 1).toString().padStart(2, '0');
-        const year = date.getFullYear();
-        return `${day}.${month}.${year}`;
+    const formatDateTime = (date: Date) => {
+        const d = dayjs(date);
+        return d.format('ddd, DD.MM.YYYY - HH:mm');
     };
 
     const numberOfAttendants = (eventData.users ?? []).length;
 
-    const mainButton = () => {
-        let buttonText = "I'm here!";
-        let disabled = loading;
-
-        if (eventData.status === 'completed') {
-            disabled = true;
-            buttonText = 'Event done.';
-        } else if (eventData.hostId === user.id) {
-            if (eventData.status === 'active') {
-                buttonText = 'Stop event!';
-            } else if (eventData.status === 'scheduled') {
-                buttonText = 'Start event!';
-            }
-        } else {
-            const relationship = getEventRelationship();
-            console.debug(relationship);
-            if (relationship === 'attending') {
-                buttonText = 'Leave event!';
-            } else if (relationship === 'interested') {
-                if (!inRange || eventData.status !== 'active') {
-                    buttonText = 'Not interested?';
-                    // TODO: add subtitle: `Not close enough to join (xx m)`
-                }
-                // else, if in range and event is active, show "I'm here"
-            } else if (relationship === undefined || relationship === 'left') {
-                if (!inRange || eventData.status !== 'active') {
-                    buttonText = "I'm interested!";
-                }
-                // else, if in range and event is active, show "I'm here"
-            } else if (relationship === 'banned') {
-                disabled = true;
-                buttonText = 'Banned.';
-            }
-        }
-
-        const mainJsx = (
-            <View style={styles.joinButtonContainer}>
-                <Pressable
-                    style={{ ...styles.joinButton, opacity: disabled ? 0.5 : 1 }}
-                    onPress={asyncHandler(
-                        async () => {
-                            await EventManager.join(eventId);
-                        },
-                        { prefix: 'Failed to join event' }
-                    )}
-                    disabled={disabled}
-                >
-                    <Text style={styles.joinButtonText}>{buttonText}</Text>
-                </Pressable>
-            </View>
-        );
-        return mainJsx;
-    };
     const navigationBar = (
         <>
             <View style={styles.chatButtonContainer}>
@@ -188,7 +142,14 @@ function EventDetailScreen({ route, navigation, preview, evId }: Props) {
                     <Ionicons name={'chatbox-ellipses-outline'} size={37} color={'white'} />
                 </Pressable>
             </View>
-            {mainButton()}
+            <DetailActionButton
+                loading={loading}
+                inRange={inRange}
+                isHost={eventData.hostId === user.id}
+                eventStatus={eventData.status}
+                userStatus={getEventRelationship()}
+                onAction={onButtonAction}
+            />
             <View style={styles.JoinCameraButtonContainer}>
                 {isPreview ? (
                     <Pressable
@@ -255,19 +216,13 @@ function EventDetailScreen({ route, navigation, preview, evId }: Props) {
         <View style={styles.GeneralInformationArea}>
             <View style={{ maxWidth: '60%' }}>
                 <Text style={{ color: 'grey', fontSize: 16 }}>
-                    {`Start: ${formatDate(eventData.startDate)} - ${formatTime(
-                        eventData.startDate
-                    )}`}
+                    {`Start: ${formatDateTime(eventData.startDate)}`}
                 </Text>
                 {eventData.endDate ? (
                     <Text style={{ color: 'grey', fontSize: 16 }}>
-                        {`End:  ${formatDate(eventData.startDate)} - ${formatTime(
-                            eventData.startDate
-                        )}`}
+                        {`End: ${formatDateTime(eventData.endDate)}`}
                     </Text>
-                ) : (
-                    <></>
-                )}
+                ) : null}
                 {/* <Text style={{ fontSize: 18, fontWeight: 'bold' }}> </Text> */}
             </View>
 
@@ -445,33 +400,6 @@ const styles = StyleSheet.create({
     DescriptionArea: {
         padding: 10,
     },
-    ChatArea: {},
-    IMHereButtonContainer: {
-        // display: 'flex',
-        // flexDirection: 'row',
-        // alignSelf: 'stretch',
-        // justifyContent: 'center',
-        // padding: 6,
-        backgroundColor: '#eaeaea',
-        flex: 1,
-    },
-    IMHereButtonArea: {
-        // display: 'flex',
-        // flexDirection: 'row',
-        // alignSelf: 'stretch',
-        // flex: 1,
-        justifyContent: 'center',
-        // marginHorizontal: 3,
-        borderRadius: 9,
-        backgroundColor: 'black',
-        padding: 7,
-        height: 55,
-    },
-    IMHereButton: {
-        color: 'white',
-        fontWeight: 'bold',
-        fontSize: 30,
-    },
     overlay: {
         position: 'absolute',
         bottom: 0,
@@ -482,28 +410,6 @@ const styles = StyleSheet.create({
         flex: 1,
         flexDirection: 'row',
         display: 'flex',
-    },
-    joinButtonContainer: {
-        flex: 3,
-        // backgroundColor: 'yellow',
-        marginLeft: 10,
-        marginRight: 10,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    joinButton: {
-        backgroundColor: 'black',
-        borderRadius: 7,
-        flex: 1,
-        // width: 300,
-        alignSelf: 'stretch',
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    joinButtonText: {
-        color: 'white',
-        fontWeight: 'bold',
-        fontSize: 30,
     },
     chatButtonContainer: {
         flex: 1,

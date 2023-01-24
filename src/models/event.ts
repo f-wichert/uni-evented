@@ -52,7 +52,6 @@ export interface Tag {
     id: string;
     label: string;
     color: string;
-    value: string;
     parent: string;
 }
 
@@ -62,6 +61,8 @@ export interface RelevantEventsResponse {
     followedEvents: EventResponse[];
     followerEvents: EventResponse[];
 }
+
+export type EventCreateParams = Parameters<typeof EventManager.create>[0];
 
 export class EventManager {
     static host(event: Event): User | undefined {
@@ -114,7 +115,7 @@ export class EventManager {
 
     static async create(params: {
         name: string;
-        tags: Tag[];
+        tags: string[]; // tag IDs
         description: string;
         location: LatLng;
         startDate: Date | null;
