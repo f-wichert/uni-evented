@@ -17,7 +17,8 @@ import { EventManager } from '../models';
 import { EventDetailProps } from '../nav/types';
 import { useEventFetch } from '../state/event';
 import { useCurrentUser } from '../state/user';
-import { UnreachableCaseError, useAsyncCallback, useAsyncEffects } from '../util';
+import { EmptyObject } from '../types';
+import { request, UnreachableCaseError, useAsyncCallback, useAsyncEffects } from '../util';
 
 const MAX_JOIN_RADIUS_METERS = 50;
 
@@ -208,8 +209,8 @@ function EventDetailScreen({ route, navigation, preview, evId }: Props) {
     );
 
     function onRating(rating: number) {
-        request('POST', '/event/rate', { eventID: eventId, rating: rating }).catch((reason) =>
-            toast.show('Could not send rating. Please try again')
+        request<EmptyObject>('POST', '/event/rate', { eventID: eventId, rating: rating }).catch(
+            (reason) => toast.show('Could not send rating. Please try again')
         );
     }
 
