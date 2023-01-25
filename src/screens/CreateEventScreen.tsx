@@ -6,6 +6,7 @@ import {
     Button,
     Dimensions,
     Platform,
+    ScrollView,
     StyleSheet,
     Text,
     TextInput,
@@ -150,7 +151,7 @@ function CreateEventScreen({ navigation, route }: EventListStackNavProps<'Create
     );
 
     return (
-        <View style={styles.container}>
+        <ScrollView style={styles.container}>
             <View style={styles.section}>
                 <Text style={styles.sectionTitle}>Name</Text>
 
@@ -310,7 +311,7 @@ function CreateEventScreen({ navigation, route }: EventListStackNavProps<'Create
             </View>
 
             <Button color="orange" title="Create event!" onPress={onCreateButton} />
-        </View>
+        </ScrollView>
     );
 }
 
