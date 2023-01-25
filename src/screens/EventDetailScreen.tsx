@@ -132,7 +132,7 @@ function EventDetailScreen({ route, navigation, preview, evId }: Props) {
 
     const formatDateTime = (date: Date) => {
         const d = dayjs(date);
-        return d.format('ddd, DD.MM.YYYY - HH:mm');
+        return d.format('ddd, DD.MM - HH:mm');
     };
 
     const numberOfAttendants = (eventData.users ?? []).length;
@@ -307,8 +307,8 @@ function EventDetailScreen({ route, navigation, preview, evId }: Props) {
             region={{
                 latitude: eventData.lat,
                 longitude: eventData.lon,
-                latitudeDelta: 0.001,
-                longitudeDelta: 0.001,
+                latitudeDelta: 0.002,
+                longitudeDelta: 0.002,
             }}
         >
             <Marker
