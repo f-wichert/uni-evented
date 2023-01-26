@@ -168,3 +168,22 @@ export function mergeStyleSheets<T extends NamedStyles<T>>(
     }
     return StyleSheet.create(result);
 }
+
+// thanks, stackoverflow: https://stackoverflow.com/a/40724354/5080607
+export function abbreviateNumber(number: number) {
+    // what tier? (determines SI symbol)
+    const tier = (Math.log10(Math.abs(number)) / 3) | 0;
+
+    // if zero, we don't need a suffix
+    if (tier == 0) return number;
+
+    // get suffix and determine scale
+    const suffix = ['', 'k', 'M', 'G', 'T', 'P', 'E'][tier] || '?';
+    const scale = Math.pow(10, tier * 3);
+
+    // scale the number
+    const scaled = number / scale;
+
+    // format number and add suffix
+    return scaled.toFixed(1) + suffix;
+}
