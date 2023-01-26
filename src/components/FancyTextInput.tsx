@@ -24,9 +24,17 @@ interface Props {
     maxLength?: number;
 
     style?: StyleProp<ViewStyle>;
+    multiline?: boolean;
     textInputProps?: Omit<
         TextInput['props'],
-        'ref' | 'value' | 'style' | 'onChangeText' | 'onFocus' | 'onBlur'
+        | 'ref'
+        | 'value'
+        | 'style'
+        | 'onChangeText'
+        | 'onFocus'
+        | 'onBlur'
+        | 'multiline'
+        | 'textAlignVertical'
     >;
 }
 
@@ -41,6 +49,7 @@ export default function FancyTextInput({
     maxLength,
 
     style,
+    multiline,
     textInputProps,
 }: Props) {
     // focus text input when text field is tapped (including title etc.)
@@ -85,6 +94,8 @@ export default function FancyTextInput({
                 ref={inputRef}
                 onFocus={onFocus}
                 onBlur={onBlur}
+                multiline={multiline}
+                textAlignVertical={multiline ? 'top' : 'auto'}
             />
             {/* optional validation error subtitle */}
             {validationError ? (
