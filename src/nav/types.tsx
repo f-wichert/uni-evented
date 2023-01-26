@@ -112,6 +112,7 @@ export type CommonStackParams = {
     EventDetail: { eventId: string };
     MediaCapture: { eventId: string };
     Chat: { eventId: string };
+    UserProfile: { userId: string };
 };
 
 export type CommonStackProps<T extends keyof CommonStackParams = keyof CommonStackParams> =

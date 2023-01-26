@@ -1,4 +1,5 @@
 import Constants from 'expo-constants';
+import { ImageStyle, StyleSheet, TextStyle, ViewStyle } from 'react-native';
 import urlJoin from 'url-join';
 
 import { DependencyList, useCallback, useEffect, useState } from 'react';
@@ -153,4 +154,17 @@ export class UnreachableCaseError extends Error {
     constructor(val: never, prefix = 'Unreachable case') {
         super(`${prefix}: ${JSON.stringify(val)}`);
     }
+}
+
+type NamedStyles<T> = { [P in keyof T]: ViewStyle | TextStyle | ImageStyle };
+export function mergeStyleSheets<T extends NamedStyles<T>>(
+    base: T,
+    merge: Partial<NamedStyles<T>>
+): T {
+    const result = { ...base };
+    // merge one level deep
+    for (const key of Object.keys(merge) as Array<keyof T>) {
+        result[key] = { ...result[key], ...merge[key] };
+    }
+    return StyleSheet.create(result);
 }
