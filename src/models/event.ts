@@ -171,8 +171,13 @@ export class EventManager {
         return await request<Tag[]>('GET', '/info/all_tags');
     }
 
-    static async fetchDiscoverData(): Promise<Event[]> {
-        const data = await request<EventResponse[]>('GET', '/discover');
+    static async fetchDiscoverData(
+        location = { latitude: 0, longitude: 0 } as LatLng
+    ): Promise<Event[]> {
+        const data = await request<EventResponse[]>(
+            'GET',
+            `/discover/${location.latitude}-${location.longitude}`
+        );
         return data.map((e) => this.fromEventResponse(e));
     }
 }
