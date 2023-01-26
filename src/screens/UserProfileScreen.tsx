@@ -1,5 +1,5 @@
 import React from 'react';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import yellowSplash from '../../assets/yellow_splash.png';
 import ProfileHeader from '../components/ProfileHeader';
@@ -26,6 +26,12 @@ export default function UserProfileScreen({ route }: CommonStackProps<'UserProfi
                 />
             </View>
 
+            {user.bio ? (
+                <View style={styles.bio}>
+                    <Text>{user.bio}</Text>
+                </View>
+            ) : null}
+
             <View style={styles.values}>
                 <ValueDisplay value={12345} name="Following" />
                 <ValueDisplay value={9999999} name="Followers" />
@@ -45,10 +51,15 @@ const styles = StyleSheet.create({
         marginHorizontal: '5%',
     },
 
+    bio: {
+        marginHorizontal: '5%',
+        marginTop: 10,
+    },
+
     values: {
         borderRadius: 16,
-        paddingVertical: 8,
-        paddingHorizontal: 16,
+        paddingVertical: 12,
+        paddingHorizontal: 24,
         marginTop: 20,
         marginHorizontal: '15%',
         backgroundColor: '#f0f0f0',
