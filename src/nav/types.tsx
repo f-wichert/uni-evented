@@ -9,6 +9,7 @@ import { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import { CompositeScreenProps } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { LatLng } from 'react-native-maps';
+import { Event, User } from '../models';
 
 // ==========
 // root navigators, only one of these is active at a time
@@ -100,7 +101,9 @@ export type ProfileStackNavParams = {
     ManageAccount: undefined;
     AdminMainScreen: undefined;
     AdminUsersScreen: undefined;
-    // AdminEventsScreen: undefined;
+    AdminUserScreen: { user: User };
+    AdminEventsScreen: undefined;
+    AdminEventScreen: { event: Event };
 } & EventDetailParams;
 
 export type ProfileStackNavProps<
