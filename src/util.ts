@@ -187,3 +187,7 @@ export function abbreviateNumber(number: number) {
     // format number and add suffix
     return scaled.toFixed(1) + suffix;
 }
+
+export function identity<T>(t: T): T {
+    return t;
+}
