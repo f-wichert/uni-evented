@@ -17,6 +17,7 @@ export default function UserProfileScreen({ navigation, route }: CommonStackProp
 
     useFocusEffect(useCallback(() => void refresh(), [refresh]));
 
+    // show edit header button if needed
     useEffect(() => {
         navigation.setOptions({
             headerRight: () =>
@@ -34,6 +35,14 @@ export default function UserProfileScreen({ navigation, route }: CommonStackProp
                 ) : null,
         });
     }, [navigation, showEdit]);
+
+    // show username in title
+    const username = user?.username;
+    useEffect(() => {
+        navigation.setOptions({
+            title: username ? `${username}'s Profile` : 'User Profile',
+        });
+    }, [navigation, username]);
 
     let mainView: ReactNode | null = null;
     if (user) {
