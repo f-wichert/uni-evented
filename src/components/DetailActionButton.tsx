@@ -115,6 +115,6 @@ const styles = StyleSheet.create({
     joinButtonText: {
         color: 'white',
         fontWeight: 'bold',
-        fontSize: 30,
+        fontSize: 25,
     },
 });
