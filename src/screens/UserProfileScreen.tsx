@@ -1,19 +1,21 @@
 import { Ionicons } from '@expo/vector-icons';
-import React, { useEffect } from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
+import React, { ReactNode, useCallback, useEffect } from 'react';
+import { RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import yellowSplash from '../../assets/yellow_splash.png';
 import ProfileHeader from '../components/ProfileHeader';
 import ValueDisplay from '../components/ValueDisplay';
 import { UserManager } from '../models';
 import { CommonStackProps, ProfileStackNavProps } from '../nav/types';
-import { useCurrentUser } from '../state/user';
+import { useUserFetch } from '../state/user';
 
 export default function UserProfileScreen({ navigation, route }: CommonStackProps<'UserProfile'>) {
     const showEdit = route.params.showEdit ?? false;
     const userId = route.params.userId;
-    console.log(userId); // TODO: remove
-    const user = useCurrentUser();
+    const { user, loading, refresh } = useUserFetch(userId);
+
+    useFocusEffect(useCallback(() => void refresh(), [refresh]));
 
     useEffect(() => {
         navigation.setOptions({
@@ -33,30 +35,42 @@ export default function UserProfileScreen({ navigation, route }: CommonStackProp
         });
     }, [navigation, showEdit]);
 
-    return (
-        <ScrollView style={styles.container}>
-            <View style={styles.profileHeader}>
-                <ProfileHeader
-                    imageUri={UserManager.getAvatarUrl(user)}
-                    displayName={user.displayName}
-                    username={user.username}
-                    // TODO: better fallback image
-                    fallbackImage={yellowSplash}
-                    compact
-                />
-            </View>
-
-            {user.bio ? (
-                <View style={styles.bio}>
-                    <Text>{user.bio}</Text>
+    let mainView: ReactNode | null = null;
+    if (user) {
+        mainView = (
+            <View>
+                <View style={styles.profileHeader}>
+                    <ProfileHeader
+                        imageUri={UserManager.getAvatarUrl(user)}
+                        displayName={user.displayName}
+                        username={user.username}
+                        // TODO: better fallback image
+                        fallbackImage={yellowSplash}
+                        compact
+                    />
                 </View>
-            ) : null}
 
-            <View style={styles.values}>
-                <ValueDisplay value={12345} name="Following" />
-                <ValueDisplay value={9999999} name="Followers" />
-                <ValueDisplay value={3} name="Events" />
+                {user.bio ? (
+                    <View style={styles.bio}>
+                        <Text>{user.bio}</Text>
+                    </View>
+                ) : null}
+
+                <View style={styles.values}>
+                    <ValueDisplay value={12345} name="Following" />
+                    <ValueDisplay value={9999999} name="Followers" />
+                    <ValueDisplay value={3} name="Events" />
+                </View>
             </View>
+        );
+    }
+
+    return (
+        <ScrollView
+            style={styles.container}
+            refreshControl={<RefreshControl refreshing={loading} onRefresh={refresh} />}
+        >
+            {mainView}
         </ScrollView>
     );
 }
