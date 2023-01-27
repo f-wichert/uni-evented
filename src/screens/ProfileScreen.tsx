@@ -70,16 +70,18 @@ export default function ProfileScreen({ navigation }: ProfileStackNavProps<'Prof
                             accessory="DisclosureIndicator"
                         />
                     </Section>
-                    <Section sectionPaddingTop={0}>
-                        <Cell
-                            image={getCellIcon('construct-outline')}
-                            title="Moderation"
-                            accessory="DisclosureIndicator"
-                            onPress={useCallback(() => {
-                                navigation.navigate('AdminMainScreen');
-                            }, [navigation])}
-                        />
-                    </Section>
+                    {user.isAdmin && (
+                        <Section sectionPaddingTop={0}>
+                            <Cell
+                                image={getCellIcon('construct-outline')}
+                                title="Moderation"
+                                accessory="DisclosureIndicator"
+                                onPress={useCallback(() => {
+                                    navigation.navigate('AdminMainScreen');
+                                }, [navigation])}
+                            />
+                        </Section>
+                    )}
                     <Section sectionPaddingTop={0}>
                         <Cell
                             image={getCellIcon('build-outline')}
