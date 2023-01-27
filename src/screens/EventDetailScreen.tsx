@@ -17,7 +17,6 @@ import { EventManager } from '../models';
 import { EventDetailProps } from '../nav/types';
 import { useEventFetch } from '../state/event';
 import { useCurrentUser } from '../state/user';
-import { EmptyObject } from '../types';
 import { request, UnreachableCaseError, useAsyncCallback, useAsyncEffects } from '../util';
 
 const MAX_JOIN_RADIUS_METERS = 50;
@@ -35,7 +34,6 @@ function EventDetailScreen({ route, navigation, preview, evId }: Props) {
     console.log(eventData);
 
     const user = useCurrentUser();
-    const isHost = eventData!.hostId === user.id;
 
     // MediaCarousel
     const [isPlay, setIsPlay] = useState<boolean>(true);
@@ -190,6 +188,7 @@ function EventDetailScreen({ route, navigation, preview, evId }: Props) {
     const ratingArea = (
         <View style={styles.RatingArea}>
             <Rating
+                readonly={!eventData.ratable}
                 imageSize={28}
                 onFinishRating={onRating}
                 startingValue={eventData.rating ? eventData.rating! : 0}
@@ -210,9 +209,10 @@ function EventDetailScreen({ route, navigation, preview, evId }: Props) {
     );
 
     function onRating(rating: number) {
-        request<EmptyObject>('POST', '/event/rate', { eventID: eventId, rating: rating }).catch(
-            (reason) => toast.show('Could not send rating. Please try again')
-        );
+        request<{ message: string }>('POST', '/event/rate', {
+            eventID: eventId,
+            rating: rating,
+        }).catch((reason) => toast.show('Could not send rating. Please try again'));
     }
 
     const titleLine = (

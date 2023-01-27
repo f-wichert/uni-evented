@@ -16,6 +16,7 @@ export interface EventResponse {
     readonly lat: string;
     readonly lon: string;
     readonly rating?: number;
+    readonly ratable: boolean;
     readonly startDateTime: string;
     readonly endDateTime: string | null;
     readonly address: string | null;
@@ -35,6 +36,7 @@ export interface Event {
     readonly lon: number;
     readonly rad: number;
     readonly rating?: number;
+    readonly ratable: boolean;
     readonly startDate: Date;
     readonly endDate: Date | null;
     readonly address: string | null;
