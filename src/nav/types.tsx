@@ -112,7 +112,7 @@ export type CommonStackParams = {
     EventDetail: { eventId: string };
     MediaCapture: { eventId: string };
     Chat: { eventId: string };
-    UserProfile: { userId: string };
+    UserProfile: { userId: string; /* this only works on the profile tab */ showEdit?: boolean };
 };
 
 export type CommonStackProps<T extends keyof CommonStackParams = keyof CommonStackParams> =

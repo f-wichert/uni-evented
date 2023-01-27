@@ -52,7 +52,10 @@ export default function MyProfileScreen({ navigation }: ProfileStackNavProps<'My
                             title="My Profile"
                             accessory="DisclosureIndicator"
                             onPress={useCallback(() => {
-                                navigation.navigate('UserProfile', { userId: user.id });
+                                navigation.navigate('UserProfile', {
+                                    userId: user.id,
+                                    showEdit: true,
+                                });
                             }, [navigation, user.id])}
                         />
                         <Cell
@@ -70,16 +73,6 @@ export default function MyProfileScreen({ navigation }: ProfileStackNavProps<'My
                         />
                     </Section>
                     <Section sectionPaddingTop={0}>
-                        {/* TODO: move "Edit Profile" to button in profile screen instead? */}
-                        <Cell
-                            image={getCellIcon('create-outline')}
-                            title="Edit Profile"
-                            accessory="DisclosureIndicator"
-                            // TODO: show current user's profile here, and show edit screen as a subscreen of that
-                            onPress={useCallback(() => {
-                                navigation.navigate('EditProfile');
-                            }, [navigation])}
-                        />
                         <Cell
                             image={getCellIcon('build-outline')}
                             title="Manage Account"

@@ -1,17 +1,37 @@
-import React from 'react';
+import { Ionicons } from '@expo/vector-icons';
+import React, { useEffect } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import yellowSplash from '../../assets/yellow_splash.png';
 import ProfileHeader from '../components/ProfileHeader';
 import ValueDisplay from '../components/ValueDisplay';
 import { UserManager } from '../models';
-import { CommonStackProps } from '../nav/types';
+import { CommonStackProps, ProfileStackNavProps } from '../nav/types';
 import { useCurrentUser } from '../state/user';
 
-export default function UserProfileScreen({ route }: CommonStackProps<'UserProfile'>) {
+export default function UserProfileScreen({ navigation, route }: CommonStackProps<'UserProfile'>) {
+    const showEdit = route.params.showEdit ?? false;
     const userId = route.params.userId;
     console.log(userId); // TODO: remove
     const user = useCurrentUser();
+
+    useEffect(() => {
+        navigation.setOptions({
+            headerRight: () =>
+                showEdit ? (
+                    <Ionicons
+                        name="create-outline"
+                        size={32}
+                        color="black"
+                        onPress={() =>
+                            (navigation as ProfileStackNavProps['navigation']).navigate(
+                                'EditProfile'
+                            )
+                        }
+                    />
+                ) : null,
+        });
+    }, [navigation, showEdit]);
 
     return (
         <ScrollView style={styles.container}>
