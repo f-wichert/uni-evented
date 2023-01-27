@@ -4,7 +4,16 @@ import dayjs from 'dayjs';
 import * as Location from 'expo-location';
 import { getDistance } from 'geolib';
 import React, { useCallback, useEffect, useState } from 'react';
-import { Image, Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
+import {
+    Image,
+    Pressable,
+    RefreshControl,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
+} from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import MapView, { LatLng, Marker } from 'react-native-maps';
 import { Rating } from 'react-native-ratings';
@@ -83,6 +92,11 @@ function EventDetailScreen({ route, navigation, preview, evId }: Props) {
         },
         [eventId]
     );
+
+    const showProfile = useCallback(() => {
+        if (!eventData?.hostId) return;
+        navigation.navigate('UserProfile', { userId: eventData?.hostId });
+    }, [navigation, eventData?.hostId]);
 
     if (!eventData) {
         return (
@@ -231,10 +245,12 @@ function EventDetailScreen({ route, navigation, preview, evId }: Props) {
                     {numberOfAttendants}
                 </Text>
             </View>
-            <Image
-                style={styles.ProfilePicture}
-                source={{ uri: getProfilePicture().profilePicture }}
-            />
+            <TouchableOpacity onPress={showProfile}>
+                <Image
+                    style={styles.ProfilePicture}
+                    source={{ uri: getProfilePicture().profilePicture }}
+                />
+            </TouchableOpacity>
         </View>
     );
 
