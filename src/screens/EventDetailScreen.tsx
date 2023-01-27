@@ -76,10 +76,25 @@ function EventDetailScreen({ route, navigation, preview, evId }: Props) {
                 case EventActionState.AttendeeJoin:
                     await EventManager.join(eventId);
                     break;
-                // TODO: implement other actions
+                case EventActionState.AttendeeLeave:
+                    await EventManager.leave(eventId);
+                    break;
+                case EventActionState.AttendeeInterested:
+                    await EventManager.follow(eventId);
+                    break;
+                case EventActionState.AttendeeNotInterested:
+                    await EventManager.unfollow(eventId);
+                    break;
+                case EventActionState.HostStart:
+                    await EventManager.start(eventId);
+                    break;
+                case EventActionState.HostEnd:
+                    await EventManager.stop(eventId);
+                    break;
                 default:
                     throw new UnreachableCaseError(state, 'Unknown event action');
             }
+            refresh();
         },
         [eventId]
     );
