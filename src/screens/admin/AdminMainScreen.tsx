@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useCallback } from 'react';
-import { ScrollView } from 'react-native-gesture-handler';
+import { ScrollView } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { Cell, Section, TableView } from 'react-native-tableview-simple';
 import { ProfileStackNavProps } from '../../nav/types';
@@ -26,7 +26,7 @@ export default function AdminMainScreen({ navigation }: ProfileStackNavProps<'Ad
                             title="All Events"
                             accessory="DisclosureIndicator"
                             onPress={useCallback(() => {
-                                // navigation.navigate('EditProfile');
+                                navigation.navigate('AdminEventsScreen');
                             }, [navigation])}
                         />
                     </Section>
