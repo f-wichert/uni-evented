@@ -16,6 +16,7 @@ export interface UserResponse {
     readonly username: string;
     readonly displayName: string;
     readonly avatarHash: string | null;
+    readonly isAdmin: boolean;
     readonly eventAttendee?: PartialAttendee;
 }
 
@@ -24,6 +25,7 @@ export interface User {
     readonly username: string;
     readonly displayName: string;
     readonly avatarHash: string | null;
+    readonly isAdmin: boolean;
     readonly eventAttendee?: PartialAttendee;
 }
 
