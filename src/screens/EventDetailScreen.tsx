@@ -17,7 +17,8 @@ import { EventManager } from '../models';
 import { EventDetailProps } from '../nav/types';
 import { useEventFetch } from '../state/event';
 import { useCurrentUser } from '../state/user';
-import { UnreachableCaseError, useAsyncCallback, useAsyncEffects } from '../util';
+import { EmptyObject } from '../types';
+import { request, UnreachableCaseError, useAsyncCallback, useAsyncEffects } from '../util';
 
 const MAX_JOIN_RADIUS_METERS = 50;
 
@@ -29,6 +30,10 @@ interface Props extends EventDetailProps<'EventDetail'> {
 function EventDetailScreen({ route, navigation, preview, evId }: Props) {
     const eventId = evId ? evId : route.params.eventId;
     const { event: eventData, loading, refresh } = useEventFetch(eventId);
+
+    console.log('Our Event Data =======================================================');
+    console.log(eventData);
+
     const user = useCurrentUser();
 
     // MediaCarousel
@@ -127,7 +132,7 @@ function EventDetailScreen({ route, navigation, preview, evId }: Props) {
 
     const formatDateTime = (date: Date) => {
         const d = dayjs(date);
-        return d.format('ddd, DD.MM.YYYY - HH:mm');
+        return d.format('ddd, DD.MM - HH:mm');
     };
 
     const numberOfAttendants = (eventData.users ?? []).length;
@@ -183,9 +188,31 @@ function EventDetailScreen({ route, navigation, preview, evId }: Props) {
 
     const ratingArea = (
         <View style={styles.RatingArea}>
-            <Rating imageSize={28} />
+            <Rating
+                imageSize={28}
+                onFinishRating={onRating}
+                startingValue={eventData.rating ? eventData.rating! : 0}
+            />
+            <Text
+                style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    marginLeft: 3,
+                    fontSize: 25,
+                }}
+            >
+                {' '}
+                {eventData.rating ? eventData.rating! : 0}/5
+            </Text>
         </View>
     );
+
+    function onRating(rating: number) {
+        request<EmptyObject>('POST', '/event/rate', { eventID: eventId, rating: rating }).catch(
+            (reason) => toast.show('Could not send rating. Please try again')
+        );
+    }
 
     const titleLine = (
         <View style={styles.TitleLine}>
@@ -280,8 +307,8 @@ function EventDetailScreen({ route, navigation, preview, evId }: Props) {
             region={{
                 latitude: eventData.lat,
                 longitude: eventData.lon,
-                latitudeDelta: 0.001,
-                longitudeDelta: 0.001,
+                latitudeDelta: 0.002,
+                longitudeDelta: 0.002,
             }}
         >
             <Marker
@@ -366,7 +393,6 @@ const styles = StyleSheet.create({
         display: 'flex',
         flexDirection: 'row',
         alignSelf: 'stretch', // Float elements to the left
-        flexWrap: 'wrap',
         backgroundColor: 'white',
         padding: 5,
         paddingLeft: 7,
@@ -452,3 +478,6 @@ const styles = StyleSheet.create({
 });
 
 export default EventDetailScreen;
+function ratedWith(rating: any, number: any) {
+    throw new Error('Function not implemented.');
+}

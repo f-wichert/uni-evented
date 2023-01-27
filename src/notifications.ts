@@ -1,9 +1,8 @@
-import Constants from 'expo-constants';
 import * as Notifications from 'expo-notifications';
 import { useCallback, useEffect } from 'react';
 import { Platform } from 'react-native';
 
-import { extra } from './config';
+import * as config from './config';
 import { UserManager } from './models';
 import { useAuthStore } from './state/auth';
 import { useUserStore } from './state/user';
@@ -81,11 +80,9 @@ async function registerForPushNotificationsAsync(): Promise<string | null> {
         return null;
     }
 
-    // If not running in Expo Go, we need to explicitly specify `projectId`
-    // due to https://github.com/expo/expo/issues/18570
-    const projectId = Constants.appOwnership !== 'expo' ? extra?.eas?.projectId : undefined;
-
-    return (await Notifications.getExpoPushTokenAsync({ projectId })).data;
+    // Need to explicitly specify `projectId` due to https://github.com/expo/expo/issues/18570
+    return (await Notifications.getExpoPushTokenAsync({ projectId: config.extra?.eas?.projectId }))
+        .data;
 }
 
 /** Callback when a user taps a notification */
