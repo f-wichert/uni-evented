@@ -101,7 +101,7 @@ export class EventManager {
     }
 
     static async start(eventId: string) {
-        await request<EmptyObject>('POST', '/event/close', { eventId });
+        await request<EmptyObject>('POST', '/event/start', { eventId });
 
         useEventStore.setState((state) => {
             // update status of event
