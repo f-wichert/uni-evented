@@ -4,7 +4,16 @@ import dayjs from 'dayjs';
 import * as Location from 'expo-location';
 import { getDistance } from 'geolib';
 import React, { useCallback, useEffect, useState } from 'react';
-import { Image, Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
+import {
+    Button,
+    Image,
+    Pressable,
+    RefreshControl,
+    ScrollView,
+    StyleSheet,
+    Text,
+    View,
+} from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import MapView, { LatLng, Marker } from 'react-native-maps';
 import { Rating } from 'react-native-ratings';
@@ -17,6 +26,7 @@ import { EventManager } from '../models';
 import { EventDetailProps } from '../nav/types';
 import { useEventFetch } from '../state/event';
 import { useCurrentUser } from '../state/user';
+
 import { request, UnreachableCaseError, useAsyncCallback, useAsyncEffects } from '../util';
 
 const MAX_JOIN_RADIUS_METERS = 50;
@@ -46,6 +56,23 @@ function EventDetailScreen({ route, navigation, preview, evId }: Props) {
     const [inRange, setInRange] = useState(false);
 
     const isPreview = preview ? preview : false;
+
+    const isHost = eventData!.hostId == user.id;
+    console.log('Is Host?: ' + isHost);
+
+    function onEdit() {
+        navigation.navigate('EventDetailEdit', { eventId: eventId });
+    }
+
+    if (isHost) {
+        navigation.setOptions({
+            headerRight: () => (
+                <View>
+                    <Button onPress={onEdit} title="Edit Event" />
+                </View>
+            ),
+        });
+    }
 
     useAsyncEffects(
         async () => {
@@ -490,6 +517,16 @@ const styles = StyleSheet.create({
         width: '100%',
         height: 300,
         borderRadius: 5,
+    },
+    editButton: {
+        backgroundColor: 'dodgerblue',
+        padding: 5,
+        paddingLeft: 8,
+        paddingRight: 8,
+        marginLeft: 11,
+        marginRight: 11,
+        borderRadius: 3,
+        fontSize: 18,
     },
 });
 

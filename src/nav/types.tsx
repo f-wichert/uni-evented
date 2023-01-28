@@ -112,6 +112,7 @@ export type EventDetailParams = {
     EventDetail: { eventId: string };
     MediaCapture: { eventId: string };
     Chat: { eventId: string };
+    EventDetailEdit: { eventId: string };
 };
 
 export type EventDetailProps<T extends keyof EventDetailParams = keyof EventDetailParams> =

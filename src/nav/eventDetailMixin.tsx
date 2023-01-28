@@ -3,6 +3,7 @@ import React from 'react';
 
 import VideoCamera from '../components/VideoCamera';
 import ChatScreen from '../screens/ChatScreen';
+import EventDetailEditScreen from '../screens/EventDetailEditScreen';
 import EventDetailScreen from '../screens/EventDetailScreen';
 import { EventDetailParams } from './types';
 
@@ -16,6 +17,11 @@ export default function createEventScreens(Screen: ScreenType) {
                 component={EventDetailScreen}
                 // TODO: consider showing event title here (see https://reactnavigation.org/docs/headers/#using-params-in-the-title)
                 options={{ title: 'Detail' }}
+            />
+            <Screen
+                name="EventDetailEdit"
+                component={EventDetailEditScreen}
+                options={{ title: 'Edit your Event' }}
             />
             <Screen
                 name="MediaCapture"
