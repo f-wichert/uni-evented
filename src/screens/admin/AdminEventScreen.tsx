@@ -1,23 +1,17 @@
-import { Ionicons } from '@expo/vector-icons';
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { ScrollView, StyleSheet } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { Cell, Section, TableView } from 'react-native-tableview-simple';
 
 import { ProfileStackNavProps } from '../../nav/types';
-import { IoniconsName } from '../../types';
 import { asyncHandler, request } from '../../util';
-import { confirmationAlert } from './util';
+import { confirmationAlert, getCellIcon } from './util';
 
 export default function AdminEventScreen({
     navigation,
     route,
 }: ProfileStackNavProps<'AdminEventScreen'>) {
     const [event, setEvent] = useState(route.params.event);
-
-    const getCellIcon = (name: IoniconsName, color?: string) => (
-        <Ionicons name={name} size={27} color={color} />
-    );
 
     const deleteEvent = () => {
         confirmationAlert(
@@ -34,6 +28,18 @@ export default function AdminEventScreen({
         <SafeAreaProvider>
             <ScrollView style={styles.tableContainer} alwaysBounceVertical={false}>
                 <TableView style={styles.table}>
+                    <Section>
+                        <Cell
+                            image={getCellIcon('image-outline')}
+                            title="Media"
+                            accessory="DisclosureIndicator"
+                            onPress={useCallback(() => {
+                                navigation.navigate('AdminEventMediasScreen', {
+                                    eventId: event.id,
+                                });
+                            }, [])}
+                        />
+                    </Section>
                     <Section>
                         <Cell
                             image={getCellIcon('trash-bin-outline', 'red')}

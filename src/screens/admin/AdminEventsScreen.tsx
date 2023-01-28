@@ -1,6 +1,7 @@
 import { Cell } from 'react-native-tableview-simple';
 import SearchableList from '../../components/SearchableList';
-import { Event, EventManager, EventResponse } from '../../models';
+import { EventManager, EventResponse } from '../../models';
+import { EventExtra } from '../../models/event';
 import { ProfileStackNavProps } from '../../nav/types';
 import { request } from '../../util';
 
@@ -8,7 +9,7 @@ export default function AdminEventsScreen({
     navigation,
 }: ProfileStackNavProps<'AdminEventsScreen'>) {
     return (
-        <SearchableList<Event>
+        <SearchableList<EventExtra>
             fetchItems={async () => {
                 const eventsResponse = (await request(
                     'GET',

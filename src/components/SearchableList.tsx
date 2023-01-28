@@ -5,7 +5,7 @@ import { asyncHandler, useAsyncEffects } from '../util';
 
 interface Props<ItemT> {
     fetchItems: () => Promise<ItemT[]>;
-    filterItems: (items: ItemT[], searchText: string) => ItemT[];
+    filterItems?: (items: ItemT[], searchText: string) => ItemT[];
     extractItemKey: (item: ItemT) => string;
     renderItem: (info: ListRenderItemInfo<ItemT>) => JSX.Element;
 }
@@ -27,6 +27,7 @@ export default function SearchableList<ItemT>({
 
     const filterData = () => {
         if (!items) return [];
+        if (!filterItems) return items;
         if (searchText === undefined) return items;
         return filterItems(items, searchText);
     };

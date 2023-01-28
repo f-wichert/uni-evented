@@ -1,4 +1,3 @@
-import { Ionicons } from '@expo/vector-icons';
 import React, { useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -9,19 +8,14 @@ import ProfileHeader from '../../components/ProfileHeader';
 import Separator from '../../components/Separator';
 import { UserManager } from '../../models';
 import { ProfileStackNavProps } from '../../nav/types';
-import { IoniconsName } from '../../types';
 import { asyncHandler, request } from '../../util';
-import { confirmationAlert } from './util';
+import { confirmationAlert, getCellIcon } from './util';
 
 export default function AdminUserScreen({
     navigation,
     route,
 }: ProfileStackNavProps<'AdminUserScreen'>) {
     const [user, setUser] = useState(route.params.user);
-
-    const getCellIcon = (name: IoniconsName, color?: string) => (
-        <Ionicons name={name} size={27} color={color} />
-    );
 
     const clearAvatar = () => {
         confirmationAlert(
