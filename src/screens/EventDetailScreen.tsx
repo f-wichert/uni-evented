@@ -176,8 +176,18 @@ function EventDetailScreen({ route, navigation, preview, evId }: Props) {
                     </Pressable>
                 ) : (
                     <Pressable
-                        style={styles.chatButton}
+                        style={{
+                            ...styles.chatButton,
+                            opacity:
+                                eventData.hostId !== user.id &&
+                                getEventRelationship() !== 'attending'
+                                    ? 0.5
+                                    : 1,
+                        }}
                         onPress={() => navigation.navigate('MediaCapture', { eventId: eventId })}
+                        disabled={
+                            eventData.hostId !== user.id && getEventRelationship() !== 'attending'
+                        }
                     >
                         <Ionicons name="camera" size={37} color="white" />
                     </Pressable>
