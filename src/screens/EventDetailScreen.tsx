@@ -253,10 +253,15 @@ function EventDetailScreen({ route, navigation, preview, evId }: Props) {
                     alignItems: 'center',
                 }}
             >
-                <Ionicons name="people" size={28} />
-                <Text style={{ fontSize: 25, fontWeight: 'bold', marginLeft: 2 }}>
-                    {numberOfAttendants}
-                </Text>
+                <Pressable
+                    onPress={() => navigation.navigate('EventAttendees', { eventId: eventId })}
+                    style={{ flexDirection: 'row', alignItems: 'center' }}
+                >
+                    <Ionicons name="people" size={28} />
+                    <Text style={{ fontSize: 25, fontWeight: 'bold', marginLeft: 2 }}>
+                        {numberOfAttendants}
+                    </Text>
+                </Pressable>
             </View>
             <Image
                 style={styles.ProfilePicture}
