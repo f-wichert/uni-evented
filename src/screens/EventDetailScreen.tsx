@@ -31,9 +31,6 @@ function EventDetailScreen({ route, navigation, preview, evId }: Props) {
     const eventId = evId ? evId : route.params.eventId;
     const { event: eventData, loading, refresh } = useEventFetch(eventId);
 
-    console.log('Our Event Data =======================================================');
-    console.log(eventData);
-
     const user = useCurrentUser();
 
     // MediaCarousel
