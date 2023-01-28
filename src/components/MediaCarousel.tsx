@@ -1,13 +1,10 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useIsFocused } from '@react-navigation/native';
 import { useRef, useState } from 'react';
-import { ActivityIndicator, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Carousel from 'react-native-reanimated-carousel';
 import { useSafeAreaFrame } from 'react-native-safe-area-context';
-import urlJoin from 'url-join';
 
-import yellowSplash from '../../assets/yellow_splash.png';
-import config from '../config';
 import { Event } from '../models';
 import { useMediaFetch } from '../state/event';
 import ImageDiscover from './ImageDiscover';
@@ -305,14 +302,14 @@ export default function MediaCarousel({
                 style={styles.headerContainer}
                 onPress={() => navigateDetail(item.id)}
             >
-                <Image
+                {/* <Image
                     style={styles.eventIcon}
                     // TODO: include full host user object in events, then use UserManager.getAvatarUrl here
                     source={{
                         uri: urlJoin(config.BASE_URL, 'media', 'avatar', item.hostId, 'high.jpg'),
                     }}
                     defaultSource={yellowSplash}
-                />
+                /> */}
                 <Text style={styles.eventHeader}>
                     {item.name.length >= 25 ? item.name.slice(0, 22) + '...' : item.name}
                 </Text>
