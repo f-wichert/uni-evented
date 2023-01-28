@@ -4,6 +4,7 @@ import { ActivityIndicator, StyleSheet, View } from 'react-native';
 import UserPreview from '../components/UserPreview';
 import { EventDetailProps } from '../nav/types';
 import { useEventFetch } from '../state/event';
+import { useCurrentUser } from '../state/user';
 
 interface Props extends EventDetailProps<'EventAttendees'> {}
 
@@ -23,6 +24,7 @@ function EventAttendees({ navigation, route }: Props) {
     }
 
     const hostId = event.hostId;
+    const currentUser = useCurrentUser();
 
     return (
         <>
@@ -38,6 +40,7 @@ function EventAttendees({ navigation, route }: Props) {
                         bio={user.bio}
                         status={user.eventAttendee?.status}
                         host={true}
+                        ban={false}
                     />
                 ))}
             {event?.users
@@ -57,6 +60,7 @@ function EventAttendees({ navigation, route }: Props) {
                         bio={user.bio}
                         status={user.eventAttendee?.status}
                         host={false}
+                        ban={hostId === currentUser.id}
                     />
                 ))}
         </>
