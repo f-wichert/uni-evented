@@ -16,6 +16,7 @@ export interface EventResponse {
     readonly lat: string;
     readonly lon: string;
     readonly rating?: number;
+    readonly ratable: boolean;
     readonly startDateTime: string;
     readonly endDateTime: string | null;
     readonly address: string | null;
@@ -35,6 +36,7 @@ export interface Event {
     readonly lon: number;
     readonly rad: number;
     readonly rating?: number;
+    readonly ratable: boolean;
     readonly startDate: Date;
     readonly endDate: Date | null;
     readonly address: string | null;
@@ -99,7 +101,7 @@ export class EventManager {
     }
 
     static async start(eventId: string) {
-        await request<EmptyObject>('POST', '/event/close', { eventId });
+        await request<EmptyObject>('POST', '/event/start', { eventId });
 
         useEventStore.setState((state) => {
             // update status of event
@@ -171,8 +173,13 @@ export class EventManager {
         return await request<Tag[]>('GET', '/info/all_tags');
     }
 
-    static async fetchDiscoverData(): Promise<Event[]> {
-        const data = await request<EventResponse[]>('GET', '/discover');
+    static async fetchDiscoverData(
+        location = { latitude: 0, longitude: 0 } as LatLng
+    ): Promise<Event[]> {
+        const data = await request<EventResponse[]>(
+            'GET',
+            `/discover/${location.latitude}-${location.longitude}`
+        );
         return data.map((e) => this.fromEventResponse(e));
     }
 }
