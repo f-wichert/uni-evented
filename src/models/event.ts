@@ -15,6 +15,8 @@ export interface EventResponse {
     readonly status: EventStatus;
     readonly lat: string;
     readonly lon: string;
+    readonly rating?: number;
+    readonly ratable: boolean;
     readonly startDateTime: string;
     readonly endDateTime: string | null;
     readonly address: string | null;
@@ -33,6 +35,8 @@ export interface Event {
     readonly lat: number;
     readonly lon: number;
     readonly rad: number;
+    readonly rating?: number;
+    readonly ratable: boolean;
     readonly startDate: Date;
     readonly endDate: Date | null;
     readonly address: string | null;
@@ -52,7 +56,6 @@ export interface Tag {
     id: string;
     label: string;
     color: string;
-    value: string;
     parent: string;
 }
 
@@ -63,14 +66,16 @@ export interface RelevantEventsResponse {
     followerEvents: EventResponse[];
 }
 
+export type EventCreateParams = Parameters<typeof EventManager.create>[0];
+
 export class EventManager {
     static host(event: Event): User | undefined {
         return event.users ? event.users.find((user) => user.id == event.hostId) : undefined;
     }
 
-    static async join(eventId: string, lat: number, lon: number) {
+    static async join(eventId: string) {
         // TODO: client side validation
-        await request<EmptyObject>('POST', '/event/join', { eventId, lat, lon });
+        await request<EmptyObject>('POST', '/event/join', { eventId });
 
         useEventStore.setState((state) => {
             // TODO: add self as attendee? alternatively, return full event from server and just overwrite local state entirely here
@@ -78,9 +83,38 @@ export class EventManager {
         });
     }
 
-    static async close(eventId: string) {
+    static async leave(eventId: string) {
         // TODO: client side validation
-        await request<EmptyObject>('POST', '/event/close', { eventId });
+        await request<EmptyObject>('POST', '/event/leave', { eventId });
+
+        useEventStore.setState((state) => {
+            state.currentEventId = null;
+        });
+    }
+
+    static async follow(eventId: string) {
+        await request<EmptyObject>('POST', '/event/follow', { eventId });
+    }
+
+    static async unfollow(eventId: string) {
+        await request<EmptyObject>('POST', '/event/unfollow', { eventId });
+    }
+
+    static async start(eventId: string) {
+        await request<EmptyObject>('POST', '/event/start', { eventId });
+
+        useEventStore.setState((state) => {
+            // update status of event
+            const event = state.events[eventId];
+            if (event) event.status = 'active';
+
+            state.currentEventId = eventId;
+        });
+    }
+
+    static async stop(eventId: string) {
+        // TODO: client side validation
+        await request<EmptyObject>('POST', '/event/stop', { eventId });
 
         useEventStore.setState((state) => {
             // update status of event
@@ -96,9 +130,7 @@ export class EventManager {
         const { media, attendees, startDateTime, endDateTime, lat, lon, ...fields } = response;
 
         // TODO: add these to user store
-        const users = attendees
-            ? attendees.map((user) => UserManager.fromUserResponse(user))
-            : null;
+        const users = attendees?.map((user) => UserManager.fromUserResponse(user)) ?? null;
 
         return {
             ...fields,
@@ -114,7 +146,7 @@ export class EventManager {
 
     static async create(params: {
         name: string;
-        tags: Tag[];
+        tags: string[]; // tag IDs
         description: string;
         location: LatLng;
         startDate: Date | null;
@@ -141,8 +173,13 @@ export class EventManager {
         return await request<Tag[]>('GET', '/info/all_tags');
     }
 
-    static async fetchDiscoverData(): Promise<Event[]> {
-        const data = await request<EventResponse[]>('GET', '/discover');
+    static async fetchDiscoverData(
+        location = { latitude: 0, longitude: 0 } as LatLng
+    ): Promise<Event[]> {
+        const data = await request<EventResponse[]>(
+            'GET',
+            `/discover/${location.latitude}-${location.longitude}`
+        );
         return data.map((e) => this.fromEventResponse(e));
     }
 }

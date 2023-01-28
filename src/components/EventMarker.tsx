@@ -1,9 +1,15 @@
-import React, { useRef } from 'react';
-import { StyleSheet } from 'react-native';
-import { Marker } from 'react-native-maps';
+import React, { useEffect, useRef } from 'react';
+import { Platform, StyleSheet } from 'react-native';
+import { MapMarker } from 'react-native-maps';
 
-function EventMarker(props) {
-    const markerRef = useRef();
+import { EventStatus } from '../models';
+
+type Props = MapMarker['props'] & {
+    state: EventStatus;
+};
+
+function EventMarker(props: Props) {
+    const markerRef = useRef<MapMarker | null>(null);
     const state = props.state;
 
     let pinColor = 'blue';
@@ -21,19 +27,16 @@ function EventMarker(props) {
             console.log('Default');
     }
 
-    // console.log(pinColor);
-    markerRef?.current?.redraw();
+    // force redraw when color changes
+    useEffect(() => {
+        if (Platform.OS === 'android') markerRef.current?.redraw();
+    }, [pinColor]);
 
     return (
-        <Marker
+        <MapMarker
+            {...props}
             ref={markerRef}
-            key={props.id}
-            coordinate={props.coordinate}
-            name={props.name}
             pinColor={pinColor}
-            // TODO: this might re-render every time since the
-            // callback isn't memoized, not sure
-            onCalloutPress={props.onCalloutPress}
             // tracksViewChanges={true}
         />
     );

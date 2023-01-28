@@ -52,7 +52,6 @@ export function useEvent(id: string): Event | undefined {
 
 export function useEventFetch(id: string) {
     if (!id) throw new Error(`Invalid event ID: ${id}`);
-
     const fetchFunc = useCallback(async () => {
         const eventData = await request<EventResponse>('GET', `event/info/${id}`);
 

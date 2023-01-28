@@ -1,9 +1,10 @@
 import * as Location from 'expo-location';
 import { LocationObject } from 'expo-location';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import MapView, { LatLng, Marker } from 'react-native-maps';
-import { asyncHandler } from '../util';
+
+import { useAsyncEffects } from '../util';
 
 MapPicker.propTypes = {};
 
@@ -21,19 +22,16 @@ export default function MapPicker({ route, navigation }) {
         longitude: 8.652653,
     });
 
-    useEffect(
-        asyncHandler(async () => {
-            // const eventList = await request('get', 'event/find', authState.token);
-            // setEvents(eventList.events);
-            await getCurrentPosition();
-            // TODO: add repeating location checks and updates. This might also be implemented in MapScreen
-            // Location.watchPositionAsync({
-            //     accuracy: Location.Accuracy.Balanced,
-            //     timeInterval: 2000
-            // }, (loc) => {setLocation(loc);})
-        }),
-        []
-    );
+    useAsyncEffects(async () => {
+        // const eventList = await request('get', 'event/find', authState.token);
+        // setEvents(eventList.events);
+        await getCurrentPosition();
+        // TODO: add repeating location checks and updates. This might also be implemented in MapScreen
+        // Location.watchPositionAsync({
+        //     accuracy: Location.Accuracy.Balanced,
+        //     timeInterval: 2000
+        // }, (loc) => {setLocation(loc);})
+    }, []);
 
     const getCurrentPosition = async () => {
         const { status } = await Location.requestForegroundPermissionsAsync();

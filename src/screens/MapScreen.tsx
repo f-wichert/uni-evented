@@ -1,15 +1,16 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
+import dayjs from 'dayjs';
 import * as Location from 'expo-location';
-import React, { useCallback, useEffect, useState } from 'react';
+import { LocationObject } from 'expo-location';
+import React, { useCallback, useState } from 'react';
 import { Dimensions, StyleSheet, View } from 'react-native';
 import MapView, { LatLng } from 'react-native-maps';
-import MapFilter from '../components/MapFilter';
 
-import { LocationObject } from 'expo-location';
 import EventMarker from '../components/EventMarker';
+import MapFilter from '../components/MapFilter';
 import { MapStackNavProps } from '../nav/types';
 import { useFindEvents } from '../state/event';
-import { asyncHandler } from '../util';
+import { useAsyncEffects } from '../util';
 import EventDetailScreen from './EventDetailScreen';
 
 function MapScreen({ navigation, route }: MapStackNavProps<'MapView'>) {
@@ -61,46 +62,43 @@ function MapScreen({ navigation, route }: MapStackNavProps<'MapView'>) {
         });
     };
 
-    useEffect(
-        asyncHandler(async () => {
-            setMenuVisible(false);
-            navigation.setOptions({
-                headerRight: () => (
-                    <View style={{ flexDirection: 'row' }}>
-                        <Ionicons
-                            name="refresh-outline"
-                            size={32}
-                            color="black"
-                            onPress={refresh}
-                            style={{
-                                marginRight: 10,
-                            }}
-                        />
-                        <Ionicons
-                            name="menu-outline"
-                            size={32}
-                            color="black"
-                            onPress={() => {
-                                // TODO: herausfinden warum das hier funktioniert?
-                                console.log('Value toggled.');
-                                setMenuVisible((val) => !val);
-                            }}
-                            style={{
-                                marginRight: 10,
-                            }}
-                        />
-                    </View>
-                ),
-            });
-            const { status } = await Location.requestForegroundPermissionsAsync();
-            if (status !== 'granted') {
-                throw new Error('Location access not granted');
-            }
-            getLastKnownPosition();
-            await getCurrentPosition();
-        }),
-        [navigation]
-    );
+    useAsyncEffects(async () => {
+        setMenuVisible(false);
+        navigation.setOptions({
+            headerRight: () => (
+                <View style={{ flexDirection: 'row' }}>
+                    <Ionicons
+                        name="refresh-outline"
+                        size={32}
+                        color="black"
+                        onPress={refresh}
+                        style={{
+                            marginRight: 10,
+                        }}
+                    />
+                    <Ionicons
+                        name="menu-outline"
+                        size={32}
+                        color="black"
+                        onPress={() => {
+                            // TODO: herausfinden warum das hier funktioniert?
+                            console.log('Value toggled.');
+                            setMenuVisible((val) => !val);
+                        }}
+                        style={{
+                            marginRight: 10,
+                        }}
+                    />
+                </View>
+            ),
+        });
+        const { status } = await Location.requestForegroundPermissionsAsync();
+        if (status !== 'granted') {
+            throw new Error('Location access not granted');
+        }
+        getLastKnownPosition();
+        await getCurrentPosition();
+    }, [navigation]);
 
     const navigateDetail = useCallback(
         (id: string) => {
@@ -109,14 +107,10 @@ function MapScreen({ navigation, route }: MapStackNavProps<'MapView'>) {
         [navigation]
     );
 
-    // Credit to https://stackoverflow.com/questions/3224834/get-difference-between-2-dates-in-javascript
-    function dateDiffInDays(a, b) {
-        const _MS_PER_DAY = 1000 * 60 * 60 * 24;
-        // Discard the time and time-zone information.
-        const utc1 = Date.UTC(a.getFullYear(), a.getMonth(), a.getDate());
-        const utc2 = Date.UTC(b.getFullYear(), b.getMonth(), b.getDate());
-
-        return Math.floor(Math.abs(utc2 - utc1) / _MS_PER_DAY);
+    function dateDiffInDays(a: Date, b: Date) {
+        const aDay = dayjs(a).startOf('day');
+        const bDay = dayjs(b).startOf('day');
+        return aDay.diff(bDay, 'days');
     }
 
     return (
@@ -153,15 +147,10 @@ function MapScreen({ navigation, route }: MapStackNavProps<'MapView'>) {
                     >
                         <>
                             {events.map((el) => {
-                                let status = 'current';
-                                // console.log(el.startDate);
-                                const today = new Date(Date.now());
-                                const date = new Date(el.startDate);
-                                const diff = dateDiffInDays(date, today);
+                                const diffDays = dateDiffInDays(el.startDate, new Date());
 
                                 // Remove events that are not in our day range
-                                if (diff <= currentDayRange) {
-                                } else {
+                                if (diffDays > currentDayRange) {
                                     return;
                                 }
 
@@ -169,9 +158,6 @@ function MapScreen({ navigation, route }: MapStackNavProps<'MapView'>) {
                                 if (el.status == 'completed') {
                                     return;
                                 }
-
-                                // console.log(`Date: ${date} - Diff: ${diff} - Curr: ${currentDayRange} - Fut[1]: ${futureDayRange} => ${status}`);
-                                // console.log(el.status);
 
                                 return (
                                     <EventMarker

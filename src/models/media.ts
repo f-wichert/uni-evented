@@ -45,7 +45,6 @@ export class MediaManager {
         }
 
         if (media.type === 'livestream') {
-            console.log(`${config.NMS_RTMP_URL}/livestream/${media.id}`);
             return `${config.NMS_RTMP_URL}/livestream/${media.id}`;
         }
 

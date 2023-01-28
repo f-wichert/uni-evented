@@ -24,7 +24,7 @@ function EventPreview({ id, navigateDetail }: Props) {
             <Ionicons style={[styles.icon]} name="rocket-outline" color="#000" size={32} />
             <View style={[styles.innerContainer]}>
                 <Text style={[styles.title]}>{event.name}</Text>
-                <Text>Your description can be here!</Text>
+                <Text>{event.description?.slice(0, 40) + '...'}</Text>
             </View>
         </TouchableOpacity>
     );

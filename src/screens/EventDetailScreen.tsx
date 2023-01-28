@@ -1,33 +1,36 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { useFocusEffect } from '@react-navigation/native';
+import dayjs from 'dayjs';
 import * as Location from 'expo-location';
-import { LocationObject } from 'expo-location';
-import React, { useEffect, useState } from 'react';
+import { getDistance } from 'geolib';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Image, Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import MapView, { LatLng, Marker } from 'react-native-maps';
 import { Rating } from 'react-native-ratings';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
+import DetailActionButton, { EventActionState } from '../components/DetailActionButton';
 import MediaCarousel from '../components/MediaCarousel';
 import { Tag } from '../components/Tag';
 import { EventManager } from '../models';
 import { EventDetailProps } from '../nav/types';
-import { useEventFetch, useEventStore } from '../state/event';
+import { useEventFetch } from '../state/event';
 import { useCurrentUser } from '../state/user';
-import { asyncHandler } from '../util';
+import { request, UnreachableCaseError, useAsyncCallback, useAsyncEffects } from '../util';
 
-function EventDetailScreen({
-    route,
-    navigation,
-    preview,
-    evId,
-    orig,
-}: EventDetailProps<'EventDetail'>) {
+const MAX_JOIN_RADIUS_METERS = 50;
+
+interface Props extends EventDetailProps<'EventDetail'> {
+    preview?: boolean;
+    evId?: string;
+}
+
+function EventDetailScreen({ route, navigation, preview, evId }: Props) {
     const eventId = evId ? evId : route.params.eventId;
-    const origin = orig ? orig : route.params.origin;
     const { event: eventData, loading, refresh } = useEventFetch(eventId);
+
     const user = useCurrentUser();
-    const userCurrentEventId = useEventStore((state) => state.currentEventId); // Get event ID of current event of currently logged in user
 
     // MediaCarousel
     const [isPlay, setIsPlay] = useState<boolean>(true);
@@ -35,21 +38,61 @@ function EventDetailScreen({
     const [isOpenQuality, setIsOpenQuality] = useState<boolean>(false);
     const [quality, setQuality] = useState<'auto' | '1080' | '720' | '480' | '360'>('auto');
 
-    const [location, setLocation] = useState<LatLng | null>();
+    const [location, setLocation] = useState<LatLng | null>(null);
+
+    const [inRange, setInRange] = useState(false);
 
     const isPreview = preview ? preview : false;
 
-    useEffect(
-        asyncHandler(async () => {
-            // TODO: await
+    useAsyncEffects(
+        async () => {
             const { status } = await Location.requestForegroundPermissionsAsync();
             if (status !== 'granted') {
                 throw new Error('Location access not granted');
             }
-            getLastKnownPosition();
-            getCurrentPosition();
-        }),
-        []
+            await Promise.all([getLastKnownPosition(), getCurrentPosition()]);
+        },
+        [],
+        { prefix: 'Failed to fetch location' }
+    );
+
+    useEffect(() => {
+        if (!location || !eventData) return;
+
+        const eventLocation = { latitude: eventData.lat, longitude: eventData.lon };
+        const distance = getDistance(location, eventLocation);
+        setInRange(distance < MAX_JOIN_RADIUS_METERS);
+    }, [location, eventData]);
+
+    useFocusEffect(useCallback(() => void refresh(), [refresh]));
+
+    const onButtonAction = useAsyncCallback(
+        async (state: EventActionState) => {
+            switch (state) {
+                case EventActionState.AttendeeJoin:
+                    await EventManager.join(eventId);
+                    break;
+                case EventActionState.AttendeeLeave:
+                    await EventManager.leave(eventId);
+                    break;
+                case EventActionState.AttendeeInterested:
+                    await EventManager.follow(eventId);
+                    break;
+                case EventActionState.AttendeeNotInterested:
+                    await EventManager.unfollow(eventId);
+                    break;
+                case EventActionState.HostStart:
+                    await EventManager.start(eventId);
+                    break;
+                case EventActionState.HostEnd:
+                    await EventManager.stop(eventId);
+                    break;
+                default:
+                    throw new UnreachableCaseError(state, 'Unknown event action');
+            }
+            refresh();
+        },
+        [eventId]
     );
 
     if (!eventData) {
@@ -70,17 +113,17 @@ function EventDetailScreen({
 
     const getEventRelationship = () => {
         // return if loading or the event has no users
-        if (!loading || !eventData.users) return;
-        const eventUser = eventData.users.find((el) => el.id === user.id);
-        // return if user is not part of the event
-        if (!eventUser) return;
-        return eventUser.eventAttendee.status;
+        const eventUser = eventData.users?.find((el) => el.id === user.id);
+        return eventUser?.eventAttendee?.status;
     };
 
     const getLastKnownPosition = async () => {
-        const { coords } =
-            (await Location.getLastKnownPositionAsync()) as unknown as LocationObject;
-        const lastLocation = { latitude: coords.latitude, longitude: coords.longitude };
+        const location = await Location.getLastKnownPositionAsync();
+        if (!location) return;
+        const lastLocation = {
+            latitude: location.coords.latitude,
+            longitude: location.coords.longitude,
+        };
 
         setLocation(lastLocation);
     };
@@ -98,55 +141,13 @@ function EventDetailScreen({
         };
     }
 
-    const formatTime = (date: Date) => {
-        const hours = date.getHours().toString().padStart(2, '0');
-        const minutes = date.getMinutes().toString().padStart(2, '0');
-        return `${hours}:${minutes}`;
-    };
-
-    const formatDate = (date: Date) => {
-        const day = date.getDate().toString().padStart(2, '0');
-        const month = (date.getMonth() + 1).toString().padStart(2, '0');
-        const year = date.getFullYear();
-        return `${day}.${month}.${year}`;
+    const formatDateTime = (date: Date) => {
+        const d = dayjs(date);
+        return d.format('ddd, DD.MM - HH:mm');
     };
 
     const numberOfAttendants = (eventData.users ?? []).length;
 
-    const mainButton = () => {
-        let button = <Text style={styles.joinButtonText}>I'm here!</Text>;
-        let disabled = false;
-
-        const mainJsx = (
-            <View style={styles.joinButtonContainer}>
-                <Pressable
-                    style={{ ...styles.joinButton, opacity: disabled ? 0.5 : 1 }}
-                    onPress={asyncHandler(
-                        async () => {
-                            await EventManager.join(eventId, 0, 0);
-                        },
-                        { prefix: 'Failed to join event' }
-                    )}
-                    disabled={disabled}
-                >
-                    {button}
-                </Pressable>
-            </View>
-        );
-
-        // // User is Host and Event is active
-        // if (eventData.hostId === user.id && eventData.status === 'active') {
-        //     button = <Text style={styles.joinButtonText}>Stop event!</Text>;
-        // }
-        // // User is Host and Event is scheduled
-        // if (eventData.hostId === user.id && eventData.status === 'scheduled') {
-        //     button = <Text style={styles.joinButtonText}>Start event!</Text>;
-        // }
-        // if (getEventRelationship() === 'attending') {
-        //     button = <Text style={styles.joinButtonText}>Leave event!</Text>;
-        // }
-        return mainJsx;
-    };
     const navigationBar = (
         <>
             <View style={styles.chatButtonContainer}>
@@ -157,7 +158,14 @@ function EventDetailScreen({
                     <Ionicons name={'chatbox-ellipses-outline'} size={37} color={'white'} />
                 </Pressable>
             </View>
-            {mainButton()}
+            <DetailActionButton
+                loading={loading}
+                inRange={inRange}
+                isHost={eventData.hostId === user.id}
+                eventStatus={eventData.status}
+                userStatus={getEventRelationship()}
+                onAction={onButtonAction}
+            />
             <View style={styles.JoinCameraButtonContainer}>
                 {isPreview ? (
                     <Pressable
@@ -168,8 +176,18 @@ function EventDetailScreen({
                     </Pressable>
                 ) : (
                     <Pressable
-                        style={styles.chatButton}
+                        style={{
+                            ...styles.chatButton,
+                            opacity:
+                                eventData.hostId !== user.id &&
+                                getEventRelationship() !== 'attending'
+                                    ? 0.5
+                                    : 1,
+                        }}
                         onPress={() => navigation.navigate('MediaCapture', { eventId: eventId })}
+                        disabled={
+                            eventData.hostId !== user.id && getEventRelationship() !== 'attending'
+                        }
                     >
                         <Ionicons name="camera" size={37} color="white" />
                     </Pressable>
@@ -191,9 +209,37 @@ function EventDetailScreen({
 
     const ratingArea = (
         <View style={styles.RatingArea}>
-            <Rating imageSize={28} />
+            <Rating
+                readonly={!eventData.ratable}
+                imageSize={28}
+                onFinishRating={onRating}
+                startingValue={eventData.rating ? eventData.rating! : 0}
+            />
+            <Text
+                style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    marginLeft: 3,
+                    fontSize: 25,
+                }}
+            >
+                {eventData.rating ? eventData.rating : 0}/5
+            </Text>
+            {eventData.status === 'active' ? (
+                <View style={styles.activeIndicator}>
+                    <Text style={styles.activeIndicatorText}>Active</Text>
+                </View>
+            ) : null}
         </View>
     );
+
+    function onRating(rating: number) {
+        request<{ message: string }>('POST', '/event/rate', {
+            eventID: eventId,
+            rating: rating,
+        }).catch((reason) => toast.show('Could not send rating. Please try again'));
+    }
 
     const titleLine = (
         <View style={styles.TitleLine}>
@@ -207,10 +253,15 @@ function EventDetailScreen({
                     alignItems: 'center',
                 }}
             >
-                <Ionicons name="people" size={28} />
-                <Text style={{ fontSize: 25, fontWeight: 'bold', marginLeft: 2 }}>
-                    {numberOfAttendants}
-                </Text>
+                <Pressable
+                    onPress={() => navigation.navigate('EventAttendees', { eventId: eventId })}
+                    style={{ flexDirection: 'row', alignItems: 'center' }}
+                >
+                    <Ionicons name="people" size={28} />
+                    <Text style={{ fontSize: 25, fontWeight: 'bold', marginLeft: 2 }}>
+                        {numberOfAttendants}
+                    </Text>
+                </Pressable>
             </View>
             <Image
                 style={styles.ProfilePicture}
@@ -224,19 +275,13 @@ function EventDetailScreen({
         <View style={styles.GeneralInformationArea}>
             <View style={{ maxWidth: '60%' }}>
                 <Text style={{ color: 'grey', fontSize: 16 }}>
-                    {`Start: ${formatDate(eventData.startDate)} - ${formatTime(
-                        eventData.startDate
-                    )}`}
+                    {`Start: ${formatDateTime(eventData.startDate)}`}
                 </Text>
                 {eventData.endDate ? (
                     <Text style={{ color: 'grey', fontSize: 16 }}>
-                        {`End:  ${formatDate(eventData.startDate)} - ${formatTime(
-                            eventData.startDate
-                        )}`}
+                        {`End: ${formatDateTime(eventData.endDate)}`}
                     </Text>
-                ) : (
-                    <></>
-                )}
+                ) : null}
                 {/* <Text style={{ fontSize: 18, fontWeight: 'bold' }}> </Text> */}
             </View>
 
@@ -290,11 +335,12 @@ function EventDetailScreen({
             scrollEnabled={true}
             pitchEnabled={true}
             rotateEnabled={true}
+            showsUserLocation={true}
             region={{
                 latitude: eventData.lat,
                 longitude: eventData.lon,
-                latitudeDelta: 0.001,
-                longitudeDelta: 0.001,
+                latitudeDelta: 0.002,
+                longitudeDelta: 0.002,
             }}
         >
             <Marker
@@ -305,19 +351,6 @@ function EventDetailScreen({
                 }}
                 title={eventData.name}
             />
-            {location ? (
-                <Marker
-                    key={2}
-                    coordinate={{
-                        latitude: location.latitude,
-                        longitude: location.longitude,
-                    }}
-                    title={'You'}
-                    pinColor={'orange'}
-                />
-            ) : (
-                <></>
-            )}
         </MapView>
     );
 
@@ -392,7 +425,6 @@ const styles = StyleSheet.create({
         display: 'flex',
         flexDirection: 'row',
         alignSelf: 'stretch', // Float elements to the left
-        flexWrap: 'wrap',
         backgroundColor: 'white',
         padding: 5,
         paddingLeft: 7,
@@ -426,33 +458,6 @@ const styles = StyleSheet.create({
     DescriptionArea: {
         padding: 10,
     },
-    ChatArea: {},
-    IMHereButtonContainer: {
-        // display: 'flex',
-        // flexDirection: 'row',
-        // alignSelf: 'stretch',
-        // justifyContent: 'center',
-        // padding: 6,
-        backgroundColor: '#eaeaea',
-        flex: 1,
-    },
-    IMHereButtonArea: {
-        // display: 'flex',
-        // flexDirection: 'row',
-        // alignSelf: 'stretch',
-        // flex: 1,
-        justifyContent: 'center',
-        // marginHorizontal: 3,
-        borderRadius: 9,
-        backgroundColor: 'black',
-        padding: 7,
-        height: 55,
-    },
-    IMHereButton: {
-        color: 'white',
-        fontWeight: 'bold',
-        fontSize: 30,
-    },
     overlay: {
         position: 'absolute',
         bottom: 0,
@@ -463,28 +468,6 @@ const styles = StyleSheet.create({
         flex: 1,
         flexDirection: 'row',
         display: 'flex',
-    },
-    joinButtonContainer: {
-        flex: 3,
-        // backgroundColor: 'yellow',
-        marginLeft: 10,
-        marginRight: 10,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    joinButton: {
-        backgroundColor: 'black',
-        borderRadius: 7,
-        flex: 1,
-        // width: 300,
-        alignSelf: 'stretch',
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    joinButtonText: {
-        color: 'white',
-        fontWeight: 'bold',
-        fontSize: 30,
     },
     chatButtonContainer: {
         flex: 1,
@@ -523,6 +506,22 @@ const styles = StyleSheet.create({
         width: '100%',
         height: 300,
         borderRadius: 5,
+    },
+    activeIndicator: {
+        marginLeft: 'auto',
+        marginRight: 5,
+        backgroundColor: '#e66c6a',
+        borderColor: 'black',
+        borderRadius: 5,
+        borderWidth: 2,
+    },
+    activeIndicatorText: {
+        textAlign: 'center',
+        textAlignVertical: 'center',
+        fontSize: 20,
+        flex: 1,
+        paddingLeft: 10,
+        paddingRight: 10,
     },
 });
 

@@ -6,28 +6,25 @@ import { SafeAreaView, ScrollView, StyleSheet, TextInput, View } from 'react-nat
 import Message from '../components/Message';
 import { Message as MessageModel, MessageManager } from '../models/message';
 import { EventDetailProps } from '../nav/types';
-import { useUserStore } from '../state/user';
-import { asyncHandler } from '../util';
+import { useAsyncCallback } from '../util';
 
 function ChatScreen({ route }: EventDetailProps<'Chat'>) {
     const eventId = route.params?.eventId ?? null;
-    const userId = useUserStore((state) => state.currentUserId);
     const [messages, setMessages] = useState<MessageModel[]>();
-    const [text, setText] = useState();
-    const textInputRef = React.createRef();
+    const [text, setText] = useState('');
 
-    const scrollViewRef = useRef();
+    const textInputRef = useRef<TextInput | null>(null);
+    const scrollViewRef = useRef<ScrollView | null>(null);
 
-    const refreshMessages = useCallback(() => {
-        asyncHandler(
-            async () => {
-                // TODO: scroll to end if new message added
-                const data = await MessageManager.fetchMessages(eventId);
-                setMessages(data);
-            },
-            { prefix: 'Failed to load messages' }
-        )();
-    }, [eventId]);
+    const refreshMessages = useAsyncCallback(
+        async () => {
+            // TODO: scroll to end if new message added
+            const data = await MessageManager.fetchMessages(eventId);
+            setMessages(data);
+        },
+        [eventId],
+        { prefix: 'Failed to load messages' }
+    );
 
     useFocusEffect(
         useCallback(() => {
@@ -40,9 +37,15 @@ function ChatScreen({ route }: EventDetailProps<'Chat'>) {
         }, [refreshMessages])
     );
 
-    async function sendMessage(text: string) {
-        return await MessageManager.sendMessage(eventId, text);
-    }
+    const sendMessage = useAsyncCallback(
+        async () => {
+            if (!text) return;
+            await MessageManager.sendMessage(eventId, text);
+            textInputRef.current?.clear();
+        },
+        [eventId, text, textInputRef],
+        { prefix: 'Failed to send message' }
+    );
 
     return (
         <View style={styles.container}>
@@ -68,23 +71,16 @@ function ChatScreen({ route }: EventDetailProps<'Chat'>) {
                 <TextInput
                     style={styles.textInput}
                     placeholder="Message..."
-                    onChangeText={(t) => {
-                        setText(t);
-                    }}
+                    onChangeText={setText}
                     ref={textInputRef}
                 />
+                {/* TODO: disable button if input field empty */}
                 <View style={styles.sendButton}>
                     <Ionicons
                         name="send"
                         size={25}
                         color={'#fcba03'}
-                        onPress={asyncHandler(
-                            async () => {
-                                await sendMessage(text);
-                                textInputRef.current.clear();
-                            },
-                            { prefix: 'Failed to send message' }
-                        )}
+                        onPress={sendMessage}
                     ></Ionicons>
                 </View>
             </View>

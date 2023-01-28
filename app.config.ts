@@ -48,6 +48,7 @@ const config: ExpoConfig = {
                 apiKey: 'AIzaSyChSdHjqhSGgVqGZV53oppwt4FjMSinlGk',
             },
         },
+        googleServicesFile: './google-services.json',
     },
     web: {
         favicon: './assets/favicon.png',
