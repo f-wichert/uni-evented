@@ -36,7 +36,7 @@ function EventDetailScreen({ route, navigation, preview, evId }: Props) {
     const [isPlay, setIsPlay] = useState<boolean>(true);
     const [isMute, setIsMute] = useState<boolean>(true);
     const [isOpenQuality, setIsOpenQuality] = useState<boolean>(false);
-    const [quality, setQuality] = useState<'auto' | '1080' | '720' | '480' | '360'>('auto');
+    const [quality, setQuality] = useState<'auto' | '720' | '480' | '360'>('auto');
 
     const [location, setLocation] = useState<LatLng | null>(null);
 
