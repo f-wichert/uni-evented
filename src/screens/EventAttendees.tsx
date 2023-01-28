@@ -45,7 +45,8 @@ function EventAttendees({ navigation, route }: Props) {
                 .filter(
                     (el) =>
                         el.eventAttendee?.status === 'interested' ||
-                        el.eventAttendee?.status === 'attending'
+                        el.eventAttendee?.status === 'attending' ||
+                        el.eventAttendee?.status === 'left'
                 )
                 .map((user) => (
                     <UserPreview

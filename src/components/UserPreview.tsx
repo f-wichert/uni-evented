@@ -15,10 +15,15 @@ declare type Props = {
 function UserPreview({ id, username, displayName, status, bio, host }: Props) {
     const statusIcon = () => {
         if (host) return 'home-outline';
-        if (status === 'attending') {
-            return 'pin-outline';
-        } else {
-            return 'help-outline';
+        switch (status) {
+            case 'attending':
+                return 'checkmark-circle-outline';
+            case 'interested':
+                return 'help-outline';
+            case 'left':
+                return 'close-circle-outline';
+            case 'banned':
+                return 'ban-outline';
         }
     };
 
