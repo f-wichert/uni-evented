@@ -7,7 +7,7 @@ import { baseHeaders } from '../util';
 declare type Props = {
     item: Media;
     navigateDetail: (id: string) => void;
-    quality?: 'auto' | '1080' | '720' | '480' | '360';
+    quality?: 'auto' | '720' | '480' | '360';
 };
 
 function ImageDiscover({ item, navigateDetail, quality }: Props) {

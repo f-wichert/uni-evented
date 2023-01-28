@@ -17,7 +17,6 @@ import { EventManager } from '../models';
 import { EventDetailProps } from '../nav/types';
 import { useEventFetch } from '../state/event';
 import { useCurrentUser } from '../state/user';
-import { EmptyObject } from '../types';
 import { request, UnreachableCaseError, useAsyncCallback, useAsyncEffects } from '../util';
 
 const MAX_JOIN_RADIUS_METERS = 50;
@@ -31,16 +30,13 @@ function EventDetailScreen({ route, navigation, preview, evId }: Props) {
     const eventId = evId ? evId : route.params.eventId;
     const { event: eventData, loading, refresh } = useEventFetch(eventId);
 
-    console.log('Our Event Data =======================================================');
-    console.log(eventData);
-
     const user = useCurrentUser();
 
     // MediaCarousel
     const [isPlay, setIsPlay] = useState<boolean>(true);
     const [isMute, setIsMute] = useState<boolean>(true);
     const [isOpenQuality, setIsOpenQuality] = useState<boolean>(false);
-    const [quality, setQuality] = useState<'auto' | '1080' | '720' | '480' | '360'>('auto');
+    const [quality, setQuality] = useState<'auto' | '720' | '480' | '360'>('auto');
 
     const [location, setLocation] = useState<LatLng | null>(null);
 
@@ -76,10 +72,25 @@ function EventDetailScreen({ route, navigation, preview, evId }: Props) {
                 case EventActionState.AttendeeJoin:
                     await EventManager.join(eventId);
                     break;
-                // TODO: implement other actions
+                case EventActionState.AttendeeLeave:
+                    await EventManager.leave(eventId);
+                    break;
+                case EventActionState.AttendeeInterested:
+                    await EventManager.follow(eventId);
+                    break;
+                case EventActionState.AttendeeNotInterested:
+                    await EventManager.unfollow(eventId);
+                    break;
+                case EventActionState.HostStart:
+                    await EventManager.start(eventId);
+                    break;
+                case EventActionState.HostEnd:
+                    await EventManager.stop(eventId);
+                    break;
                 default:
                     throw new UnreachableCaseError(state, 'Unknown event action');
             }
+            refresh();
         },
         [eventId]
     );
@@ -165,8 +176,18 @@ function EventDetailScreen({ route, navigation, preview, evId }: Props) {
                     </Pressable>
                 ) : (
                     <Pressable
-                        style={styles.chatButton}
+                        style={{
+                            ...styles.chatButton,
+                            opacity:
+                                eventData.hostId !== user.id &&
+                                getEventRelationship() !== 'attending'
+                                    ? 0.5
+                                    : 1,
+                        }}
                         onPress={() => navigation.navigate('MediaCapture', { eventId: eventId })}
+                        disabled={
+                            eventData.hostId !== user.id && getEventRelationship() !== 'attending'
+                        }
                     >
                         <Ionicons name="camera" size={37} color="white" />
                     </Pressable>
@@ -189,6 +210,7 @@ function EventDetailScreen({ route, navigation, preview, evId }: Props) {
     const ratingArea = (
         <View style={styles.RatingArea}>
             <Rating
+                readonly={!eventData.ratable}
                 imageSize={28}
                 onFinishRating={onRating}
                 startingValue={eventData.rating ? eventData.rating! : 0}
@@ -202,16 +224,21 @@ function EventDetailScreen({ route, navigation, preview, evId }: Props) {
                     fontSize: 25,
                 }}
             >
-                {' '}
-                {eventData.rating ? eventData.rating! : 0}/5
+                {eventData.rating ? eventData.rating : 0}/5
             </Text>
+            {eventData.status === 'active' ? (
+                <View style={styles.activeIndicator}>
+                    <Text style={styles.activeIndicatorText}>Active</Text>
+                </View>
+            ) : null}
         </View>
     );
 
     function onRating(rating: number) {
-        request<EmptyObject>('POST', '/event/rate', { eventID: eventId, rating: rating }).catch(
-            (reason) => toast.show('Could not send rating. Please try again')
-        );
+        request<{ message: string }>('POST', '/event/rate', {
+            eventID: eventId,
+            rating: rating,
+        }).catch((reason) => toast.show('Could not send rating. Please try again'));
     }
 
     const titleLine = (
@@ -226,10 +253,15 @@ function EventDetailScreen({ route, navigation, preview, evId }: Props) {
                     alignItems: 'center',
                 }}
             >
-                <Ionicons name="people" size={28} />
-                <Text style={{ fontSize: 25, fontWeight: 'bold', marginLeft: 2 }}>
-                    {numberOfAttendants}
-                </Text>
+                <Pressable
+                    onPress={() => navigation.navigate('EventAttendees', { eventId: eventId })}
+                    style={{ flexDirection: 'row', alignItems: 'center' }}
+                >
+                    <Ionicons name="people" size={28} />
+                    <Text style={{ fontSize: 25, fontWeight: 'bold', marginLeft: 2 }}>
+                        {numberOfAttendants}
+                    </Text>
+                </Pressable>
             </View>
             <Image
                 style={styles.ProfilePicture}
@@ -475,9 +507,22 @@ const styles = StyleSheet.create({
         height: 300,
         borderRadius: 5,
     },
+    activeIndicator: {
+        marginLeft: 'auto',
+        marginRight: 5,
+        backgroundColor: '#e66c6a',
+        borderColor: 'black',
+        borderRadius: 5,
+        borderWidth: 2,
+    },
+    activeIndicatorText: {
+        textAlign: 'center',
+        textAlignVertical: 'center',
+        fontSize: 20,
+        flex: 1,
+        paddingLeft: 10,
+        paddingRight: 10,
+    },
 });
 
 export default EventDetailScreen;
-function ratedWith(rating: any, number: any) {
-    throw new Error('Function not implemented.');
-}

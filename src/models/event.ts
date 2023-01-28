@@ -16,6 +16,7 @@ export interface EventResponse {
     readonly lat: string;
     readonly lon: string;
     readonly rating?: number;
+    readonly ratable: boolean;
     readonly startDateTime: string;
     readonly endDateTime: string | null;
     readonly address: string | null;
@@ -35,6 +36,7 @@ export interface Event {
     readonly lon: number;
     readonly rad: number;
     readonly rating?: number;
+    readonly ratable: boolean;
     readonly startDate: Date;
     readonly endDate: Date | null;
     readonly address: string | null;
@@ -99,7 +101,7 @@ export class EventManager {
     }
 
     static async start(eventId: string) {
-        await request<EmptyObject>('POST', '/event/close', { eventId });
+        await request<EmptyObject>('POST', '/event/start', { eventId });
 
         useEventStore.setState((state) => {
             // update status of event
