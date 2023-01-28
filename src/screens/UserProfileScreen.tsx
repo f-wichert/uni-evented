@@ -104,23 +104,24 @@ export default function UserProfileScreen({ navigation, route }: CommonStackProp
             <Tabs.Container renderHeader={renderMain}>
                 <Tabs.Tab name="Hosted Events">
                     <Tabs.FlatList
-                        data={events?.myEvents}
+                        data={events?.hostedEvents}
                         renderItem={renderEventItem}
                         keyExtractor={identity}
                         nestedScrollEnabled
                     />
                 </Tabs.Tab>
-                <Tabs.Tab name="Followed Events">
+                {/* TODO: rename this tab? can't think of a better name */}
+                <Tabs.Tab name="Interested">
                     <Tabs.FlatList
-                        data={events?.followedEvents}
+                        data={events?.interestedEvents}
                         renderItem={renderEventItem}
                         keyExtractor={identity}
                         nestedScrollEnabled
                     />
                 </Tabs.Tab>
-                <Tabs.Tab name="Follower Events">
+                <Tabs.Tab name="Past Events">
                     <Tabs.FlatList
-                        data={events?.followerEvents}
+                        data={events?.pastEvents}
                         renderItem={renderEventItem}
                         keyExtractor={identity}
                         nestedScrollEnabled

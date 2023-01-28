@@ -60,10 +60,10 @@ export interface Tag {
 }
 
 export interface RelevantEventsResponse {
-    activeEvent: EventResponse[];
-    myEvents: EventResponse[];
-    followedEvents: EventResponse[];
-    followerEvents: EventResponse[];
+    hostedEvents: EventResponse[];
+    currentEvent: EventResponse | null;
+    interestedEvents: EventResponse[];
+    pastEvents: EventResponse[];
 }
 
 export type EventCreateParams = Parameters<typeof EventManager.create>[0];

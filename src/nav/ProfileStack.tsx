@@ -2,8 +2,8 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import React from 'react';
 
 import EditProfileScreen from '../screens/EditProfileScreen';
+import HostedEventsScreen from '../screens/HostedEventsScreen';
 import ManageAccountScreen from '../screens/ManageAccountScreen';
-import MyEventsScreen from '../screens/MyEventsScreen';
 import MyProfileScreen from '../screens/MyProfileScreen';
 import createCommonScreens from './commonScreensMixin';
 import { ProfileStackNavParams } from './types';
@@ -24,8 +24,8 @@ function ProfileStack() {
                 options={{ title: 'Edit Profile' }}
             />
             <Stack.Screen
-                name="MyEvents"
-                component={MyEventsScreen}
+                name="HostedEvents"
+                component={HostedEventsScreen}
                 options={{ title: 'My Events' }}
             />
             <Stack.Screen

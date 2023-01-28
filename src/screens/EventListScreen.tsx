@@ -33,15 +33,15 @@ export default function EventListScreen({ navigation }: EventListStackNavProps<'
                 refreshControl={<RefreshControl refreshing={loading} onRefresh={refresh} />}
             >
                 <Text style={[styles.headerTitle]}>Active event</Text>
-                {events?.activeEvent.map((id) => {
-                    return <EventPreview key={id} id={id} navigateDetail={navigateDetail} />;
-                })}
-                <Text style={[styles.headerTitle]}>Your Events</Text>
-                {events?.myEvents.map((id) => {
+                {events?.currentEvent ? (
+                    <EventPreview id={events.currentEvent} navigateDetail={navigateDetail} />
+                ) : null}
+                <Text style={[styles.headerTitle]}>Hosted Events</Text>
+                {events?.hostedEvents.map((id) => {
                     return <EventPreview key={id} id={id} navigateDetail={navigateDetail} />;
                 })}
                 <Text style={[styles.headerTitle]}>Followed Events</Text>
-                {events?.followedEvents.map((id) => {
+                {events?.interestedEvents.map((id) => {
                     return <EventPreview key={id} id={id} navigateDetail={navigateDetail} />;
                 })}
             </ScrollView>

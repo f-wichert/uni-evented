@@ -60,10 +60,10 @@ export default function MyProfileScreen({ navigation }: ProfileStackNavProps<'My
                         />
                         <Cell
                             image={getCellIcon('earth-outline')}
-                            title="My Events"
+                            title="My Hosted Events"
                             accessory="DisclosureIndicator"
                             onPress={useCallback(() => {
-                                navigation.navigate('MyEvents');
+                                navigation.navigate('HostedEvents');
                             }, [navigation])}
                         />
                         <Cell
