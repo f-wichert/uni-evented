@@ -224,9 +224,13 @@ function EventDetailScreen({ route, navigation, preview, evId }: Props) {
                     fontSize: 25,
                 }}
             >
-                {' '}
-                {eventData.rating ? eventData.rating! : 0}/5
+                {eventData.rating ? eventData.rating : 0}/5
             </Text>
+            {eventData.status === 'active' ? (
+                <View style={styles.activeIndicator}>
+                    <Text style={styles.activeIndicatorText}>Active</Text>
+                </View>
+            ) : null}
         </View>
     );
 
@@ -497,6 +501,22 @@ const styles = StyleSheet.create({
         width: '100%',
         height: 300,
         borderRadius: 5,
+    },
+    activeIndicator: {
+        marginLeft: 'auto',
+        marginRight: 5,
+        backgroundColor: '#e66c6a',
+        borderColor: 'black',
+        borderRadius: 5,
+        borderWidth: 2,
+    },
+    activeIndicatorText: {
+        textAlign: 'center',
+        textAlignVertical: 'center',
+        fontSize: 20,
+        flex: 1,
+        paddingLeft: 10,
+        paddingRight: 10,
     },
 });
 
