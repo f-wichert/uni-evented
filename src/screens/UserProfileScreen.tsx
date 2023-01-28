@@ -90,7 +90,7 @@ export default function UserProfileScreen({ navigation, route }: CommonStackProp
     const renderMain = useCallback(() => <MainView user={user} />, [user]);
     const renderEventItem: ListRenderItem<string> = useCallback(
         ({ item }) => <EventPreview id={item} navigateDetail={navigateDetail} />,
-        []
+        [navigateDetail]
     );
 
     return (
