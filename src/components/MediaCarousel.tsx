@@ -123,31 +123,55 @@ export default function MediaCarousel({
                             return (
                                 <>
                                     {item.type === 'video' && (
-                                        <VideoDiscover
-                                            item={item}
-                                            navigateDetail={navigateDetail}
-                                            isPlay={shouldThisSpecificVideoPlay}
-                                            isMute={isMute}
-                                            // setDuration={setDuration}
-                                            // setPosition={setPosition}
-                                            finishedVideo={onFinishedVideo}
-                                            quality={quality}
-                                        />
+                                        <>
+                                            <VideoDiscover
+                                                item={item}
+                                                navigateDetail={navigateDetail}
+                                                isPlay={shouldThisSpecificVideoPlay}
+                                                isMute={isMute}
+                                                // setDuration={setDuration}
+                                                // setPosition={setPosition}
+                                                finishedVideo={onFinishedVideo}
+                                                quality={quality}
+                                            />
+                                            <Ionicons
+                                                name={'videocam-outline'}
+                                                size={25}
+                                                style={styles.typeIcon}
+                                                color={'white'}
+                                            />
+                                        </>
                                     )}
                                     {item.type === 'image' && (
-                                        <ImageDiscover
-                                            item={item}
-                                            navigateDetail={navigateDetail}
-                                            quality={quality}
-                                        />
+                                        <>
+                                            <ImageDiscover
+                                                item={item}
+                                                navigateDetail={navigateDetail}
+                                                quality={quality}
+                                            />
+                                            <Ionicons
+                                                name={'image-outline'}
+                                                size={25}
+                                                style={styles.typeIcon}
+                                                color={'white'}
+                                            />
+                                        </>
                                     )}
                                     {item.type === 'livestream' && (
-                                        <LiveDiscover
-                                            item={item}
-                                            isMute={isMute}
-                                            isPlay={shouldThisSpecificVideoPlay}
-                                            navigateDetail={navigateDetail}
-                                        />
+                                        <>
+                                            <LiveDiscover
+                                                item={item}
+                                                isMute={isMute}
+                                                isPlay={shouldThisSpecificVideoPlay}
+                                                navigateDetail={navigateDetail}
+                                            />
+                                            <Ionicons
+                                                name={'pulse-outline'}
+                                                size={25}
+                                                style={styles.typeIcon}
+                                                color={'white'}
+                                            />
+                                        </>
                                     )}
                                 </>
                             );
@@ -400,5 +424,10 @@ const styles = StyleSheet.create({
     },
     sadText: {
         fontSize: 20,
+    },
+    typeIcon: {
+        position: 'absolute',
+        top: 25,
+        right: 10,
     },
 });
