@@ -24,10 +24,11 @@ function MapScreen({ navigation, route }: MapStackNavProps<'MapView'>) {
     const { events, refresh } = useFindEvents();
 
     // Filter options
+    const [showPlannedEvents, setShowPlannedEvents] = useState(true);
     const [showCurrentEvents, setShowCurrentEvents] = useState(true);
-    const [currentDayRange, setCurrentDayRange] = useState(0);
-    const [showFutureEvents, setShowFutureEvents] = useState(true);
-    const [futureDayRange, setFutureDayRange] = useState(2);
+    const [currentDayRange, setCurrentDayRange] = useState(2);
+    // const [showFutureEvents, setShowFutureEvents] = useState(true);
+    // const [futureDayRange, setFutureDayRange] = useState(2);
 
     const updateCurrentRange = (up) => {
         setCurrentDayRange(up);
@@ -211,14 +212,12 @@ function MapScreen({ navigation, route }: MapStackNavProps<'MapView'>) {
                 //     <Text>This might a menu someday!</Text>
                 // </View>
                 <MapFilter
+                    showPlannedEvents={showPlannedEvents}
+                    setShowPlannedEvents={setShowPlannedEvents}
                     showCurrentEvents={showCurrentEvents}
                     setShowCurrentEvents={setShowCurrentEvents}
                     currentDayRange={currentDayRange}
                     setCurrentDayRange={updateCurrentRange}
-                    showFutureEvents={showFutureEvents}
-                    setShowFutureEvents={updateFutureRange}
-                    futureDayRange={futureDayRange}
-                    setFutureDayRange={setFutureDayRange}
                     refresh={refresh}
                 />
             ) : (

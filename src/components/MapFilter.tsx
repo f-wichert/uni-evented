@@ -1,4 +1,5 @@
 import { Slider } from '@miblanchard/react-native-slider';
+import Checkbox from 'expo-checkbox';
 import React from 'react';
 import { AppRegistry, StyleSheet, Text, View } from 'react-native';
 
@@ -9,6 +10,8 @@ function MapFilter(props) {
     // const [futureDayRangeStart, setFutureDayRangeStart] = useState(2);
     // const [futureDayRangeEnd, setFutureDayRangeEnd] = useState(4);
 
+    const showPlannedEvents = props.showPlannedEvents;
+    const setShowPlannedEvents = props.setShowPlannedEvents;
     const showCurrentEvents = props.showCurrentEvents;
     const setShowCurrentEvents = props.setShowCurrentEvents;
     const currentDayRange = props.currentDayRange;
@@ -40,30 +43,25 @@ function MapFilter(props) {
                         </View>
                     </View>
                 </View>
-                {/* <View style={styles.section}>
-                    <Text style={styles.sectionHeader}>Range for future events:</Text>
+                <View style={styles.section}>
+                    <Text>Bool Filters</Text>
                     <View style={styles.sectionBody}>
-                        <View style={{ flex: 3 }}>
-                            <Text>
-                                {currentDayRange} - {futureDayRange} Days
-                            </Text>
+                        <View style={{ flexDirection: 'row' }}>
+                            <Text>Planned Events</Text>
+                            <Checkbox
+                                value={showPlannedEvents}
+                                onValueChange={setShowPlannedEvents}
+                            />
                         </View>
-                        <View style={{ flex: 14 }}>
-                            <Slider
-                                minimumValue={0}
-                                maximumValue={7}
-                                step={1}
-                                value={futureDayRange}
-                                // maximumTrackTintColor="#d3d3d3"
-                                // minimumTrackTintColor="#1fb28a"
-                                // thumbTintColor="#1a9274"
-                                onValueChange={(e) => {
-                                    setFutureDayRange(e);
-                                }}
+                        <View style={{ flexDirection: 'row' }}>
+                            <Text>Show Planned Events</Text>
+                            <Checkbox
+                                value={showPlannedEvents}
+                                onValueChange={setShowPlannedEvents}
                             />
                         </View>
                     </View>
-                </View> */}
+                </View>
                 {/* <View style={styles.section}>
                     <Pressable 
                         onPress={(e) => {
