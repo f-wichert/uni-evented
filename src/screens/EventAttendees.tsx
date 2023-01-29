@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo } from 'react';
-import { ActivityIndicator, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
 
 import UserPreview from '../components/UserPreview';
 import { UserManager } from '../models';
@@ -9,7 +9,7 @@ import { useCurrentUser } from '../state/user';
 
 function EventAttendees({ navigation, route }: CommonStackProps<'EventAttendees'>) {
     const eventId = route.params.eventId;
-    const { event, loading } = useEventFetch(eventId);
+    const { event, loading, refresh } = useEventFetch(eventId);
 
     const currentUser = useCurrentUser();
 
@@ -46,7 +46,7 @@ function EventAttendees({ navigation, route }: CommonStackProps<'EventAttendees'
     }
 
     return (
-        <>
+        <ScrollView refreshControl={<RefreshControl refreshing={loading} onRefresh={refresh} />}>
             {sortedUsers.map((user) => {
                 const avatarUrl = UserManager.getAvatarUrl(user);
                 return (
@@ -61,10 +61,12 @@ function EventAttendees({ navigation, route }: CommonStackProps<'EventAttendees'
                         host={event.hostId === user.id}
                         ban={event.hostId === currentUser.id}
                         showProfile={showProfile}
+                        eventId={event.id}
+                        refresh={refresh}
                     />
                 );
             })}
-        </>
+        </ScrollView>
     );
 }
 

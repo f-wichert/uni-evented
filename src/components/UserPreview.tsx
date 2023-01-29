@@ -1,6 +1,7 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import React, { useCallback } from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { EventManager } from '../models';
 
 import { EventAttendeeStatus } from '../models/user';
 
@@ -14,6 +15,8 @@ declare type Props = {
     host: boolean;
     ban: boolean;
     showProfile: (userId: string) => void;
+    eventId: string;
+    refresh: () => void;
 };
 
 function UserPreview({
@@ -26,6 +29,8 @@ function UserPreview({
     host,
     ban,
     showProfile,
+    eventId,
+    refresh,
 }: Props) {
     const statusIcon = () => {
         if (host) return 'home-outline';
@@ -40,6 +45,11 @@ function UserPreview({
     };
 
     const showUserProfile = useCallback(() => showProfile(id), [showProfile, id]);
+
+    const banUser = async () => {
+        await EventManager.banUser(eventId, id);
+        refresh();
+    };
 
     return (
         <View style={[styles.container]}>
@@ -63,7 +73,7 @@ function UserPreview({
                 <TouchableOpacity
                     style={styles.statusIcon}
                     // ToDo: add ban user endpoint
-                    onPress={undefined}
+                    onPress={banUser}
                 >
                     <Ionicons name="close-circle-outline" color={'red'} size={32} />
                 </TouchableOpacity>

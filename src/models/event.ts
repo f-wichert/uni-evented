@@ -135,6 +135,10 @@ export class EventManager {
         });
     }
 
+    static async banUser(eventId: string, userId: string) {
+        await request<EmptyObject>('POST', '/event/banFromEvent', { eventId, userId });
+    }
+
     static fromEventResponse(response: EventResponse): EventExtra {
         const { media, attendees, host, startDateTime, endDateTime, lat, lon, ...fields } =
             response;
