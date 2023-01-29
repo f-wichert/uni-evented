@@ -4,24 +4,34 @@ import dayjs from 'dayjs';
 import * as Location from 'expo-location';
 import { getDistance } from 'geolib';
 import React, { useCallback, useEffect, useState } from 'react';
-import { Image, Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
+import {
+    Image,
+    Pressable,
+    RefreshControl,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
+} from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import MapView, { LatLng, Marker } from 'react-native-maps';
 import { Rating } from 'react-native-ratings';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
+import yellowSplash from '../../assets/yellow_splash.png';
 import DetailActionButton, { EventActionState } from '../components/DetailActionButton';
 import MediaCarousel from '../components/MediaCarousel';
 import { Tag } from '../components/Tag';
-import { EventManager } from '../models';
-import { EventDetailProps } from '../nav/types';
+import { EventManager, UserManager } from '../models';
+import { CommonStackProps } from '../nav/types';
 import { useEventFetch } from '../state/event';
 import { useCurrentUser } from '../state/user';
 import { request, UnreachableCaseError, useAsyncCallback, useAsyncEffects } from '../util';
 
 const MAX_JOIN_RADIUS_METERS = 50;
 
-interface Props extends EventDetailProps<'EventDetail'> {
+interface Props extends CommonStackProps<'EventDetail'> {
     preview?: boolean;
     evId?: string;
 }
@@ -95,6 +105,11 @@ function EventDetailScreen({ route, navigation, preview, evId }: Props) {
         [eventId]
     );
 
+    const showProfile = useCallback(() => {
+        if (!eventData?.hostId) return;
+        navigation.navigate('UserProfile', { userId: eventData?.hostId });
+    }, [navigation, eventData?.hostId]);
+
     if (!eventData) {
         return (
             <View
@@ -133,13 +148,6 @@ function EventDetailScreen({ route, navigation, preview, evId }: Props) {
         const latlng = { latitude: location.coords.latitude, longitude: location.coords.longitude };
         setLocation(latlng);
     };
-
-    function getProfilePicture() {
-        return {
-            profilePicture:
-                'https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=745&q=80',
-        };
-    }
 
     const formatDateTime = (date: Date) => {
         const d = dayjs(date);
@@ -241,6 +249,8 @@ function EventDetailScreen({ route, navigation, preview, evId }: Props) {
         }).catch((reason) => toast.show('Could not send rating. Please try again'));
     }
 
+    const hostAvatarUrl = UserManager.getAvatarUrl(eventData.host);
+
     const titleLine = (
         <View style={styles.TitleLine}>
             <Text style={{ fontSize: 25, fontWeight: 'bold', maxWidth: '70%' }}>
@@ -263,10 +273,12 @@ function EventDetailScreen({ route, navigation, preview, evId }: Props) {
                     </Text>
                 </Pressable>
             </View>
-            <Image
-                style={styles.ProfilePicture}
-                source={{ uri: getProfilePicture().profilePicture }}
-            />
+            <TouchableOpacity onPress={showProfile}>
+                <Image
+                    style={styles.ProfilePicture}
+                    source={hostAvatarUrl ? { uri: hostAvatarUrl } : yellowSplash}
+                />
+            </TouchableOpacity>
         </View>
     );
 

@@ -12,6 +12,9 @@ export const USERNAME_VALIDATION: StringValidateOptions = {
 export const DISPLAYNAME_VALIDATION: StringValidateOptions = {
     maxLength: 32,
 };
+export const BIO_VALIDATION: StringValidateOptions = {
+    maxLength: 200,
+};
 export const PASSWORD_VALIDATION: StringValidateOptions = {
     minLength: 8,
     maxLength: 64,

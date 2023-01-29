@@ -10,6 +10,8 @@ import { CompositeScreenProps } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { LatLng } from 'react-native-maps';
 
+import type { EventListKeys } from '../models/event';
+
 // ==========
 // root navigators, only one of these is active at a time
 // ==========
@@ -58,7 +60,7 @@ export type TabNavProps<ScreenName extends keyof TabNavParams = keyof TabNavPara
 
 export type DiscoverStackNavParams = {
     DiscoverView: undefined;
-} & EventDetailParams;
+} & CommonStackParams;
 
 export type DiscoverStackNavProps<
     T extends keyof DiscoverStackNavParams = keyof DiscoverStackNavParams
@@ -70,50 +72,51 @@ export type DiscoverStackNavProps<
 
 export type MapStackNavParams = {
     MapView: undefined;
-} & EventDetailParams;
+} & CommonStackParams;
 
 export type MapStackNavProps<T extends keyof MapStackNavParams = keyof MapStackNavParams> =
     CompositeScreenProps<NativeStackScreenProps<MapStackNavParams, T>, TabNavProps>;
 
 // ==========
-// event list tab
+// event overview list tab
 // ==========
 
-export type EventListStackNavParams = {
-    EventList: undefined;
+export type EventsOverviewStackNavParams = {
+    EventsOverview: undefined;
     CreateEvent: { location?: LatLng } | undefined;
     MapPicker: undefined;
-} & EventDetailParams;
+} & CommonStackParams;
 
-export type EventListStackNavProps<
-    T extends keyof EventListStackNavParams = keyof EventListStackNavParams
-> = CompositeScreenProps<NativeStackScreenProps<EventListStackNavParams, T>, TabNavProps>;
+export type EventsOverviewStackNavProps<
+    T extends keyof EventsOverviewStackNavParams = keyof EventsOverviewStackNavParams
+> = CompositeScreenProps<NativeStackScreenProps<EventsOverviewStackNavParams, T>, TabNavProps>;
 
 // ==========
 // profile tab
 // ==========
 
 export type ProfileStackNavParams = {
-    ProfileView: undefined;
+    MyProfileView: undefined;
     EditProfile: undefined;
-    MyEvents: undefined;
+    UserEventList: { type: EventListKeys };
     ManageAccount: undefined;
-} & EventDetailParams;
+} & CommonStackParams;
 
 export type ProfileStackNavProps<
     T extends keyof ProfileStackNavParams = keyof ProfileStackNavParams
 > = CompositeScreenProps<NativeStackScreenProps<ProfileStackNavParams, T>, TabNavProps>;
 
 // ==========
-// event detail substack
+// stack mixin for common views on all tabs
 // ==========
 
-export type EventDetailParams = {
+export type CommonStackParams = {
     EventDetail: { eventId: string };
     MediaCapture: { eventId: string };
     Chat: { eventId: string };
     EventAttendees: { eventId: string };
+    UserProfile: { userId: string; /* this only works on the profile tab */ showEdit?: boolean };
 };
 
-export type EventDetailProps<T extends keyof EventDetailParams = keyof EventDetailParams> =
-    CompositeScreenProps<NativeStackScreenProps<EventDetailParams, T>, TabNavProps>;
+export type CommonStackProps<T extends keyof CommonStackParams = keyof CommonStackParams> =
+    CompositeScreenProps<NativeStackScreenProps<CommonStackParams, T>, TabNavProps>;
