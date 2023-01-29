@@ -23,14 +23,11 @@ export interface Media {
 }
 
 export class MediaManager {
-    static src(media: Media, quality?: 'auto' | '1080' | '720' | '480' | '360'): string {
+    static src(media: Media, quality?: 'auto' | '720' | '480' | '360'): string {
         const parsedVideoQuality = quality === 'auto' ? undefined : quality;
         let parsedImageQuality = 'high';
         switch (quality) {
             case 'auto':
-                parsedImageQuality = 'high';
-                break;
-            case '1080':
                 parsedImageQuality = 'high';
                 break;
             case '720':

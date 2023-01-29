@@ -15,7 +15,7 @@ declare type Props = {
     // setDuration: (dur: number) => void;
     // setPosition: (pos: number) => void;
     finishedVideo: () => void;
-    quality?: 'auto' | '1080' | '720' | '480' | '360';
+    quality?: 'auto' | '720' | '480' | '360';
 };
 
 function VideoDiscover({

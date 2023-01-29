@@ -4,24 +4,34 @@ import dayjs from 'dayjs';
 import * as Location from 'expo-location';
 import { getDistance } from 'geolib';
 import React, { useCallback, useEffect, useState } from 'react';
-import { Image, Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
+import {
+    Image,
+    Pressable,
+    RefreshControl,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
+} from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import MapView, { LatLng, Marker } from 'react-native-maps';
 import { Rating } from 'react-native-ratings';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
+import yellowSplash from '../../assets/yellow_splash.png';
 import DetailActionButton, { EventActionState } from '../components/DetailActionButton';
 import MediaCarousel from '../components/MediaCarousel';
 import { Tag } from '../components/Tag';
-import { EventManager } from '../models';
-import { EventDetailProps } from '../nav/types';
+import { EventManager, UserManager } from '../models';
+import { CommonStackProps } from '../nav/types';
 import { useEventFetch } from '../state/event';
 import { useCurrentUser } from '../state/user';
-import { request, UnreachableCaseError, useAsyncCallback, useAsyncEffects } from '../util';
+import { UnreachableCaseError, useAsyncCallback, useAsyncEffects } from '../util';
 
 const MAX_JOIN_RADIUS_METERS = 50;
 
-interface Props extends EventDetailProps<'EventDetail'> {
+interface Props extends CommonStackProps<'EventDetail'> {
     preview?: boolean;
     evId?: string;
 }
@@ -36,7 +46,7 @@ function EventDetailScreen({ route, navigation, preview, evId }: Props) {
     const [isPlay, setIsPlay] = useState<boolean>(true);
     const [isMute, setIsMute] = useState<boolean>(true);
     const [isOpenQuality, setIsOpenQuality] = useState<boolean>(false);
-    const [quality, setQuality] = useState<'auto' | '1080' | '720' | '480' | '360'>('auto');
+    const [quality, setQuality] = useState<'auto' | '720' | '480' | '360'>('auto');
 
     const [location, setLocation] = useState<LatLng | null>(null);
 
@@ -87,12 +97,29 @@ function EventDetailScreen({ route, navigation, preview, evId }: Props) {
                 case EventActionState.HostEnd:
                     await EventManager.stop(eventId);
                     break;
+                case EventActionState.Completed:
+                case EventActionState.AttendeeBanned:
+                    // no action, button is disabled
+                    break;
                 default:
                     throw new UnreachableCaseError(state, 'Unknown event action');
             }
             refresh();
         },
-        [eventId]
+        [eventId, refresh]
+    );
+
+    const showProfile = useCallback(() => {
+        if (!eventData?.hostId) return;
+        navigation.navigate('UserProfile', { userId: eventData.hostId });
+    }, [navigation, eventData?.hostId]);
+
+    const sendRating = useAsyncCallback(
+        async (rating: number) => {
+            await EventManager.rate(eventId, rating);
+        },
+        [eventId],
+        { prefix: 'Failed to rate event' }
     );
 
     if (!eventData) {
@@ -134,13 +161,6 @@ function EventDetailScreen({ route, navigation, preview, evId }: Props) {
         setLocation(latlng);
     };
 
-    function getProfilePicture() {
-        return {
-            profilePicture:
-                'https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=745&q=80',
-        };
-    }
-
     const formatDateTime = (date: Date) => {
         const d = dayjs(date);
         return d.format('ddd, DD.MM - HH:mm');
@@ -152,8 +172,12 @@ function EventDetailScreen({ route, navigation, preview, evId }: Props) {
         <>
             <View style={styles.chatButtonContainer}>
                 <Pressable
-                    style={styles.chatButton}
+                    style={{
+                        ...styles.chatButton,
+                        opacity: getEventRelationship() === 'banned' ? 0.5 : 1,
+                    }}
                     onPress={() => navigation.navigate('Chat', { eventId: eventId })}
+                    disabled={getEventRelationship() === 'banned'}
                 >
                     <Ionicons name={'chatbox-ellipses-outline'} size={37} color={'white'} />
                 </Pressable>
@@ -212,8 +236,8 @@ function EventDetailScreen({ route, navigation, preview, evId }: Props) {
             <Rating
                 readonly={!eventData.ratable}
                 imageSize={28}
-                onFinishRating={onRating}
-                startingValue={eventData.rating ? eventData.rating! : 0}
+                onFinishRating={sendRating}
+                startingValue={eventData.rating ?? 0}
             />
             <Text
                 style={{
@@ -234,12 +258,7 @@ function EventDetailScreen({ route, navigation, preview, evId }: Props) {
         </View>
     );
 
-    function onRating(rating: number) {
-        request<{ message: string }>('POST', '/event/rate', {
-            eventID: eventId,
-            rating: rating,
-        }).catch((reason) => toast.show('Could not send rating. Please try again'));
-    }
+    const hostAvatarUrl = UserManager.getAvatarUrl(eventData.host);
 
     const titleLine = (
         <View style={styles.TitleLine}>
@@ -263,10 +282,12 @@ function EventDetailScreen({ route, navigation, preview, evId }: Props) {
                     </Text>
                 </Pressable>
             </View>
-            <Image
-                style={styles.ProfilePicture}
-                source={{ uri: getProfilePicture().profilePicture }}
-            />
+            <TouchableOpacity onPress={showProfile}>
+                <Image
+                    style={styles.ProfilePicture}
+                    source={hostAvatarUrl ? { uri: hostAvatarUrl } : yellowSplash}
+                />
+            </TouchableOpacity>
         </View>
     );
 

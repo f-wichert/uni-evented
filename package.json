@@ -45,6 +45,7 @@
         "react": "18.1.0",
         "react-dom": "18.1.0",
         "react-native": "0.70.5",
+        "react-native-collapsible-tab-view": "^4.5.2",
         "react-native-dropdown-picker": "^5.4.3",
         "react-native-gesture-handler": "^2.8.0",
         "react-native-image-progress": "^1.2.0",

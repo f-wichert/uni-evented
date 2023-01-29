@@ -18,8 +18,8 @@ interface Props {
     isOpenQuality: boolean;
     setIsPlay: (val: boolean) => void;
     setIsMute: (val: boolean) => void;
-    quality: 'auto' | '1080' | '720' | '480' | '360';
-    setQuality: (val: 'auto' | '1080' | '720' | '480' | '360') => void;
+    quality: 'auto' | '720' | '480' | '360';
+    setQuality: (val: 'auto' | '720' | '480' | '360') => void;
     setIsOpenQuality: (val: boolean) => void;
     navigateDetail?: (id: string) => void;
     discover?: boolean;
@@ -252,19 +252,6 @@ export default function MediaCarousel({
                             </TouchableOpacity>
                             <TouchableOpacity
                                 style={styles.qualityOption}
-                                onPress={() => setQuality('1080')}
-                            >
-                                <Text
-                                    style={{
-                                        ...styles.qualityText,
-                                        opacity: quality === '1080' ? 1 : 0.25,
-                                    }}
-                                >
-                                    1080p
-                                </Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity
-                                style={styles.qualityOption}
                                 onPress={() => setQuality('720')}
                             >
                                 <Text
@@ -326,14 +313,6 @@ export default function MediaCarousel({
                 style={styles.headerContainer}
                 onPress={() => navigateDetail(item.id)}
             >
-                {/* <Image
-                    style={styles.eventIcon}
-                    // TODO: include full host user object in events, then use UserManager.getAvatarUrl here
-                    source={{
-                        uri: urlJoin(config.BASE_URL, 'media', 'avatar', item.hostId, 'high.jpg'),
-                    }}
-                    defaultSource={yellowSplash}
-                /> */}
                 <Text style={styles.eventHeader}>
                     {item.name.length >= 25 ? item.name.slice(0, 22) + '...' : item.name}
                 </Text>
