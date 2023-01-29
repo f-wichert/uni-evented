@@ -28,6 +28,7 @@ function MapScreen({ navigation, route }: MapStackNavProps<'MapView'>) {
     const [showPlannedEvents, setShowPlannedEvents] = useState(true);
     const [showCurrentEvents, setShowCurrentEvents] = useState(true);
     const [currentDayRange, setCurrentDayRange] = useState(2);
+    const [selectedTags, setSelectedTags] = useState<string[]>([]);
     // const [showFutureEvents, setShowFutureEvents] = useState(true);
     // const [futureDayRange, setFutureDayRange] = useState(2);
 
@@ -147,6 +148,11 @@ function MapScreen({ navigation, route }: MapStackNavProps<'MapView'>) {
                     >
                         <>
                             {events.map((el) => {
+                                // console.log('===');
+                                // console.log(el.tags);
+                                // console.log(el.users?.length);
+                                // console.log('===');
+
                                 const diffDays = dateDiffInDays(el.startDate, new Date());
 
                                 // Remove events that are not in our day range
@@ -159,6 +165,30 @@ function MapScreen({ navigation, route }: MapStackNavProps<'MapView'>) {
                                     return;
                                 }
 
+                                // Remove active events
+                                if (el.status == 'active' && showCurrentEvents == false) {
+                                    return;
+                                }
+
+                                // Remove planned events
+                                if (el.status == 'scheduled' && showPlannedEvents == false) {
+                                    return;
+                                }
+
+                                // Filter for tags - remove if the event has no tag from selectedTags
+                                if (selectedTags.length >= 1) {
+                                    const eventTags = el.tags.map((t) => t.id);
+                                    let match = false;
+                                    for (const tag of selectedTags) {
+                                        if (eventTags.includes(tag)) {
+                                            match = true;
+                                        }
+                                    }
+                                    if (!match) {
+                                        return;
+                                    }
+                                }
+
                                 return (
                                     <EventMarker
                                         key={el.id}
@@ -167,6 +197,8 @@ function MapScreen({ navigation, route }: MapStackNavProps<'MapView'>) {
                                             longitude: el.lon,
                                         }}
                                         title={el.name}
+                                        numPeople={el.users?.length}
+                                        livestream={true}
                                         // TODO: this might re-render every time since the
                                         // callback isn't memoized, not sure
                                         onCalloutPress={() => {
@@ -205,6 +237,8 @@ function MapScreen({ navigation, route }: MapStackNavProps<'MapView'>) {
                     currentDayRange={currentDayRange}
                     setCurrentDayRange={updateCurrentRange}
                     refresh={refresh}
+                    selectedTags={selectedTags}
+                    setSelectedTags={setSelectedTags}
                 />
             ) : (
                 <></>
