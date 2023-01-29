@@ -75,12 +75,17 @@ export class EventManager {
 
     static async join(eventId: string) {
         // TODO: client side validation
-        await request<EmptyObject>('POST', '/event/join', { eventId });
-
-        useEventStore.setState((state) => {
-            // TODO: add self as attendee? alternatively, return full event from server and just overwrite local state entirely here
-            state.currentEventId = eventId;
-        });
+        request<EmptyObject>('POST', '/event/join', { eventId })
+            .then((data) => {
+                useEventStore.setState((state) => {
+                    // TODO: add self as attendee? alternatively, return full event from server and just overwrite local state entirely here
+                    state.currentEventId = eventId;
+                });
+            })
+            .catch((err) => {
+                toast.show(err.message, { type: 'danger' });
+                // -> request function already catches our error :(
+            });
     }
 
     static async leave(eventId: string) {
