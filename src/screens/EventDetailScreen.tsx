@@ -160,8 +160,12 @@ function EventDetailScreen({ route, navigation, preview, evId }: Props) {
         <>
             <View style={styles.chatButtonContainer}>
                 <Pressable
-                    style={styles.chatButton}
+                    style={{
+                        ...styles.chatButton,
+                        opacity: getEventRelationship() === 'banned' ? 0.5 : 1,
+                    }}
                     onPress={() => navigation.navigate('Chat', { eventId: eventId })}
+                    disabled={getEventRelationship() === 'banned'}
                 >
                     <Ionicons name={'chatbox-ellipses-outline'} size={37} color={'white'} />
                 </Pressable>
