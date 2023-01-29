@@ -76,18 +76,18 @@ export type MapStackNavProps<T extends keyof MapStackNavParams = keyof MapStackN
     CompositeScreenProps<NativeStackScreenProps<MapStackNavParams, T>, TabNavProps>;
 
 // ==========
-// event list tab
+// event overview list tab
 // ==========
 
-export type EventListStackNavParams = {
-    EventList: undefined;
+export type EventsOverviewStackNavParams = {
+    EventsOverview: undefined;
     CreateEvent: { location?: LatLng } | undefined;
     MapPicker: undefined;
 } & CommonStackParams;
 
-export type EventListStackNavProps<
-    T extends keyof EventListStackNavParams = keyof EventListStackNavParams
-> = CompositeScreenProps<NativeStackScreenProps<EventListStackNavParams, T>, TabNavProps>;
+export type EventsOverviewStackNavProps<
+    T extends keyof EventsOverviewStackNavParams = keyof EventsOverviewStackNavParams
+> = CompositeScreenProps<NativeStackScreenProps<EventsOverviewStackNavParams, T>, TabNavProps>;
 
 // ==========
 // profile tab

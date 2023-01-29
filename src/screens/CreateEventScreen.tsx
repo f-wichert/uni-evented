@@ -20,7 +20,7 @@ import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import { INPUT_BACKGR_COLOR } from '../constants';
 import { EventManager } from '../models';
 import { EventCreateParams, Tag } from '../models/event';
-import { EventListStackNavProps } from '../nav/types';
+import { EventsOverviewStackNavProps } from '../nav/types';
 import { asyncHandler, useAsyncEffects } from '../util';
 
 const width = Dimensions.get('window').width;
@@ -28,7 +28,7 @@ const width = Dimensions.get('window').width;
 // dropdown uses `value` prop on items, we put the tag's ID there
 type TagWithValue = Tag & { value: string };
 
-function CreateEventScreen({ navigation, route }: EventListStackNavProps<'CreateEvent'>) {
+function CreateEventScreen({ navigation, route }: EventsOverviewStackNavProps<'CreateEvent'>) {
     // This is passed back from the map picker (https://reactnavigation.org/docs/params#passing-params-to-a-previous-screen).
     // If `params.location` changed, we call `setLocation` with the new value.
 

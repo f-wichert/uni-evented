@@ -119,7 +119,7 @@ export default function UserProfileScreen({ navigation, route }: CommonStackProp
                         nestedScrollEnabled
                     />
                 </Tabs.Tab>
-                <Tabs.Tab name="Past Events">
+                <Tabs.Tab name="Visited Events">
                     <Tabs.FlatList
                         data={events?.pastEvents}
                         renderItem={renderEventItem}

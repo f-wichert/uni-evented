@@ -3,10 +3,12 @@ import React, { useCallback, useEffect } from 'react';
 import { RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import EventPreview from '../components/EventPreview';
-import { EventListStackNavProps } from '../nav/types';
+import { EventsOverviewStackNavProps } from '../nav/types';
 import { useRelevantEvents } from '../state/event';
 
-export default function EventListScreen({ navigation }: EventListStackNavProps<'EventList'>) {
+export default function EventsOverviewScreen({
+    navigation,
+}: EventsOverviewStackNavProps<'EventsOverview'>) {
     useEffect(() => {
         navigation.setOptions({
             headerRight: () => (

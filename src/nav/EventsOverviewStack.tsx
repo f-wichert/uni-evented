@@ -2,19 +2,19 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import React from 'react';
 
 import CreateEventScreen from '../screens/CreateEventScreen';
-import EventListScreen from '../screens/EventListScreen';
+import EventsOverviewListScreen from '../screens/EventsOverviewScreen';
 import MapPickerScreen from '../screens/MapPickerScreen';
 import createCommonScreens from './commonScreensMixin';
-import { EventListStackNavParams } from './types';
+import { EventsOverviewStackNavParams } from './types';
 
-const Stack = createNativeStackNavigator<EventListStackNavParams>();
+const Stack = createNativeStackNavigator<EventsOverviewStackNavParams>();
 
-function EventListStack() {
+function EventsOverviewStack() {
     return (
         <Stack.Navigator>
             <Stack.Screen
-                name="EventList"
-                component={EventListScreen}
+                name="EventsOverview"
+                component={EventsOverviewListScreen}
                 options={{ title: 'Events' }}
             />
             <Stack.Screen
@@ -32,4 +32,4 @@ function EventListStack() {
     );
 }
 
-export default EventListStack;
+export default EventsOverviewStack;

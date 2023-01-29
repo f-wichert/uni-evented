@@ -5,7 +5,7 @@ import React from 'react';
 import { useEventStore } from '../state/event';
 import { IoniconsName } from '../types';
 import DiscoverStack from './DiscoverStack';
-import EventListStack from './EventListStack';
+import EventsOverviewStack from './EventsOverviewStack';
 import MapStack from './MapStack';
 import ProfileStack from './ProfileStack';
 import { TabNavParams } from './types';
@@ -43,7 +43,7 @@ export default function TabNavigator() {
         >
             <Tab.Screen name="Discover" component={DiscoverStack} />
             <Tab.Screen name="Map" component={MapStack} />
-            <Tab.Screen name="Events" component={EventListStack} />
+            <Tab.Screen name="Events" component={EventsOverviewStack} />
             <Tab.Screen name="Profile" component={ProfileStack} />
         </Tab.Navigator>
     );
