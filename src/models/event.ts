@@ -23,6 +23,7 @@ export interface EventResponse {
     readonly description: string | null;
     readonly musicStyle: string | null;
     readonly hostId: string;
+    readonly host: UserResponse;
     readonly media: MediaResponse[] | null;
     readonly attendees: UserResponse[] | null;
     readonly tags: Tag[];
@@ -43,7 +44,8 @@ export interface Event {
     readonly description: string | null;
     readonly musicStyle: string | null;
     readonly hostId: string;
-    readonly users: User[] | null;
+    readonly host: User;
+    readonly users?: User[];
     readonly tags: Tag[];
 }
 
@@ -60,19 +62,21 @@ export interface Tag {
 }
 
 export interface RelevantEventsResponse {
-    activeEvent: EventResponse[];
-    myEvents: EventResponse[];
-    followedEvents: EventResponse[];
-    followerEvents: EventResponse[];
+    hostedEvents: EventResponse[];
+    currentEvent: EventResponse | null;
+    interestedEvents: EventResponse[];
+    pastEvents: EventResponse[];
 }
+
+export type EventListKeys = {
+    [K in keyof RelevantEventsResponse]: RelevantEventsResponse[K] extends EventResponse[]
+        ? K
+        : never;
+}[keyof RelevantEventsResponse];
 
 export type EventCreateParams = Parameters<typeof EventManager.create>[0];
 
 export class EventManager {
-    static host(event: Event): User | undefined {
-        return event.users ? event.users.find((user) => user.id == event.hostId) : undefined;
-    }
-
     static async join(eventId: string) {
         // TODO: client side validation
         request<EmptyObject>('POST', '/event/join', { eventId })
@@ -132,10 +136,11 @@ export class EventManager {
     }
 
     static fromEventResponse(response: EventResponse): EventExtra {
-        const { media, attendees, startDateTime, endDateTime, lat, lon, ...fields } = response;
+        const { media, attendees, host, startDateTime, endDateTime, lat, lon, ...fields } =
+            response;
 
         // TODO: add these to user store
-        const users = attendees?.map((user) => UserManager.fromUserResponse(user)) ?? null;
+        const users = attendees?.map((user) => UserManager.fromUserResponse(user));
 
         return {
             ...fields,
@@ -144,7 +149,8 @@ export class EventManager {
             rad: 5,
             startDate: new Date(startDateTime),
             endDate: endDateTime ? new Date(endDateTime) : null,
-            users,
+            ...(users ? { users: users } : undefined),
+            host: UserManager.fromUserResponse(host),
             media: media?.map((med) => MediaManager.fromMediaResponse(med)),
         };
     }

@@ -5,10 +5,10 @@ import { SafeAreaView, ScrollView, StyleSheet, TextInput, View } from 'react-nat
 
 import Message from '../components/Message';
 import { Message as MessageModel, MessageManager } from '../models/message';
-import { EventDetailProps } from '../nav/types';
+import { CommonStackProps } from '../nav/types';
 import { useAsyncCallback } from '../util';
 
-function ChatScreen({ route }: EventDetailProps<'Chat'>) {
+function ChatScreen({ route }: CommonStackProps<'Chat'>) {
     const eventId = route.params?.eventId ?? null;
     const [messages, setMessages] = useState<MessageModel[]>();
     const [text, setText] = useState('');

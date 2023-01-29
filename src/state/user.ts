@@ -1,7 +1,8 @@
 import { WritableDraft } from 'immer/dist/types/types-external';
+import { useCallback, useEffect } from 'react';
 
 import { CurrentUser, CurrentUserResponse, User, UserResponse } from '../models';
-import { request } from '../util';
+import { request, useAsync } from '../util';
 import { useEventStore } from './event';
 import { createStore } from './utils/createStore';
 
@@ -63,4 +64,28 @@ export function useCurrentUser() {
     const user = useUserStore((state) => state.users[userId]);
     if (!user) throw new Error("User is not stored, this shouldn't happen.");
     return user as CurrentUser;
+}
+
+export function useUser(id: string): User | undefined {
+    return useUserStore((state) => state.users[id]);
+}
+
+export function useUserFetch(id: string) {
+    if (!id) throw new Error(`Invalid user ID: ${id}`);
+    const fetchFunc = useCallback(async () => {
+        // this already adds the user to the store
+        await useUserStore.getState().fetchUser(id);
+    }, [id]);
+
+    const { refresh, loading, value: _ignored, ...rest } = useAsync(fetchFunc, false);
+
+    const user = useUser(id);
+    useEffect(() => {
+        // if user isn't stored already, start fetching it
+        if (!user) {
+            refresh();
+        }
+    }, [user, refresh]);
+
+    return { refresh, loading, user, ...rest };
 }

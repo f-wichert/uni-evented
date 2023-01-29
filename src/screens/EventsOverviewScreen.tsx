@@ -10,10 +10,12 @@ import {
 } from 'react-native';
 
 import EventPreview from '../components/EventPreview';
-import { EventListStackNavProps } from '../nav/types';
+import { EventsOverviewStackNavProps } from '../nav/types';
 import { useRelevantEvents } from '../state/event';
 
-export default function EventListScreen({ navigation }: EventListStackNavProps<'EventList'>) {
+export default function EventsOverviewScreen({
+    navigation,
+}: EventsOverviewStackNavProps<'EventsOverview'>) {
     useEffect(() => {
         navigation.setOptions({
             headerRight: () => (
@@ -46,20 +48,17 @@ export default function EventListScreen({ navigation }: EventListStackNavProps<'
                 <Text style={{ ...styles.headerTitle, borderBottomColor: 'red' }}>
                     Active event
                 </Text>
-                {events?.activeEvent.map((id) => {
-                    return (
-                        <EventPreview
-                            key={id}
-                            id={id}
-                            navigateDetail={navigateDetail}
-                            filter={['scheduled', 'active']}
-                        />
-                    );
-                })}
+                {events?.currentEvent ? (
+                    <EventPreview
+                        id={events.currentEvent}
+                        navigateDetail={navigateDetail}
+                        filter={['scheduled', 'active']}
+                    />
+                ) : null}
                 <Text style={{ ...styles.headerTitle, borderBottomColor: 'orange' }}>
                     Your Events
                 </Text>
-                {events?.myEvents.map((id) => {
+                {events?.hostedEvents.map((id) => {
                     return (
                         <EventPreview
                             key={id}
@@ -72,7 +71,7 @@ export default function EventListScreen({ navigation }: EventListStackNavProps<'
                 <Text style={{ ...styles.headerTitle, borderBottomColor: 'purple' }}>
                     Followed Events
                 </Text>
-                {events?.followedEvents.map((id) => {
+                {events?.interestedEvents.map((id) => {
                     return (
                         <EventPreview
                             key={id}

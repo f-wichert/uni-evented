@@ -1,4 +1,5 @@
 import Constants from 'expo-constants';
+import { ImageStyle, StyleSheet, TextStyle, ViewStyle } from 'react-native';
 import urlJoin from 'url-join';
 
 import { DependencyList, useCallback, useEffect, useState } from 'react';
@@ -153,4 +154,40 @@ export class UnreachableCaseError extends Error {
     constructor(val: never, prefix = 'Unreachable case') {
         super(`${prefix}: ${JSON.stringify(val)}`);
     }
+}
+
+type NamedStyles<T> = { [P in keyof T]: ViewStyle | TextStyle | ImageStyle };
+export function mergeStyleSheets<T extends NamedStyles<T>>(
+    base: T,
+    merge: Partial<NamedStyles<T>>
+): T {
+    const result = { ...base };
+    // merge one level deep
+    for (const key of Object.keys(merge) as Array<keyof T>) {
+        result[key] = { ...result[key], ...merge[key] };
+    }
+    return StyleSheet.create(result);
+}
+
+// thanks, stackoverflow: https://stackoverflow.com/a/40724354/5080607
+export function abbreviateNumber(number: number) {
+    // what tier? (determines SI symbol)
+    const tier = (Math.log10(Math.abs(number)) / 3) | 0;
+
+    // if zero, we don't need a suffix
+    if (tier == 0) return number;
+
+    // get suffix and determine scale
+    const suffix = ['', 'k', 'M', 'G', 'T', 'P', 'E'][tier] || '?';
+    const scale = Math.pow(10, tier * 3);
+
+    // scale the number
+    const scaled = number / scale;
+
+    // format number and add suffix
+    return scaled.toFixed(1) + suffix;
+}
+
+export function identity<T>(t: T): T {
+    return t;
 }
