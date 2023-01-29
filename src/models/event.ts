@@ -45,7 +45,7 @@ export interface Event {
     readonly musicStyle: string | null;
     readonly hostId: string;
     readonly host: User;
-    readonly users: User[] | null;
+    readonly users?: User[];
     readonly tags: Tag[];
 }
 
@@ -135,7 +135,7 @@ export class EventManager {
             response;
 
         // TODO: add these to user store
-        const users = attendees?.map((user) => UserManager.fromUserResponse(user)) ?? null;
+        const users = attendees?.map((user) => UserManager.fromUserResponse(user));
 
         return {
             ...fields,
@@ -144,7 +144,7 @@ export class EventManager {
             rad: 5,
             startDate: new Date(startDateTime),
             endDate: endDateTime ? new Date(endDateTime) : null,
-            users,
+            ...(users ? { users: users } : undefined),
             host: UserManager.fromUserResponse(host),
             media: media?.map((med) => MediaManager.fromMediaResponse(med)),
         };

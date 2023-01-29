@@ -1,19 +1,32 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
-import React from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import React, { useCallback } from 'react';
+import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+
+import { EventAttendeeStatus } from '../models/user';
 
 declare type Props = {
     id: string;
     username: string;
-    // avatarhash: string;
     displayName: string;
     bio: string;
-    status?: string;
+    status?: EventAttendeeStatus;
+    avatarUrl: string | null;
     host: boolean;
     ban: boolean;
+    showProfile: (userId: string) => void;
 };
 
-function UserPreview({ id, username, displayName, status, bio, host, ban }: Props) {
+function UserPreview({
+    id,
+    username,
+    displayName,
+    status,
+    bio,
+    avatarUrl,
+    host,
+    ban,
+    showProfile,
+}: Props) {
     const statusIcon = () => {
         if (host) return 'home-outline';
         switch (status) {
@@ -26,20 +39,31 @@ function UserPreview({ id, username, displayName, status, bio, host, ban }: Prop
         }
     };
 
+    const showUserProfile = useCallback(() => showProfile(id), [showProfile, id]);
+
     return (
         <View style={[styles.container]}>
-            <TouchableOpacity style={[styles.container]}>
-                <Ionicons style={[styles.icon]} name="person-outline" color="#000" size={32} />
+            <TouchableOpacity style={[styles.container]} onPress={showUserProfile}>
+                {avatarUrl ? (
+                    <Image style={styles.icon} source={{ uri: avatarUrl }} />
+                ) : (
+                    <Ionicons
+                        style={[styles.icon, { height: 32 }]}
+                        name="person-outline"
+                        color="#000"
+                        size={32}
+                    />
+                )}
                 <View style={[styles.innerContainer]}>
                     <Text style={[styles.title]}>{displayName ? displayName : username}</Text>
                     <Text>{bio?.slice(0, 40) + '...'}</Text>
                 </View>
             </TouchableOpacity>
-            {ban ? (
+            {ban && !host ? (
                 <TouchableOpacity
                     style={styles.statusIcon}
                     // ToDo: add ban user endpoint
-                    onPress={() => {}}
+                    onPress={undefined}
                 >
                     <Ionicons name="close-circle-outline" color={'red'} size={32} />
                 </TouchableOpacity>
@@ -73,6 +97,10 @@ const styles = StyleSheet.create({
     },
     icon: {
         margin: 5,
+        width: 40,
+        height: 40,
+        borderRadius: 50,
+        textAlign: 'center',
     },
     statusIcon: {
         marginLeft: 'auto',
