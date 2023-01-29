@@ -42,12 +42,6 @@ function EventDetailScreen({ route, navigation, preview, evId }: Props) {
 
     const user = useCurrentUser();
 
-    // MediaCarousel
-    const [isPlay, setIsPlay] = useState<boolean>(true);
-    const [isMute, setIsMute] = useState<boolean>(true);
-    const [isOpenQuality, setIsOpenQuality] = useState<boolean>(false);
-    const [quality, setQuality] = useState<'auto' | '720' | '480' | '360'>('auto');
-
     const [location, setLocation] = useState<LatLng | null>(null);
 
     const [inRange, setInRange] = useState(false);
@@ -333,17 +327,7 @@ function EventDetailScreen({ route, navigation, preview, evId }: Props) {
     const mediaCarousel = (
         <View style={styles.camera}>
             <GestureHandlerRootView>
-                <MediaCarousel
-                    item={eventData}
-                    isPlay={isPlay}
-                    isMute={isMute}
-                    setIsPlay={setIsPlay}
-                    setIsMute={setIsMute}
-                    isOpenQuality={isOpenQuality}
-                    setIsOpenQuality={setIsOpenQuality}
-                    quality={quality}
-                    setQuality={setQuality}
-                />
+                <MediaCarousel item={eventData} />
             </GestureHandlerRootView>
         </View>
     );

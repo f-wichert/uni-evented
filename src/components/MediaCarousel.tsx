@@ -1,8 +1,8 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useIsFocused } from '@react-navigation/native';
-import { useRef, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import Carousel from 'react-native-reanimated-carousel';
+import Carousel, { ICarouselInstance } from 'react-native-reanimated-carousel';
 import { useSafeAreaFrame } from 'react-native-safe-area-context';
 
 import { Event } from '../models';
@@ -13,52 +13,66 @@ import VideoDiscover from './VideoDiscover';
 
 interface Props {
     item: Event;
-    isPlay: boolean;
-    isMute: boolean;
-    isOpenQuality: boolean;
-    setIsPlay: (val: boolean) => void;
-    setIsMute: (val: boolean) => void;
-    quality: 'auto' | '720' | '480' | '360';
-    setQuality: (val: 'auto' | '720' | '480' | '360') => void;
-    setIsOpenQuality: (val: boolean) => void;
+    // only used by/implemented for discover screen, not needed for detailview
     navigateDetail?: (id: string) => void;
-    discover?: boolean;
-    outerIndex?: number;
-    activeOuterIndex?: number;
-    nextOuterItem?: () => void;
+    isActiveOuterItem?: boolean;
+    showNextOuterItem?: () => void;
 }
 
 export default function MediaCarousel({
     item,
-    isPlay,
-    isMute,
-    isOpenQuality,
-    setIsPlay,
-    setIsMute,
-    setIsOpenQuality,
-    quality,
-    setQuality,
     // default values if it's not implemented in discover screen
-    navigateDetail = () => {},
-    discover = false,
-    activeOuterIndex = 0,
-    outerIndex = 0,
-    nextOuterItem = () => {},
+    navigateDetail,
+    isActiveOuterItem = true,
+    showNextOuterItem,
 }: Props) {
     const frame = useSafeAreaFrame();
 
-    const carousel = useRef<any>(null);
-    // const growAnim = useRef(new Animated.Value(0)).current;
+    const carousel = useRef<ICarouselInstance | null>(null);
     const [activeInnerIndex, setActiveInnerIndex] = useState<number>(0);
-    // const [duration, setDuration] = useState<number>(0);
-    // const [position, setPosition] = useState<number>(0);
     const isFocused = useIsFocused();
 
-    // TODO: force refresh on screen focus to get newest media?
+    const [isPlay, setIsPlay] = useState<boolean>(true);
+    const [isMute, setIsMute] = useState<boolean>(true);
+    const [isOpenQuality, setIsOpenQuality] = useState<boolean>(false);
+    const [quality, setQuality] = useState<'auto' | '720' | '480' | '360'>('auto');
+
     const { media } = useMediaFetch(item.id);
 
+    const isLastItem = useCallback(() => {
+        if (media?.length === undefined) return false;
+        return carousel.current?.getCurrentIndex() === media.length - 1;
+    }, [media?.length]);
+
+    const nextInnerItem = useCallback(() => {
+        if (!carousel.current) return;
+        carousel.current.next();
+        setActiveInnerIndex(carousel.current.getCurrentIndex());
+    }, []);
+
+    const prevInnerItem = useCallback(() => {
+        if (!carousel.current) return;
+        carousel.current?.prev();
+        setActiveInnerIndex(carousel.current.getCurrentIndex());
+    }, []);
+
+    const onFinishedVideo = useCallback(() => {
+        // if current video is not last media of event, then go to next inner item
+        if (!isLastItem()) {
+            nextInnerItem();
+            return;
+        }
+        // current media is last media of event, so we go to the next outer item (event)
+        // only call this if it's implemented in the discover screen
+        showNextOuterItem?.();
+    }, [isLastItem, nextInnerItem, showNextOuterItem]);
+
+    const emptyNavigate = useCallback(() => {
+        /* do nothing */
+    }, []);
+    const maybeNavigateDetail = navigateDetail || emptyNavigate;
+
     if (!media) {
-        // TODO: improve this, inline styles are bad I guess
         return (
             <View
                 style={{
@@ -72,31 +86,6 @@ export default function MediaCarousel({
             </View>
         );
     }
-
-    const onFinishedVideo = () => {
-        // if current video is not last media of event, then go to next inner item
-        if (!checkIfLastMedia()) {
-            nextInnerItem();
-            return;
-        }
-        // current media is last media of event, so we go to the next outer item (event)
-        // only call this if it's implemented in the discover screen
-        discover && nextOuterItem();
-    };
-
-    const checkIfLastMedia = () => {
-        return carousel.current.getCurrentIndex() === media.length - 1;
-    };
-
-    const nextInnerItem = () => {
-        carousel.current.next();
-        setActiveInnerIndex(carousel.current.getCurrentIndex());
-    };
-
-    const prevInnerItem = () => {
-        carousel.current.prev();
-        setActiveInnerIndex(carousel.current.getCurrentIndex());
-    };
 
     return (
         <>
@@ -117,7 +106,7 @@ export default function MediaCarousel({
                             // only play video when the current index in the carousel is correct and the screen is focused
                             const shouldThisSpecificVideoPlay =
                                 isFocused &&
-                                outerIndex === activeOuterIndex &&
+                                isActiveOuterItem &&
                                 innerIndex === activeInnerIndex &&
                                 isPlay;
                             return (
@@ -126,7 +115,7 @@ export default function MediaCarousel({
                                         <>
                                             <VideoDiscover
                                                 item={item}
-                                                navigateDetail={navigateDetail}
+                                                navigateDetail={maybeNavigateDetail}
                                                 isPlay={shouldThisSpecificVideoPlay}
                                                 isMute={isMute}
                                                 // setDuration={setDuration}
@@ -146,7 +135,7 @@ export default function MediaCarousel({
                                         <>
                                             <ImageDiscover
                                                 item={item}
-                                                navigateDetail={navigateDetail}
+                                                navigateDetail={maybeNavigateDetail}
                                                 quality={quality}
                                             />
                                             <Ionicons
@@ -163,7 +152,7 @@ export default function MediaCarousel({
                                                 item={item}
                                                 isMute={isMute}
                                                 isPlay={shouldThisSpecificVideoPlay}
-                                                navigateDetail={navigateDetail}
+                                                navigateDetail={maybeNavigateDetail}
                                             />
                                             <Ionicons
                                                 name={'pulse-outline'}
@@ -311,7 +300,7 @@ export default function MediaCarousel({
             )}
             <TouchableOpacity
                 style={styles.headerContainer}
-                onPress={() => navigateDetail(item.id)}
+                onPress={() => maybeNavigateDetail(item.id)}
             >
                 <Text style={styles.eventHeader}>
                     {item.name.length >= 25 ? item.name.slice(0, 22) + '...' : item.name}
