@@ -10,6 +10,8 @@ import { CompositeScreenProps } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { LatLng } from 'react-native-maps';
 
+import type { EventListKeys } from '../models/event';
+
 // ==========
 // root navigators, only one of these is active at a time
 // ==========
@@ -96,7 +98,7 @@ export type EventsOverviewStackNavProps<
 export type ProfileStackNavParams = {
     MyProfileView: undefined;
     EditProfile: undefined;
-    HostedEvents: undefined;
+    UserEventList: { type: EventListKeys };
     ManageAccount: undefined;
 } & CommonStackParams;
 

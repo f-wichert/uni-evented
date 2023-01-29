@@ -66,6 +66,12 @@ export interface RelevantEventsResponse {
     pastEvents: EventResponse[];
 }
 
+export type EventListKeys = {
+    [K in keyof RelevantEventsResponse]: RelevantEventsResponse[K] extends EventResponse[]
+        ? K
+        : never;
+}[keyof RelevantEventsResponse];
+
 export type EventCreateParams = Parameters<typeof EventManager.create>[0];
 
 export class EventManager {

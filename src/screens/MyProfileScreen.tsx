@@ -63,13 +63,25 @@ export default function MyProfileScreen({ navigation }: ProfileStackNavProps<'My
                             title="My Hosted Events"
                             accessory="DisclosureIndicator"
                             onPress={useCallback(() => {
-                                navigation.navigate('HostedEvents');
+                                navigation.navigate('UserEventList', { type: 'hostedEvents' });
+                            }, [navigation])}
+                        />
+                        <Cell
+                            image={getCellIcon('calendar-outline')}
+                            // TODO: rename this? can't think of a better name
+                            title="Interested Events"
+                            accessory="DisclosureIndicator"
+                            onPress={useCallback(() => {
+                                navigation.navigate('UserEventList', { type: 'interestedEvents' });
                             }, [navigation])}
                         />
                         <Cell
                             image={getCellIcon('time-outline')}
                             title="Visited Events"
                             accessory="DisclosureIndicator"
+                            onPress={useCallback(() => {
+                                navigation.navigate('UserEventList', { type: 'pastEvents' });
+                            }, [navigation])}
                         />
                     </Section>
                     <Section sectionPaddingTop={0}>

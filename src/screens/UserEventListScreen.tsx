@@ -5,7 +5,11 @@ import EventPreview from '../components/EventPreview';
 import { ProfileStackNavProps } from '../nav/types';
 import { useRelevantEvents } from '../state/event';
 
-export default function HostedEventsScreen({ navigation }: ProfileStackNavProps<'HostedEvents'>) {
+export default function UserEventListScreen({
+    navigation,
+    route,
+}: ProfileStackNavProps<'UserEventList'>) {
+    const listType = route.params.type;
     const { loading, value: events, refresh } = useRelevantEvents();
 
     const navigateDetail = useCallback(
@@ -20,7 +24,7 @@ export default function HostedEventsScreen({ navigation }: ProfileStackNavProps<
             <ScrollView
                 refreshControl={<RefreshControl refreshing={loading} onRefresh={refresh} />}
             >
-                {events?.hostedEvents.map((id) => {
+                {events?.[listType].map((id) => {
                     return <EventPreview key={id} id={id} navigateDetail={navigateDetail} />;
                 })}
             </ScrollView>
