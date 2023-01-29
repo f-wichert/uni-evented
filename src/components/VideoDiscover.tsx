@@ -1,11 +1,11 @@
-import { AVPlaybackStatusToSet, ResizeMode } from 'expo-av';
+import { AVPlaybackStatus, ResizeMode, Video } from 'expo-av';
 import VideoPlayer from 'expo-video-player';
-import { useEffect, useRef, useState } from 'react';
+import { MutableRefObject, useCallback, useRef } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { useSafeAreaFrame } from 'react-native-safe-area-context';
 
 import { Media, MediaManager } from '../models';
-import { baseHeaders } from '../util';
+import { baseHeaders, useAsyncEffects } from '../util';
 
 declare type Props = {
     item: Media;
@@ -26,30 +26,29 @@ function VideoDiscover({
     // setPosition,
     finishedVideo,
 }: Props) {
-    // I really can't manage to find the correct type for this thing -> checked the package
-    const video = useRef<any>(null);
-    const [status, setStatus] = useState<AVPlaybackStatusToSet | null>(null);
+    const video = useRef<Video | null>(null);
+    // const [status, setStatus] = useState<AVPlaybackStatus | null>(null);
 
     const frame = useSafeAreaFrame();
 
-    useEffect(() => {
+    useAsyncEffects(async () => {
         // set play status for video
-        video.current &&
-            video.current.setStatusAsync({
-                shouldPlay: isPlay,
-            });
+        await video.current?.setStatusAsync({
+            shouldPlay: isPlay,
+        });
         // // give duration and position to parent component
         // if (!status || !status.positionMillis || !status.durationMillis) return;
         // setPosition(status.positionMillis);
-        // // might need AVPlaybackStatusSuccess here for durationMillis
         // setDuration(status.durationMillis);
     }, [isPlay]);
 
-    const updateStatus = (playState: AVPlaybackStatusToSet) => {
-        // setStatus(playState);
-        // might need AVPlaybackStatusSuccess here for durationMillis
-        playState.didJustFinish && finishedVideo();
-    };
+    const updateStatus = useCallback(
+        (playState: AVPlaybackStatus) => {
+            // setStatus(playState);
+            if (playState.isLoaded && playState.didJustFinish) finishedVideo();
+        },
+        [finishedVideo]
+    );
 
     return (
         <View style={styles.container}>
@@ -63,10 +62,9 @@ function VideoDiscover({
                     shouldPlay: isPlay,
                     isMuted: isMute,
                     isLooping: true,
-                    ref: video,
+                    ref: video as MutableRefObject<Video>,
                     useNativeControls: false,
                     progressUpdateIntervalMillis: 1000,
-                    // onPlaybackStatusUpdate: (status: AVPlaybackStatusToSet) => setStatus(() => status),
                 }}
                 style={{ ...styles.video, width: frame.width }}
                 slider={{ visible: false }}
@@ -77,7 +75,7 @@ function VideoDiscover({
                     fullscreen: <></>,
                     exitFullscreen: <></>,
                 }}
-                playbackCallback={(playState: AVPlaybackStatusToSet) => updateStatus(playState)}
+                playbackCallback={updateStatus}
             />
         </View>
     );
