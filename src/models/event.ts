@@ -139,6 +139,10 @@ export class EventManager {
         await request<EmptyObject>('POST', '/event/banFromEvent', { eventId, userId });
     }
 
+    static async rate(eventId: string, rating: number) {
+        await request<EmptyObject>('POST', '/event/rate', { eventId, rating });
+    }
+
     static fromEventResponse(response: EventResponse): EventExtra {
         const { media, attendees, host, startDateTime, endDateTime, lat, lon, ...fields } =
             response;

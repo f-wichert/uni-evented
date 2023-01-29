@@ -27,7 +27,7 @@ import { EventManager, UserManager } from '../models';
 import { CommonStackProps } from '../nav/types';
 import { useEventFetch } from '../state/event';
 import { useCurrentUser } from '../state/user';
-import { request, UnreachableCaseError, useAsyncCallback, useAsyncEffects } from '../util';
+import { UnreachableCaseError, useAsyncCallback, useAsyncEffects } from '../util';
 
 const MAX_JOIN_RADIUS_METERS = 50;
 
@@ -97,18 +97,30 @@ function EventDetailScreen({ route, navigation, preview, evId }: Props) {
                 case EventActionState.HostEnd:
                     await EventManager.stop(eventId);
                     break;
+                case EventActionState.Completed:
+                case EventActionState.AttendeeBanned:
+                    // no action, button is disabled
+                    break;
                 default:
                     throw new UnreachableCaseError(state, 'Unknown event action');
             }
             refresh();
         },
-        [eventId]
+        [eventId, refresh]
     );
 
     const showProfile = useCallback(() => {
         if (!eventData?.hostId) return;
-        navigation.navigate('UserProfile', { userId: eventData?.hostId });
+        navigation.navigate('UserProfile', { userId: eventData.hostId });
     }, [navigation, eventData?.hostId]);
+
+    const sendRating = useAsyncCallback(
+        async (rating: number) => {
+            await EventManager.rate(eventId, rating);
+        },
+        [eventId],
+        { prefix: 'Failed to rate event' }
+    );
 
     if (!eventData) {
         return (
@@ -224,8 +236,8 @@ function EventDetailScreen({ route, navigation, preview, evId }: Props) {
             <Rating
                 readonly={!eventData.ratable}
                 imageSize={28}
-                onFinishRating={onRating}
-                startingValue={eventData.rating ? eventData.rating! : 0}
+                onFinishRating={sendRating}
+                startingValue={eventData.rating ?? 0}
             />
             <Text
                 style={{
@@ -245,13 +257,6 @@ function EventDetailScreen({ route, navigation, preview, evId }: Props) {
             ) : null}
         </View>
     );
-
-    function onRating(rating: number) {
-        request<{ message: string }>('POST', '/event/rate', {
-            eventID: eventId,
-            rating: rating,
-        }).catch((reason) => toast.show('Could not send rating. Please try again'));
-    }
 
     const hostAvatarUrl = UserManager.getAvatarUrl(eventData.host);
 
