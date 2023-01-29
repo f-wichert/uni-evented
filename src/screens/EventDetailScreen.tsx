@@ -19,10 +19,11 @@ import MapView, { LatLng, Marker } from 'react-native-maps';
 import { Rating } from 'react-native-ratings';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
+import yellowSplash from '../../assets/yellow_splash.png';
 import DetailActionButton, { EventActionState } from '../components/DetailActionButton';
 import MediaCarousel from '../components/MediaCarousel';
 import { Tag } from '../components/Tag';
-import { EventManager } from '../models';
+import { EventManager, UserManager } from '../models';
 import { CommonStackProps } from '../nav/types';
 import { useEventFetch } from '../state/event';
 import { useCurrentUser } from '../state/user';
@@ -148,13 +149,6 @@ function EventDetailScreen({ route, navigation, preview, evId }: Props) {
         setLocation(latlng);
     };
 
-    function getProfilePicture() {
-        return {
-            profilePicture:
-                'https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=745&q=80',
-        };
-    }
-
     const formatDateTime = (date: Date) => {
         const d = dayjs(date);
         return d.format('ddd, DD.MM - HH:mm');
@@ -255,6 +249,8 @@ function EventDetailScreen({ route, navigation, preview, evId }: Props) {
         }).catch((reason) => toast.show('Could not send rating. Please try again'));
     }
 
+    const hostAvatarUrl = UserManager.getAvatarUrl(eventData.host);
+
     const titleLine = (
         <View style={styles.TitleLine}>
             <Text style={{ fontSize: 25, fontWeight: 'bold', maxWidth: '70%' }}>
@@ -280,7 +276,7 @@ function EventDetailScreen({ route, navigation, preview, evId }: Props) {
             <TouchableOpacity onPress={showProfile}>
                 <Image
                     style={styles.ProfilePicture}
-                    source={{ uri: getProfilePicture().profilePicture }}
+                    source={hostAvatarUrl ? { uri: hostAvatarUrl } : yellowSplash}
                 />
             </TouchableOpacity>
         </View>

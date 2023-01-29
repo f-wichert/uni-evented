@@ -23,6 +23,7 @@ export interface EventResponse {
     readonly description: string | null;
     readonly musicStyle: string | null;
     readonly hostId: string;
+    readonly host: UserResponse;
     readonly media: MediaResponse[] | null;
     readonly attendees: UserResponse[] | null;
     readonly tags: Tag[];
@@ -43,6 +44,7 @@ export interface Event {
     readonly description: string | null;
     readonly musicStyle: string | null;
     readonly hostId: string;
+    readonly host: User;
     readonly users: User[] | null;
     readonly tags: Tag[];
 }
@@ -75,10 +77,6 @@ export type EventListKeys = {
 export type EventCreateParams = Parameters<typeof EventManager.create>[0];
 
 export class EventManager {
-    static host(event: Event): User | undefined {
-        return event.users ? event.users.find((user) => user.id == event.hostId) : undefined;
-    }
-
     static async join(eventId: string) {
         // TODO: client side validation
         await request<EmptyObject>('POST', '/event/join', { eventId });
@@ -133,7 +131,8 @@ export class EventManager {
     }
 
     static fromEventResponse(response: EventResponse): EventExtra {
-        const { media, attendees, startDateTime, endDateTime, lat, lon, ...fields } = response;
+        const { media, attendees, host, startDateTime, endDateTime, lat, lon, ...fields } =
+            response;
 
         // TODO: add these to user store
         const users = attendees?.map((user) => UserManager.fromUserResponse(user)) ?? null;
@@ -146,6 +145,7 @@ export class EventManager {
             startDate: new Date(startDateTime),
             endDate: endDateTime ? new Date(endDateTime) : null,
             users,
+            host: UserManager.fromUserResponse(host),
             media: media?.map((med) => MediaManager.fromMediaResponse(med)),
         };
     }

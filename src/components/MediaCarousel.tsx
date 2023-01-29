@@ -313,14 +313,6 @@ export default function MediaCarousel({
                 style={styles.headerContainer}
                 onPress={() => navigateDetail(item.id)}
             >
-                {/* <Image
-                    style={styles.eventIcon}
-                    // TODO: include full host user object in events, then use UserManager.getAvatarUrl here
-                    source={{
-                        uri: urlJoin(config.BASE_URL, 'media', 'avatar', item.hostId, 'high.jpg'),
-                    }}
-                    defaultSource={yellowSplash}
-                /> */}
                 <Text style={styles.eventHeader}>
                     {item.name.length >= 25 ? item.name.slice(0, 22) + '...' : item.name}
                 </Text>
