@@ -6,11 +6,10 @@ import { baseHeaders } from '../util';
 
 declare type Props = {
     item: Media;
-    navigateDetail: (id: string) => void;
     quality?: 'auto' | '720' | '480' | '360';
 };
 
-function ImageDiscover({ item, navigateDetail, quality }: Props) {
+function ImageDiscover({ item, quality }: Props) {
     return (
         <View style={styles.container}>
             <Image

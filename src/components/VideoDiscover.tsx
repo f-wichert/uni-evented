@@ -9,7 +9,6 @@ import { baseHeaders } from '../util';
 
 declare type Props = {
     item: Media;
-    navigateDetail: (id: string) => void;
     isPlay: boolean;
     isMute: boolean;
     // setDuration: (dur: number) => void;
@@ -20,7 +19,6 @@ declare type Props = {
 
 function VideoDiscover({
     item,
-    navigateDetail,
     isPlay,
     isMute,
     quality,
@@ -31,7 +29,6 @@ function VideoDiscover({
     // I really can't manage to find the correct type for this thing -> checked the package
     const video = useRef<any>(null);
     const [status, setStatus] = useState<AVPlaybackStatusToSet | null>(null);
-    // const [score, setScore] = React.useState(Math.floor(Math.random() * 25));
 
     const frame = useSafeAreaFrame();
 
@@ -53,24 +50,6 @@ function VideoDiscover({
         // might need AVPlaybackStatusSuccess here for durationMillis
         playState.didJustFinish && finishedVideo();
     };
-
-    // const upvote = () => {
-    //     setScore(score + 1);
-    //     updateScore('+');
-    // };
-
-    // const downvote = () => {
-    //     setScore(score - 1);
-    //     updateScore('-');
-    // };
-
-    // const updateScore = (vote: '+' | '-') => {
-    //     // TODO: update score and send it to server on vote
-    //     return;
-    //     asyncHandler(async () => {
-    //         await request('POST', 'event/vote', getToken(), { id: discoverData.id, vote: vote });
-    //     });
-    // };
 
     return (
         <View style={styles.container}>
@@ -100,26 +79,6 @@ function VideoDiscover({
                 }}
                 playbackCallback={(playState: AVPlaybackStatusToSet) => updateStatus(playState)}
             />
-
-            {/* <View style={{ ...styles.votingArea }}>
-                <Ionicons style={styles.voteIcon} name="chevron-up" size={36} onPress={upvote} />
-                <View>
-                    <Text
-                        style={{
-                            fontWeight: 'bold',
-                            color: '#c2c2c2',
-                        }}
-                    >
-                        {score}
-                    </Text>
-                </View>
-                <Ionicons
-                    style={styles.voteIcon}
-                    name="chevron-down"
-                    size={36}
-                    onPress={downvote}
-                />
-            </View> */}
         </View>
     );
 }
@@ -135,18 +94,6 @@ const styles = StyleSheet.create({
         borderRadius: 8,
         controlsBackgroundColor: 'transparent',
     },
-    // votingArea: {
-    //     width: 50,
-    //     height: '100%',
-    //     position: 'absolute',
-    //     right: 0,
-    //     justifyContent: 'center',
-    //     alignItems: 'center',
-    //     // backgroundColor: 'red'
-    // },
-    // voteIcon: {
-    //     color: '#7d7d7d',
-    // },
 });
 
 export default VideoDiscover;

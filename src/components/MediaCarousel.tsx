@@ -67,10 +67,9 @@ export default function MediaCarousel({
         showNextOuterItem?.();
     }, [isLastItem, nextInnerItem, showNextOuterItem]);
 
-    const emptyNavigate = useCallback(() => {
-        /* do nothing */
-    }, []);
-    const maybeNavigateDetail = navigateDetail || emptyNavigate;
+    const maybeNavigateDetail = useCallback(() => {
+        navigateDetail?.(item.id);
+    }, [navigateDetail, item.id]);
 
     if (!media) {
         return (
@@ -115,7 +114,6 @@ export default function MediaCarousel({
                                         <>
                                             <VideoDiscover
                                                 item={item}
-                                                navigateDetail={maybeNavigateDetail}
                                                 isPlay={shouldThisSpecificVideoPlay}
                                                 isMute={isMute}
                                                 // setDuration={setDuration}
@@ -133,11 +131,7 @@ export default function MediaCarousel({
                                     )}
                                     {item.type === 'image' && (
                                         <>
-                                            <ImageDiscover
-                                                item={item}
-                                                navigateDetail={maybeNavigateDetail}
-                                                quality={quality}
-                                            />
+                                            <ImageDiscover item={item} quality={quality} />
                                             <Ionicons
                                                 name={'image-outline'}
                                                 size={25}
@@ -152,7 +146,6 @@ export default function MediaCarousel({
                                                 item={item}
                                                 isMute={isMute}
                                                 isPlay={shouldThisSpecificVideoPlay}
-                                                navigateDetail={maybeNavigateDetail}
                                             />
                                             <Ionicons
                                                 name={'pulse-outline'}
@@ -298,10 +291,7 @@ export default function MediaCarousel({
                     </View>
                 </>
             )}
-            <TouchableOpacity
-                style={styles.headerContainer}
-                onPress={() => maybeNavigateDetail(item.id)}
-            >
+            <TouchableOpacity style={styles.headerContainer} onPress={maybeNavigateDetail}>
                 <Text style={styles.eventHeader}>
                     {item.name.length >= 25 ? item.name.slice(0, 22) + '...' : item.name}
                 </Text>
