@@ -5,6 +5,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import {
     Button,
     Dimensions,
+    LogBox,
     Platform,
     ScrollView,
     StyleSheet,
@@ -33,6 +34,12 @@ function CreateEventScreen({ navigation, route }: EventListStackNavProps<'Create
     // If `params.location` changed, we call `setLocation` with the new value.
 
     const [tags, setTags] = useState<TagWithValue[]>([]);
+
+    // https://stackoverflow.com/questions/58243680/react-native-another-virtualizedlist-backed-container
+    useEffect(() => {
+        LogBox.ignoreLogs(['VirtualizedLists should never be nested']);
+    }, []);
+
     useAsyncEffects(
         async () => {
             const response = await EventManager.fetchAllTags();
