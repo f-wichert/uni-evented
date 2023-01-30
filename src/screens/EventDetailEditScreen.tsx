@@ -153,9 +153,7 @@ function EventDetailEditScreen({ route, navigation }: EventDetailProps) {
             const eventId = await EventManager.update(eventData);
             // TODO: this should replace the current screen in the stack
             if (eventId) {
-                navigation.navigate('EventDetail', {
-                    eventId,
-                });
+                navigation.goBack();
             }
         },
         { prefix: 'Failed to create event' }
