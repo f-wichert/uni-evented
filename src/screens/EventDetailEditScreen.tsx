@@ -29,9 +29,6 @@ const width = Dimensions.get('window').width;
 type TagWithValue = Tag & { value: string };
 
 function EventDetailEditScreen({ route, navigation }: EventDetailProps) {
-    console.log('Route Params');
-    console.log(route.params);
-    console.log('End of Route Params');
     const { event: eventData, loading, refresh } = useEventFetch(route.params.eventId);
 
     const [tags, setTags] = useState<TagWithValue[]>([]);

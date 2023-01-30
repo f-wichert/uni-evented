@@ -129,31 +129,33 @@ export default function MyProfileScreen({ navigation }: ProfileStackNavProps<'My
                             />
                         </Section>
                     )}
-                    <DropDownPicker
-                        style={[styles.dropdown]}
-                        multiple={true}
-                        min={1}
-                        open={open}
-                        value={selectedTags}
-                        items={tags}
-                        setOpen={setOpen}
-                        setValue={setSelectedTags}
-                        setItems={setTags}
-                        onClose={onClose}
-                        placeholder="Select up to five tags"
-                        maxHeight={300}
-                        categorySelectable={false}
-                        mode="BADGE"
-                        badgeDotColors={[
-                            '#e76f51',
-                            '#00b4d8',
-                            '#e9c46a',
-                            '#e76f51',
-                            '#8ac926',
-                            '#00b4d8',
-                            '#e9c46a',
-                        ]}
-                    />
+                    <View style={styles.dropdownContainer}>
+                        <DropDownPicker
+                            style={[styles.dropdown]}
+                            multiple={true}
+                            min={1}
+                            open={open}
+                            value={selectedTags}
+                            items={tags}
+                            setOpen={setOpen}
+                            setValue={setSelectedTags}
+                            setItems={setTags}
+                            onClose={onClose}
+                            placeholder="Select up to five tags"
+                            maxHeight={300}
+                            categorySelectable={false}
+                            mode="BADGE"
+                            badgeDotColors={[
+                                '#e76f51',
+                                '#00b4d8',
+                                '#e9c46a',
+                                '#e76f51',
+                                '#8ac926',
+                                '#00b4d8',
+                                '#e9c46a',
+                            ]}
+                        />
+                    </View>
                     <Section sectionPaddingTop={0}>
                         <Cell
                             image={getCellIcon('build-outline')}
@@ -196,5 +198,8 @@ const styles = StyleSheet.create({
         marginTop: 10,
         marginBottom: 10,
         width: 0.9 * width,
+    },
+    dropdownContainer: {
+        paddingLeft: 15,
     },
 });
