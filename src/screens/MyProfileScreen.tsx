@@ -1,21 +1,47 @@
 import { Ionicons } from '@expo/vector-icons';
-import React, { useCallback } from 'react';
-import { Alert, ScrollView, StyleSheet, View } from 'react-native';
+import React, { useCallback, useState } from 'react';
+import { Alert, Dimensions, ScrollView, StyleSheet, View } from 'react-native';
+import DropDownPicker from 'react-native-dropdown-picker';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { Cell, Section, TableView } from 'react-native-tableview-simple';
 
 import yellowSplash from '../../assets/yellow_splash.png';
 import ProfileHeader from '../components/ProfileHeader';
 import Separator from '../components/Separator';
-import { UserManager } from '../models';
+import { EventManager, UserManager } from '../models';
+import { Tag } from '../models/event';
 import { ProfileStackNavProps } from '../nav/types';
 import { useAuthStore } from '../state/auth';
 import { useCurrentUser } from '../state/user';
-import { IoniconsName } from '../types';
+import { EmptyObject, IoniconsName } from '../types';
+import { request, useAsyncEffects } from '../util';
+const width = Dimensions.get('window').width;
+
+type TagWithValue = Tag & { value: string };
 
 export default function MyProfileScreen({ navigation }: ProfileStackNavProps<'MyProfileView'>) {
     const user = useCurrentUser();
     const signout = useAuthStore((state) => state.signout);
+
+    const [open, setOpen] = useState(false);
+    const currentFavouriteTags = user.favouriteTags.map((tag) => tag.id);
+    const [selectedTags, setSelectedTags] = useState<string[]>(currentFavouriteTags);
+    const [tags, setTags] = useState<TagWithValue[]>([]);
+
+    useAsyncEffects(
+        async () => {
+            const response = await EventManager.fetchAllTags();
+            const mappedTags = response.map((tag: Tag) => ({
+                ...tag,
+                value: tag.id,
+            }));
+            setTags(mappedTags);
+        },
+        [],
+        { prefix: 'Failed to fetch tags' }
+    );
+
+    DropDownPicker.setListMode('MODAL');
 
     const confirmLogout = useCallback(() => {
         Alert.alert('Confirm Logout', 'Are you sure that you want to log out?', [
@@ -26,6 +52,13 @@ export default function MyProfileScreen({ navigation }: ProfileStackNavProps<'My
             { text: 'Confirm', style: 'destructive', onPress: signout },
         ]);
     }, [signout]);
+
+    const onClose = async () => {
+        console.log('Closed the picker!');
+        await request<EmptyObject>('POST', '/user/setFavouriteTags', {
+            favouriteTags: selectedTags,
+        });
+    };
 
     const getCellIcon = (name: IoniconsName, color?: string) => (
         <Ionicons name={name} size={27} color={color} />
@@ -96,6 +129,33 @@ export default function MyProfileScreen({ navigation }: ProfileStackNavProps<'My
                             />
                         </Section>
                     )}
+                    <View style={styles.dropdownContainer}>
+                        <DropDownPicker
+                            style={[styles.dropdown]}
+                            multiple={true}
+                            min={1}
+                            open={open}
+                            value={selectedTags}
+                            items={tags}
+                            setOpen={setOpen}
+                            setValue={setSelectedTags}
+                            setItems={setTags}
+                            onClose={onClose}
+                            placeholder="Select up to five tags"
+                            maxHeight={300}
+                            categorySelectable={false}
+                            mode="BADGE"
+                            badgeDotColors={[
+                                '#e76f51',
+                                '#00b4d8',
+                                '#e9c46a',
+                                '#e76f51',
+                                '#8ac926',
+                                '#00b4d8',
+                                '#e9c46a',
+                            ]}
+                        />
+                    </View>
                     <Section sectionPaddingTop={0}>
                         <Cell
                             image={getCellIcon('build-outline')}
@@ -133,5 +193,13 @@ const styles = StyleSheet.create({
     },
     separator: {
         backgroundColor: 'black',
+    },
+    dropdown: {
+        marginTop: 10,
+        marginBottom: 10,
+        width: 0.9 * width,
+    },
+    dropdownContainer: {
+        paddingLeft: 15,
     },
 });
