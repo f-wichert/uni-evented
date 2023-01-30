@@ -1,22 +1,29 @@
 import { Slider } from '@miblanchard/react-native-slider';
-import React from 'react';
-import { AppRegistry, StyleSheet, Text, View } from 'react-native';
+import React, { useCallback } from 'react';
+import { StyleSheet, Text, View } from 'react-native';
 
-function MapFilter(props) {
-    // const [showCurrentEvents, setShowCurrentEvents] = useState(true);
-    // const [currentDayRange, setCurrentDayRange] = useState(1);
-    // const [showFutureEvents, setShowFutureEvents] = useState(true);
-    // const [futureDayRangeStart, setFutureDayRangeStart] = useState(2);
-    // const [futureDayRangeEnd, setFutureDayRangeEnd] = useState(4);
+interface Props {
+    showCurrentEvents: boolean;
+    setShowCurrentEvents: (value: boolean) => void;
+    currentDayRange: number;
+    setCurrentDayRange: (value: number) => void;
+    showFutureEvents: boolean;
+    setShowFutureEvents: (value: boolean) => void;
+    futureDayRange: number;
+    setFutureDayRange: (value: number) => void;
+}
 
-    const showCurrentEvents = props.showCurrentEvents;
-    const setShowCurrentEvents = props.setShowCurrentEvents;
-    const currentDayRange = props.currentDayRange;
-    const setCurrentDayRange = props.setCurrentDayRange;
-    const showFutureEvents = props.showFutureEvents;
-    const setShowFutureEvents = props.setShowFutureEvents;
-    const futureDayRange = props.futureDayRange;
-    const setFutureDayRange = props.setFutureDayRange;
+function MapFilter({ currentDayRange, setCurrentDayRange }: Props) {
+    const onCurrentDayRangeChange = useCallback(
+        (value: number | number[]) => {
+            // https://github.com/miblanchard/react-native-slider/issues/341
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            if (Array.isArray(value)) value = value[0]!;
+
+            setCurrentDayRange(value);
+        },
+        [setCurrentDayRange]
+    );
 
     return (
         <View style={styles.container}>
@@ -31,11 +38,9 @@ function MapFilter(props) {
                             <Slider
                                 minimumValue={0}
                                 maximumValue={7}
-                                step={true}
+                                step={1}
                                 value={currentDayRange}
-                                onValueChange={(e) => {
-                                    setCurrentDayRange(e[0]);
-                                }}
+                                onValueChange={onCurrentDayRangeChange}
                             />
                         </View>
                     </View>
@@ -65,7 +70,7 @@ function MapFilter(props) {
                     </View>
                 </View> */}
                 {/* <View style={styles.section}>
-                    <Pressable 
+                    <Pressable
                         onPress={(e) => {
                             console.log("Update");
                             refresh();
@@ -102,7 +107,5 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
 });
-
-AppRegistry.registerComponent('SliderExample', () => SliderExample);
 
 export default MapFilter;

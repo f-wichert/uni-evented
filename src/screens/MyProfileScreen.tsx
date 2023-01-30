@@ -13,7 +13,7 @@ import { useAuthStore } from '../state/auth';
 import { useCurrentUser } from '../state/user';
 import { IoniconsName } from '../types';
 
-export default function ProfileScreen({ navigation }: ProfileStackNavProps<'ProfileView'>) {
+export default function MyProfileScreen({ navigation }: ProfileStackNavProps<'MyProfileView'>) {
     const user = useCurrentUser();
     const signout = useAuthStore((state) => state.signout);
 
@@ -32,7 +32,7 @@ export default function ProfileScreen({ navigation }: ProfileStackNavProps<'Prof
     );
 
     return (
-        <SafeAreaProvider>
+        <SafeAreaProvider style={styles.container}>
             <View style={styles.profileHeader}>
                 <ProfileHeader
                     imageUri={UserManager.getAvatarUrl(user)}
@@ -45,29 +45,43 @@ export default function ProfileScreen({ navigation }: ProfileStackNavProps<'Prof
 
             <Separator style={styles.separator} />
             <ScrollView style={styles.tableContainer} alwaysBounceVertical={false}>
-                <TableView style={styles.table}>
+                <TableView>
                     <Section>
                         <Cell
                             image={getCellIcon('person-circle-outline')}
-                            title="Profile"
+                            title="My Profile"
                             accessory="DisclosureIndicator"
-                            // TODO: show current user's profile here, and show edit screen as a subscreen of that
                             onPress={useCallback(() => {
-                                navigation.navigate('EditProfile');
-                            }, [navigation])}
+                                navigation.navigate('UserProfile', {
+                                    userId: user.id,
+                                    showEdit: true,
+                                });
+                            }, [navigation, user.id])}
                         />
                         <Cell
                             image={getCellIcon('earth-outline')}
-                            title="My Events"
+                            title="My Hosted Events"
                             accessory="DisclosureIndicator"
                             onPress={useCallback(() => {
-                                navigation.navigate('MyEvents');
+                                navigation.navigate('UserEventList', { type: 'hostedEvents' });
+                            }, [navigation])}
+                        />
+                        <Cell
+                            image={getCellIcon('calendar-outline')}
+                            // TODO: rename this? can't think of a better name
+                            title="Interested Events"
+                            accessory="DisclosureIndicator"
+                            onPress={useCallback(() => {
+                                navigation.navigate('UserEventList', { type: 'interestedEvents' });
                             }, [navigation])}
                         />
                         <Cell
                             image={getCellIcon('time-outline')}
                             title="Visited Events"
                             accessory="DisclosureIndicator"
+                            onPress={useCallback(() => {
+                                navigation.navigate('UserEventList', { type: 'pastEvents' });
+                            }, [navigation])}
                         />
                     </Section>
                     {user.isAdmin && (
@@ -105,15 +119,17 @@ export default function ProfileScreen({ navigation }: ProfileStackNavProps<'Prof
 }
 
 const styles = StyleSheet.create({
-    tableContainer: {
-        height: '100%',
+    container: {
+        alignItems: 'center',
     },
-    table: {
+    tableContainer: {
         width: '100%',
+        height: '100%',
     },
     profileHeader: {
         marginTop: 40,
         marginBottom: 20,
+        marginHorizontal: 20,
     },
     separator: {
         backgroundColor: 'black',

@@ -2,7 +2,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import React from 'react';
 
 import DiscoverScreen from '../screens/DiscoverScreen';
-import createEventScreens from './eventDetailMixin';
+import createCommonScreens from './commonScreensMixin';
 import { DiscoverStackNavParams } from './types';
 
 const Stack = createNativeStackNavigator<DiscoverStackNavParams>();
@@ -15,7 +15,7 @@ export default function DiscoverStack() {
                 component={DiscoverScreen}
                 options={{ title: 'Discover' }}
             />
-            {createEventScreens(Stack.Screen)}
+            {createCommonScreens(Stack.Screen)}
         </Stack.Navigator>
     );
 }

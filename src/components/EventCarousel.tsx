@@ -1,6 +1,5 @@
-import { useRef, useState } from 'react';
-import { StyleSheet } from 'react-native';
-import Carousel from 'react-native-reanimated-carousel';
+import { useCallback, useRef, useState } from 'react';
+import Carousel, { ICarouselInstance } from 'react-native-reanimated-carousel';
 import { useSafeAreaFrame } from 'react-native-safe-area-context';
 
 import { Event } from '../models';
@@ -14,30 +13,27 @@ interface Props {
 export default function EventCarousel({ eventData, navigateDetail }: Props) {
     const frame = useSafeAreaFrame();
 
-    const outerCarousel = useRef<any>(null);
+    const outerCarousel = useRef<ICarouselInstance | null>(null);
     const [activeOuterIndex, setActiveOuterIndex] = useState<number>(0);
 
-    const [isPlay, setIsPlay] = useState<boolean>(true);
-    const [isMute, setIsMute] = useState<boolean>(true);
-    const [isOpenQuality, setIsOpenQuality] = useState<boolean>(false);
-    const [quality, setQuality] = useState<'auto' | '720' | '480' | '360'>('auto');
+    const isLastItem = useCallback(() => {
+        return outerCarousel.current?.getCurrentIndex() === eventData.length - 1;
+    }, [eventData.length]);
 
-    const nextOuterItem = () => {
-        if (checkIfLastEvent()) return;
+    const showNextOuterItem = useCallback(() => {
+        if (!outerCarousel.current) return;
+        if (isLastItem()) return;
         outerCarousel.current.next();
         // set active outer index
-        setActiveOuterIndex(outerCarousel.current?.getCurrentIndex());
-    };
+        setActiveOuterIndex(outerCarousel.current.getCurrentIndex());
+    }, [isLastItem]);
 
-    const onOuterCarouselSwipe = () => {
+    const onOuterCarouselSwipe = useCallback(() => {
+        if (!outerCarousel.current) return;
         // update outer index state on swipe
         // on swipe the index is already updated by the library before we can check if the previous element was the last one
-        setActiveOuterIndex(outerCarousel.current?.getCurrentIndex());
-    };
-
-    const checkIfLastEvent = () => {
-        return outerCarousel.current.getCurrentIndex() === eventData.length - 1;
-    };
+        setActiveOuterIndex(outerCarousel.current.getCurrentIndex());
+    }, []);
 
     return (
         <Carousel
@@ -55,24 +51,12 @@ export default function EventCarousel({ eventData, navigateDetail }: Props) {
                 return (
                     <MediaCarousel
                         item={item}
-                        isPlay={isPlay}
-                        isMute={isMute}
-                        setIsPlay={setIsPlay}
-                        setIsMute={setIsMute}
                         navigateDetail={navigateDetail}
-                        discover={true}
-                        outerIndex={outerIndex}
-                        activeOuterIndex={activeOuterIndex}
-                        nextOuterItem={nextOuterItem}
-                        isOpenQuality={isOpenQuality}
-                        setIsOpenQuality={setIsOpenQuality}
-                        quality={quality}
-                        setQuality={setQuality}
+                        isActiveOuterItem={outerIndex === activeOuterIndex}
+                        showNextOuterItem={showNextOuterItem}
                     />
                 );
             }}
         />
     );
 }
-
-const styles = StyleSheet.create({});

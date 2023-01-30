@@ -59,6 +59,7 @@ export class UserManager {
         avatar?: string | null;
         username?: string;
         displayName?: string;
+        bio?: string;
 
         // account fields
         email?: string;

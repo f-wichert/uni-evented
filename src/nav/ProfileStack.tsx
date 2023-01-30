@@ -10,9 +10,9 @@ import AdminUsersScreen from '../screens/admin/AdminUsersScreen';
 
 import EditProfileScreen from '../screens/EditProfileScreen';
 import ManageAccountScreen from '../screens/ManageAccountScreen';
-import MyEventsScreen from '../screens/MyEventsScreen';
-import ProfileScreen from '../screens/ProfileScreen';
-import createEventScreens from './eventDetailMixin';
+import MyProfileScreen from '../screens/MyProfileScreen';
+import UserEventListScreen from '../screens/UserEventListScreen';
+import createCommonScreens from './commonScreensMixin';
 import { ProfileStackNavParams } from './types';
 
 const Stack = createNativeStackNavigator<ProfileStackNavParams>();
@@ -21,8 +21,8 @@ function ProfileStack() {
     return (
         <Stack.Navigator>
             <Stack.Screen
-                name="ProfileView"
-                component={ProfileScreen}
+                name="MyProfileView"
+                component={MyProfileScreen}
                 options={{ headerShown: false }}
             />
             <Stack.Screen
@@ -31,9 +31,15 @@ function ProfileStack() {
                 options={{ title: 'Edit Profile' }}
             />
             <Stack.Screen
-                name="MyEvents"
-                component={MyEventsScreen}
-                options={{ title: 'My Events' }}
+                name="UserEventList"
+                component={UserEventListScreen}
+                options={({ route }) => ({
+                    title: {
+                        hostedEvents: 'Hosted Events',
+                        interestedEvents: 'Interested Events',
+                        pastEvents: 'Visited Events',
+                    }[route.params.type],
+                })}
             />
             <Stack.Screen
                 name="ManageAccount"
@@ -75,7 +81,7 @@ function ProfileStack() {
                 component={AdminMediaScreen}
                 options={{ title: 'Edit Media' }}
             />
-            {createEventScreens(Stack.Screen)}
+            {createCommonScreens(Stack.Screen)}
         </Stack.Navigator>
     );
 }

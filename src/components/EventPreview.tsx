@@ -1,15 +1,17 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import React, { useCallback } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { EventStatus } from '../models';
 
 import { useEvent } from '../state/event';
 
 declare type Props = {
     id: string;
     navigateDetail: (id: string) => void;
+    filter?: EventStatus[];
 };
 
-function EventPreview({ id, navigateDetail }: Props) {
+function EventPreview({ id, navigateDetail, filter }: Props) {
     const navigate = useCallback(() => navigateDetail(id), [navigateDetail, id]);
     const event = useEvent(id);
 
@@ -17,6 +19,10 @@ function EventPreview({ id, navigateDetail }: Props) {
         // this shouldn't happen
         console.warn(`Tried to render unknown event ${id}`);
         return <View />;
+    }
+
+    if (filter && !filter.includes(event.status)) {
+        return <></>;
     }
 
     return (

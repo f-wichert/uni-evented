@@ -110,20 +110,25 @@ export function useRelevantEvents() {
             addEvents(
                 state,
                 [
-                    ...data.activeEvent,
-                    ...data.myEvents,
-                    ...data.followedEvents,
-                    ...data.followerEvents,
+                    ...data.hostedEvents,
+                    ...(data.currentEvent ? [data.currentEvent] : []),
+                    ...data.interestedEvents,
+                    ...data.pastEvents,
                 ].map((e) => EventManager.fromEventResponse(e))
             );
         });
 
+        const hostedIDs = data.hostedEvents.map((e) => e.id);
+
         // return just the IDs
         return {
-            activeEvent: data.activeEvent.map((e) => e.id),
-            myEvents: data.myEvents.map((e) => e.id),
-            followedEvents: data.followedEvents.map((e) => e.id),
-            followerEvents: data.followerEvents.map((e) => e.id),
+            hostedEvents: data.hostedEvents.map((e) => e.id),
+            currentEvent: data.currentEvent?.id,
+            // exclude hosted events from user's interested events, since those always include hosted events
+            interestedEvents: data.interestedEvents
+                .filter((e) => !hostedIDs.includes(e.id))
+                .map((e) => e.id),
+            pastEvents: data.pastEvents.map((e) => e.id),
         };
     }, []);
 
