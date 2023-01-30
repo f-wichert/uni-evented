@@ -46,7 +46,7 @@ export default function MapPickerScreen({
     };
 
     const pickLocation = () => {
-        if (route.params.parent) {
+        if (route.params && route.params!.parent) {
             navigation.navigate('EventDetailEdit', {
                 location: pickedLocation,
                 eventId: route.params.eventId,
