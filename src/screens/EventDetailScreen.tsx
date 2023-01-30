@@ -5,7 +5,6 @@ import * as Location from 'expo-location';
 import { getDistance } from 'geolib';
 import React, { useCallback, useEffect, useState } from 'react';
 import {
-    Button,
     Image,
     Pressable,
     RefreshControl,
@@ -59,9 +58,9 @@ function EventDetailScreen({ route, navigation, preview, evId }: Props) {
     if (isHost && !isPreview) {
         navigation.setOptions({
             headerRight: () => (
-                <View>
-                    <Button onPress={onEdit} title="Edit Event" />
-                </View>
+                <Pressable onPress={onEdit}>
+                    <Ionicons name={'pencil-outline'} color={'black'} size={32} />
+                </Pressable>
             ),
         });
     }
