@@ -46,12 +46,14 @@ export default function MapPickerScreen({
     };
 
     const pickLocation = () => {
-        // pass picked location back to create event screen
-        // navigation.replace('CreateEvent', {location: pickedLocation})
-        navigation.navigate('CreateEvent', { location: pickedLocation });
-        // navigation.replace('EventDetailEdit', {location: pickedLocation})
-        // console.log("On Map Picker",route.params!.location)
-        // navigation.goBack()
+        if (route.params.parent) {
+            navigation.navigate('EventDetailEdit', {
+                location: pickedLocation,
+                eventId: route.params.eventId,
+            });
+        } else {
+            navigation.navigate('CreateEvent', { location: pickedLocation });
+        }
     };
 
     return (

@@ -29,6 +29,9 @@ const width = Dimensions.get('window').width;
 type TagWithValue = Tag & { value: string };
 
 function EventDetailEditScreen({ route, navigation }: EventDetailProps) {
+    console.log('Route Params');
+    console.log(route.params);
+    console.log('End of Route Params');
     const { event: eventData, loading, refresh } = useEventFetch(route.params.eventId);
 
     const [tags, setTags] = useState<TagWithValue[]>([]);
@@ -186,7 +189,8 @@ function EventDetailEditScreen({ route, navigation }: EventDetailProps) {
                         onPress={() => {
                             navigation.navigate('MapPicker', {
                                 location: location,
-                                onReturn: () => console.log('On Return'),
+                                eventId: route.params.eventId,
+                                parent: 'EventDetailEdit',
                             });
                         }}
                         name={location ? 'location' : 'location-outline'}
