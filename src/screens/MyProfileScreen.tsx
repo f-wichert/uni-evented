@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import React, { useCallback } from 'react';
 import { Alert, ScrollView, StyleSheet, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { Cell, Section, TableView } from 'react-native-tableview-simple';
 
 import yellowSplash from '../../assets/yellow_splash.png';
@@ -32,7 +32,7 @@ export default function MyProfileScreen({ navigation }: ProfileStackNavProps<'My
     );
 
     return (
-        <SafeAreaView>
+        <SafeAreaProvider style={styles.container}>
             <View style={styles.profileHeader}>
                 <ProfileHeader
                     imageUri={UserManager.getAvatarUrl(user)}
@@ -45,7 +45,7 @@ export default function MyProfileScreen({ navigation }: ProfileStackNavProps<'My
 
             <Separator style={styles.separator} />
             <ScrollView style={styles.tableContainer} alwaysBounceVertical={false}>
-                <TableView style={styles.table}>
+                <TableView>
                     <Section>
                         <Cell
                             image={getCellIcon('person-circle-outline')}
@@ -84,6 +84,18 @@ export default function MyProfileScreen({ navigation }: ProfileStackNavProps<'My
                             }, [navigation])}
                         />
                     </Section>
+                    {user.isAdmin && (
+                        <Section sectionPaddingTop={0}>
+                            <Cell
+                                image={getCellIcon('construct-outline')}
+                                title="Moderation"
+                                accessory="DisclosureIndicator"
+                                onPress={useCallback(() => {
+                                    navigation.navigate('AdminMainScreen');
+                                }, [navigation])}
+                            />
+                        </Section>
+                    )}
                     <Section sectionPaddingTop={0}>
                         <Cell
                             image={getCellIcon('build-outline')}
@@ -102,16 +114,17 @@ export default function MyProfileScreen({ navigation }: ProfileStackNavProps<'My
                     </Section>
                 </TableView>
             </ScrollView>
-        </SafeAreaView>
+        </SafeAreaProvider>
     );
 }
 
 const styles = StyleSheet.create({
-    tableContainer: {
-        height: '100%',
+    container: {
+        alignItems: 'center',
     },
-    table: {
+    tableContainer: {
         width: '100%',
+        height: '100%',
     },
     profileHeader: {
         marginTop: 40,
