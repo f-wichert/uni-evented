@@ -56,7 +56,7 @@ function EventDetailScreen({ route, navigation, preview, evId }: Props) {
         navigation.navigate('EventDetailEdit', { eventId: eventId });
     }
 
-    if (isHost) {
+    if (isHost && !isPreview) {
         navigation.setOptions({
             headerRight: () => (
                 <View>
