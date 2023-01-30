@@ -16,6 +16,7 @@ export interface UserResponse {
     readonly username: string;
     readonly displayName: string;
     readonly avatarHash: string | null;
+    readonly bio: string;
     readonly eventAttendee?: PartialAttendee;
 }
 
@@ -24,6 +25,7 @@ export interface User {
     readonly username: string;
     readonly displayName: string;
     readonly avatarHash: string | null;
+    readonly bio: string;
     readonly eventAttendee?: PartialAttendee;
 }
 
@@ -55,6 +57,7 @@ export class UserManager {
         avatar?: string | null;
         username?: string;
         displayName?: string;
+        bio?: string;
 
         // account fields
         email?: string;

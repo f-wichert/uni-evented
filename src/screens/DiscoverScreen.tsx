@@ -49,7 +49,7 @@ function DiscoverScreen({ navigation }: DiscoverStackNavProps<'DiscoverView'>) {
         async () => {
             // TODO: use `EventStore.eventMedia`
             if (!location) {
-                toast.show('Could not grab location');
+                // toast.show('Could not grab location');
                 setEventData(await EventManager.fetchDiscoverData());
             } else {
                 setEventData(await EventManager.fetchDiscoverData(location));

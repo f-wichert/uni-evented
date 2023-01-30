@@ -1,13 +1,10 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useIsFocused } from '@react-navigation/native';
 import { useRef, useState } from 'react';
-import { ActivityIndicator, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Carousel from 'react-native-reanimated-carousel';
 import { useSafeAreaFrame } from 'react-native-safe-area-context';
-import urlJoin from 'url-join';
 
-import yellowSplash from '../../assets/yellow_splash.png';
-import config from '../config';
 import { Event } from '../models';
 import { useMediaFetch } from '../state/event';
 import ImageDiscover from './ImageDiscover';
@@ -21,8 +18,8 @@ interface Props {
     isOpenQuality: boolean;
     setIsPlay: (val: boolean) => void;
     setIsMute: (val: boolean) => void;
-    quality: 'auto' | '1080' | '720' | '480' | '360';
-    setQuality: (val: 'auto' | '1080' | '720' | '480' | '360') => void;
+    quality: 'auto' | '720' | '480' | '360';
+    setQuality: (val: 'auto' | '720' | '480' | '360') => void;
     setIsOpenQuality: (val: boolean) => void;
     navigateDetail?: (id: string) => void;
     discover?: boolean;
@@ -126,31 +123,55 @@ export default function MediaCarousel({
                             return (
                                 <>
                                     {item.type === 'video' && (
-                                        <VideoDiscover
-                                            item={item}
-                                            navigateDetail={navigateDetail}
-                                            isPlay={shouldThisSpecificVideoPlay}
-                                            isMute={isMute}
-                                            // setDuration={setDuration}
-                                            // setPosition={setPosition}
-                                            finishedVideo={onFinishedVideo}
-                                            quality={quality}
-                                        />
+                                        <>
+                                            <VideoDiscover
+                                                item={item}
+                                                navigateDetail={navigateDetail}
+                                                isPlay={shouldThisSpecificVideoPlay}
+                                                isMute={isMute}
+                                                // setDuration={setDuration}
+                                                // setPosition={setPosition}
+                                                finishedVideo={onFinishedVideo}
+                                                quality={quality}
+                                            />
+                                            <Ionicons
+                                                name={'videocam-outline'}
+                                                size={25}
+                                                style={styles.typeIcon}
+                                                color={'white'}
+                                            />
+                                        </>
                                     )}
                                     {item.type === 'image' && (
-                                        <ImageDiscover
-                                            item={item}
-                                            navigateDetail={navigateDetail}
-                                            quality={quality}
-                                        />
+                                        <>
+                                            <ImageDiscover
+                                                item={item}
+                                                navigateDetail={navigateDetail}
+                                                quality={quality}
+                                            />
+                                            <Ionicons
+                                                name={'image-outline'}
+                                                size={25}
+                                                style={styles.typeIcon}
+                                                color={'white'}
+                                            />
+                                        </>
                                     )}
                                     {item.type === 'livestream' && (
-                                        <LiveDiscover
-                                            item={item}
-                                            isMute={isMute}
-                                            isPlay={shouldThisSpecificVideoPlay}
-                                            navigateDetail={navigateDetail}
-                                        />
+                                        <>
+                                            <LiveDiscover
+                                                item={item}
+                                                isMute={isMute}
+                                                isPlay={shouldThisSpecificVideoPlay}
+                                                navigateDetail={navigateDetail}
+                                            />
+                                            <Ionicons
+                                                name={'pulse-outline'}
+                                                size={25}
+                                                style={styles.typeIcon}
+                                                color={'white'}
+                                            />
+                                        </>
                                     )}
                                 </>
                             );
@@ -231,19 +252,6 @@ export default function MediaCarousel({
                             </TouchableOpacity>
                             <TouchableOpacity
                                 style={styles.qualityOption}
-                                onPress={() => setQuality('1080')}
-                            >
-                                <Text
-                                    style={{
-                                        ...styles.qualityText,
-                                        opacity: quality === '1080' ? 1 : 0.25,
-                                    }}
-                                >
-                                    1080p
-                                </Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity
-                                style={styles.qualityOption}
                                 onPress={() => setQuality('720')}
                             >
                                 <Text
@@ -305,14 +313,6 @@ export default function MediaCarousel({
                 style={styles.headerContainer}
                 onPress={() => navigateDetail(item.id)}
             >
-                <Image
-                    style={styles.eventIcon}
-                    // TODO: include full host user object in events, then use UserManager.getAvatarUrl here
-                    source={{
-                        uri: urlJoin(config.BASE_URL, 'media', 'avatar', item.hostId, 'high.jpg'),
-                    }}
-                    defaultSource={yellowSplash}
-                />
                 <Text style={styles.eventHeader}>
                     {item.name.length >= 25 ? item.name.slice(0, 22) + '...' : item.name}
                 </Text>
@@ -403,5 +403,10 @@ const styles = StyleSheet.create({
     },
     sadText: {
         fontSize: 20,
+    },
+    typeIcon: {
+        position: 'absolute',
+        top: 25,
+        right: 10,
     },
 });

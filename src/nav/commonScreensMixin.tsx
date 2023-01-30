@@ -3,13 +3,15 @@ import React from 'react';
 
 import VideoCamera from '../components/VideoCamera';
 import ChatScreen from '../screens/ChatScreen';
+import EventAttendees from '../screens/EventAttendees';
 import EventDetailEditScreen from '../screens/EventDetailEditScreen';
 import EventDetailScreen from '../screens/EventDetailScreen';
-import { EventDetailParams } from './types';
+import UserProfileScreen from '../screens/UserProfileScreen';
+import { CommonStackParams } from './types';
 
-type ScreenType = ReturnType<typeof createNativeStackNavigator<EventDetailParams>>['Screen'];
+type ScreenType = ReturnType<typeof createNativeStackNavigator<CommonStackParams>>['Screen'];
 
-export default function createEventScreens(Screen: ScreenType) {
+export default function createCommonScreens(Screen: ScreenType) {
     return (
         <>
             <Screen
@@ -29,6 +31,16 @@ export default function createEventScreens(Screen: ScreenType) {
                 options={{ title: 'Upload your Content' }}
             />
             <Screen name="Chat" component={ChatScreen} options={{ title: 'Chat' }} />
+            <Screen
+                name="EventAttendees"
+                component={EventAttendees}
+                options={{ title: 'Event Attendees' }}
+            />
+            <Screen
+                name="UserProfile"
+                component={UserProfileScreen}
+                options={{ title: 'User Profile' }}
+            />
         </>
     );
 }

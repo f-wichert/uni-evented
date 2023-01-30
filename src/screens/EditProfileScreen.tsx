@@ -3,7 +3,7 @@ import { ActivityIndicator, Button, Keyboard, ScrollView, StyleSheet } from 'rea
 
 import AvatarEditView from '../components/AvatarEditView';
 import FancyTextInput from '../components/FancyTextInput';
-import { DISPLAYNAME_VALIDATION, USERNAME_VALIDATION } from '../constants';
+import { BIO_VALIDATION, DISPLAYNAME_VALIDATION, USERNAME_VALIDATION } from '../constants';
 import { UserManager } from '../models';
 import { ProfileStackNavProps } from '../nav/types';
 import { useCurrentUser } from '../state/user';
@@ -45,7 +45,10 @@ export default function EditProfileScreen({ navigation }: ProfileStackNavProps<'
         DISPLAYNAME_VALIDATION
     );
 
-    const results = [avatarResult, usernameResult, displayNameResult];
+    const [bio, setBio] = useState<string>(currentUser.bio);
+    const bioResult = validate(bio, currentUser.bio, BIO_VALIDATION);
+
+    const results = [avatarResult, usernameResult, displayNameResult, bioResult];
     const hasChanged = results.some((r) => r.changed);
     const isValid = results.every((r) => !r.error);
 
@@ -59,6 +62,7 @@ export default function EditProfileScreen({ navigation }: ProfileStackNavProps<'
                 avatar: avatarResult.submitValue,
                 username: usernameResult.submitValue,
                 displayName: displayNameResult.submitValue,
+                bio: bioResult.submitValue,
             });
         } catch (e) {
             handleError(e, { prefix: 'Failed to update profile' });
@@ -113,6 +117,17 @@ export default function EditProfileScreen({ navigation }: ProfileStackNavProps<'
                 validationError={displayNameResult.error}
                 maxLength={DISPLAYNAME_VALIDATION.maxLength}
                 textInputProps={{ autoCorrect: false }}
+                style={styles.input}
+            />
+            <FancyTextInput
+                title="Bio"
+                originalValue={currentUser.bio}
+                value={bio}
+                onChangeText={setBio}
+                validationError={bioResult.error}
+                maxLength={BIO_VALIDATION.maxLength}
+                multiline
+                textInputProps={{ numberOfLines: 3 }}
                 style={styles.input}
             />
         </ScrollView>

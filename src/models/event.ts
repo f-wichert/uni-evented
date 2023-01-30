@@ -23,6 +23,7 @@ export interface EventResponse {
     readonly description: string | null;
     readonly musicStyle: string | null;
     readonly hostId: string;
+    readonly host: UserResponse;
     readonly media: MediaResponse[] | null;
     readonly attendees: UserResponse[] | null;
     readonly tags: Tag[];
@@ -43,7 +44,8 @@ export interface Event {
     readonly description: string | null;
     readonly musicStyle: string | null;
     readonly hostId: string;
-    readonly users: User[] | null;
+    readonly host: User;
+    readonly users?: User[];
     readonly tags: Tag[];
 }
 
@@ -60,27 +62,35 @@ export interface Tag {
 }
 
 export interface RelevantEventsResponse {
-    activeEvent: EventResponse[];
-    myEvents: EventResponse[];
-    followedEvents: EventResponse[];
-    followerEvents: EventResponse[];
+    hostedEvents: EventResponse[];
+    currentEvent: EventResponse | null;
+    interestedEvents: EventResponse[];
+    pastEvents: EventResponse[];
 }
 
+export type EventListKeys = {
+    [K in keyof RelevantEventsResponse]: RelevantEventsResponse[K] extends EventResponse[]
+        ? K
+        : never;
+}[keyof RelevantEventsResponse];
+
 export type EventCreateParams = Parameters<typeof EventManager.create>[0];
+export type EventUpdateParams = EventCreateParams & { eventId: string };
 
 export class EventManager {
-    static host(event: Event): User | undefined {
-        return event.users ? event.users.find((user) => user.id == event.hostId) : undefined;
-    }
-
     static async join(eventId: string) {
         // TODO: client side validation
-        await request<EmptyObject>('POST', '/event/join', { eventId });
-
-        useEventStore.setState((state) => {
-            // TODO: add self as attendee? alternatively, return full event from server and just overwrite local state entirely here
-            state.currentEventId = eventId;
-        });
+        request<EmptyObject>('POST', '/event/join', { eventId })
+            .then((data) => {
+                useEventStore.setState((state) => {
+                    // TODO: add self as attendee? alternatively, return full event from server and just overwrite local state entirely here
+                    state.currentEventId = eventId;
+                });
+            })
+            .catch((err) => {
+                toast.show(err.message, { type: 'danger' });
+                // -> request function already catches our error :(
+            });
     }
 
     static async leave(eventId: string) {
@@ -126,11 +136,20 @@ export class EventManager {
         });
     }
 
+    static async banUser(eventId: string, userId: string) {
+        await request<EmptyObject>('POST', '/event/banFromEvent', { eventId, userId });
+    }
+
+    static async rate(eventId: string, rating: number) {
+        await request<EmptyObject>('POST', '/event/rate', { eventId, rating });
+    }
+
     static fromEventResponse(response: EventResponse): EventExtra {
-        const { media, attendees, startDateTime, endDateTime, lat, lon, ...fields } = response;
+        const { media, attendees, host, startDateTime, endDateTime, lat, lon, ...fields } =
+            response;
 
         // TODO: add these to user store
-        const users = attendees?.map((user) => UserManager.fromUserResponse(user)) ?? null;
+        const users = attendees?.map((user) => UserManager.fromUserResponse(user));
 
         return {
             ...fields,
@@ -139,7 +158,8 @@ export class EventManager {
             rad: 5,
             startDate: new Date(startDateTime),
             endDate: endDateTime ? new Date(endDateTime) : null,
-            users,
+            ...(users ? { users: users } : undefined),
+            host: UserManager.fromUserResponse(host),
             media: media?.map((med) => MediaManager.fromMediaResponse(med)),
         };
     }
@@ -167,6 +187,32 @@ export class EventManager {
             state.currentEventId = event.id;
         });
         return event.id;
+    }
+
+    static async update(params: EventUpdateParams) {
+        let updateSuccessfull = true;
+        const update = await request<EventResponse>('POST', `/event/update/${params.eventId}`, {
+            name: params.name,
+            tags: params.tags,
+            lat: params.location.latitude,
+            lon: params.location.longitude,
+            description: params.description,
+            startDateTime: params.startDate?.toJSON() ?? null,
+            endDateTime: params.endDate?.toJSON() ?? null,
+        }).catch((err) => {
+            updateSuccessfull = false;
+            return err;
+        });
+
+        if (!updateSuccessfull) {
+            toast.show('Update was not successful!');
+            return;
+        }
+
+        useEventStore.setState((state) => {
+            addEvents(state, this.fromEventResponse(update));
+        });
+        return updateSuccessfull;
     }
 
     static async fetchAllTags(): Promise<Tag[]> {
