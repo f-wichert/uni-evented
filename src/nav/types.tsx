@@ -13,6 +13,7 @@ import { Media, User } from '../models';
 import { EventExtra } from '../models/event';
 
 import type { EventListKeys } from '../models/event';
+import { RecommendationSettings } from '../models/user';
 
 // ==========
 // root navigators, only one of these is active at a time
@@ -109,6 +110,7 @@ export type ProfileStackNavParams = {
     AdminEventScreen: { event: EventExtra };
     AdminEventMediasScreen: { eventId: string };
     AdminMediaScreen: { media: Media };
+    ManageDiscoverFeed: { currentRecommendationSettings: RecommendationSettings };
 } & CommonStackParams;
 
 export type ProfileStackNavProps<

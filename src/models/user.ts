@@ -35,7 +35,16 @@ export interface User {
 export interface CurrentUser extends User {
     readonly email: string;
     readonly favouriteTags: Tag[];
+    readonly recommendationSettings: RecommendationSettings;
 }
+
+export type RecommendationSettings = {
+    DistanceWeigt: number;
+    TagIntersectionWeight: number;
+    FolloweeIntersectionWeight: number;
+    AverageEventRatingWeight: number;
+    NumberOfMediasWeigth: number;
+};
 
 export interface CurrentUserResponse extends CurrentUser {
     readonly currentEventId: string | null;
