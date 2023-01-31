@@ -47,6 +47,7 @@ export interface Event {
     readonly host: User;
     readonly users?: User[];
     readonly tags: Tag[];
+    readonly livestream: Media[];
 }
 
 // transient type for processed API responses by `fromEventResponse`

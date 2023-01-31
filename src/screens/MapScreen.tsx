@@ -149,7 +149,7 @@ function MapScreen({ navigation, route }: MapStackNavProps<'MapView'>) {
                         <>
                             {events.map((el) => {
                                 // console.log('===');
-                                // console.log(el.tags);
+                                console.log(el);
                                 // console.log(el.users?.length);
                                 // console.log('===');
 
@@ -198,7 +198,7 @@ function MapScreen({ navigation, route }: MapStackNavProps<'MapView'>) {
                                         }}
                                         title={el.name}
                                         numPeople={el.users?.length}
-                                        livestream={true}
+                                        livestream={el.livstream}
                                         // TODO: this might re-render every time since the
                                         // callback isn't memoized, not sure
                                         onCalloutPress={() => {
