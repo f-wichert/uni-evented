@@ -9,6 +9,8 @@ import { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import { CompositeScreenProps } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { LatLng } from 'react-native-maps';
+import { Media, User } from '../models';
+import { EventExtra } from '../models/event';
 
 import type { EventListKeys } from '../models/event';
 
@@ -100,6 +102,13 @@ export type ProfileStackNavParams = {
     EditProfile: undefined;
     UserEventList: { type: EventListKeys };
     ManageAccount: undefined;
+    AdminMainScreen: undefined;
+    AdminUsersScreen: undefined;
+    AdminUserScreen: { user: User };
+    AdminEventsScreen: undefined;
+    AdminEventScreen: { event: EventExtra };
+    AdminEventMediasScreen: { eventId: string };
+    AdminMediaScreen: { media: Media };
 } & CommonStackParams;
 
 export type ProfileStackNavProps<
@@ -114,6 +123,7 @@ export type CommonStackParams = {
     EventDetail: { eventId: string };
     MediaCapture: { eventId: string };
     Chat: { eventId: string };
+    EventDetailEdit: { eventId: string };
     EventAttendees: { eventId: string };
     UserProfile: { userId: string; /* this only works on the profile tab */ showEdit?: boolean };
 };

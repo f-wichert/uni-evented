@@ -8,6 +8,7 @@ import MapView, { LatLng } from 'react-native-maps';
 
 import EventMarker from '../components/EventMarker';
 import MapFilter from '../components/MapFilter';
+import { Event } from '../models/event';
 import { MapStackNavProps } from '../nav/types';
 import { useFindEvents } from '../state/event';
 import { useAsyncEffects } from '../util';
@@ -16,8 +17,7 @@ import EventDetailScreen from './EventDetailScreen';
 function MapScreen({ navigation, route }: MapStackNavProps<'MapView'>) {
     const mapRef = React.useRef<MapView>(null);
     const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
-    // console.log(`Selected Event: ${JSON.stringify(selectedEvent)}`);
-    const [menuVisible, setMenuVisible] = useState<Boolean>(false);
+    const [menuVisible, setMenuVisible] = useState<boolean>(false);
     const [location, setLocation] = useState<LatLng | null>({
         latitude: 48.877616,
         longitude: 8.652653,
@@ -32,14 +32,14 @@ function MapScreen({ navigation, route }: MapStackNavProps<'MapView'>) {
     // const [showFutureEvents, setShowFutureEvents] = useState(true);
     // const [futureDayRange, setFutureDayRange] = useState(2);
 
-    const updateCurrentRange = (up) => {
-        setCurrentDayRange(up);
-    };
+    // const updateCurrentRange = (up) => {
+    //     setCurrentDayRange(up);
+    // };
 
-    const updateFutureRange = (up) => {
-        setFutureDayRange(up);
-        setCurrentDayRange(up[0]);
-    };
+    // const updateFutureRange = (up) => {
+    //     setFutureDayRange(up);
+    //     setCurrentDayRange(up[0]);
+    // };
 
     const getLastKnownPosition = async () => {
         const { coords } =
@@ -97,9 +97,8 @@ function MapScreen({ navigation, route }: MapStackNavProps<'MapView'>) {
         if (status !== 'granted') {
             throw new Error('Location access not granted');
         }
-        getLastKnownPosition();
-        await getCurrentPosition();
-    }, [navigation]);
+        await Promise.all([getLastKnownPosition(), getCurrentPosition()]);
+    }, [navigation, refresh]);
 
     const navigateDetail = useCallback(
         (id: string) => {
@@ -129,18 +128,13 @@ function MapScreen({ navigation, route }: MapStackNavProps<'MapView'>) {
                         showsUserLocation={true}
                         style={styles.map}
                         onMarkerPress={(e) => {
-                            const ev = events.filter((item) => {
-                                // TODO: this could be done better, e.g. in a single statement, but I didn't quiet got it working
-                                if (
-                                    e.nativeEvent.coordinate.latitude == item.lat &&
-                                    e.nativeEvent.coordinate.longitude == item.lon
-                                ) {
-                                    return true;
-                                } else {
-                                    return false;
-                                }
-                            });
-                            setSelectedEvent(ev[0]);
+                            const targetLat = e.nativeEvent.coordinate.latitude;
+                            const targetLon = e.nativeEvent.coordinate.longitude;
+
+                            const ev = events.find(
+                                (item) => item.lat === targetLat && item.lon === targetLon
+                            );
+                            if (ev) setSelectedEvent(ev);
                         }}
                         onPress={() => {
                             setSelectedEvent(null);
@@ -219,16 +213,10 @@ function MapScreen({ navigation, route }: MapStackNavProps<'MapView'>) {
                         route={route}
                         preview={true}
                         evId={selectedEvent.id}
-                        orig={'Map'}
                     />
                 </View>
-            ) : (
-                <></>
-            )}
+            ) : null}
             {menuVisible == true ? (
-                // <View style={styles.menuOverlay}>
-                //     <Text>This might a menu someday!</Text>
-                // </View>
                 <MapFilter
                     showPlannedEvents={showPlannedEvents}
                     setShowPlannedEvents={setShowPlannedEvents}
@@ -240,9 +228,7 @@ function MapScreen({ navigation, route }: MapStackNavProps<'MapView'>) {
                     selectedTags={selectedTags}
                     setSelectedTags={setSelectedTags}
                 />
-            ) : (
-                <></>
-            )}
+            ) : null}
         </>
     );
 }

@@ -5,7 +5,6 @@ import React, { useCallback, useEffect, useState } from 'react';
 import {
     Button,
     Dimensions,
-    LogBox,
     Platform,
     ScrollView,
     StyleSheet,
@@ -20,26 +19,19 @@ import DateTimePickerModal from 'react-native-modal-datetime-picker';
 
 import { INPUT_BACKGR_COLOR } from '../constants';
 import { EventManager } from '../models';
-import { EventCreateParams, Tag } from '../models/event';
-import { EventsOverviewStackNavProps } from '../nav/types';
+import { EventUpdateParams, Tag } from '../models/event';
+import { EventDetailProps } from '../nav/types';
+import { useEventFetch } from '../state/event';
 import { asyncHandler, useAsyncEffects } from '../util';
-
 const width = Dimensions.get('window').width;
 
 // dropdown uses `value` prop on items, we put the tag's ID there
 type TagWithValue = Tag & { value: string };
 
-function CreateEventScreen({ navigation, route }: EventsOverviewStackNavProps<'CreateEvent'>) {
-    // This is passed back from the map picker (https://reactnavigation.org/docs/params#passing-params-to-a-previous-screen).
-    // If `params.location` changed, we call `setLocation` with the new value.
+function EventDetailEditScreen({ route, navigation }: EventDetailProps) {
+    const { event: eventData, loading, refresh } = useEventFetch(route.params.eventId);
 
     const [tags, setTags] = useState<TagWithValue[]>([]);
-
-    // https://stackoverflow.com/questions/58243680/react-native-another-virtualizedlist-backed-container
-    useEffect(() => {
-        LogBox.ignoreLogs(['VirtualizedLists should never be nested']);
-    }, []);
-
     useAsyncEffects(
         async () => {
             const response = await EventManager.fetchAllTags();
@@ -60,27 +52,36 @@ function CreateEventScreen({ navigation, route }: EventsOverviewStackNavProps<'C
         }
     }, [locationParam]);
 
-    const [name, setName] = useState('');
-    const [description, setDescription] = useState('');
+    DropDownPicker.setListMode('SCROLLVIEW');
 
-    const [useEndtime, setUseEndtime] = useState<boolean>(false);
+    const [name, setName] = useState(eventData!.name);
+    const [description, setDescription] = useState(eventData!.description);
+
+    const [useEndtime, setUseEndtime] = useState<boolean>(!!eventData!.endDate);
 
     // date/time picker state
     const [isPickerVisible, setPickerVisible] = useState(false);
     const [pickerMode, setPickerMode] = useState<'time' | 'date'>('time');
     const [pickerTarget, setPickerTarget] = useState<'start' | 'end'>('start');
-
+    eventData?.startDate;
     // default start to next minute, and default end to "start + 2h"
-    const [start, setStart] = useState<Date>(dayjs().add(1, 'minute').startOf('minute').toDate());
-    const [end, setEnd] = useState<Date>(dayjs(start).add(2, 'hours').toDate());
+    const [start, setStart] = useState<Date>(eventData!.startDate);
+    const [end, setEnd] = useState<Date>(
+        eventData!.endDate ?? dayjs(eventData!.startDate).add(2, 'hours').toDate()
+    );
 
     // Dropdown State
     const [open, setOpen] = useState(false);
     // (list of tag IDs)
-    const [selectedTags, setSelectedTags] = useState<string[]>([]);
+    const [selectedTags, setSelectedTags] = useState<string[]>(
+        eventData!.tags.map((tag) => tag.id)
+    );
 
     // Location State
-    const [location, setLocation] = useState<LatLng | null>(null);
+    const [location, setLocation] = useState<LatLng | null>({
+        latitude: eventData!.lat,
+        longitude: eventData!.lon,
+    } as LatLng);
 
     // date/time picker callbacks
     const hidePicker = useCallback(() => setPickerVisible(false), []);
@@ -94,8 +95,6 @@ function CreateEventScreen({ navigation, route }: EventsOverviewStackNavProps<'C
     const showStartDatePicker = useCallback(() => showPicker('date', 'start'), [showPicker]);
     const showEndTimePicker = useCallback(() => showPicker('time', 'end'), [showPicker]);
     const showEndDatePicker = useCallback(() => showPicker('date', 'end'), [showPicker]);
-
-    DropDownPicker.setListMode('SCROLLVIEW');
 
     const onPickerConfirm = useCallback(
         (date: Date) => {
@@ -118,7 +117,7 @@ function CreateEventScreen({ navigation, route }: EventsOverviewStackNavProps<'C
     };
 
     // not using `useCallback` here, since this would re-render almost every time anyway
-    const onCreateButton = asyncHandler(
+    const onUpdateButton = asyncHandler(
         async () => {
             // TODO: require these to be non-empty in the UI
             console.log(`Location: ${location}`);
@@ -139,23 +138,23 @@ function CreateEventScreen({ navigation, route }: EventsOverviewStackNavProps<'C
                 return;
             }
 
-            const eventData: EventCreateParams = {
+            const eventData: EventUpdateParams = {
                 name: name,
                 tags: selectedTags,
                 description: description,
                 location: location,
                 startDate: start,
                 endDate: end,
+                eventId: route.params.eventId,
             };
 
             if (useEndtime) eventData.endDate = end;
 
-            const eventId = await EventManager.create(eventData);
-
+            const eventId = await EventManager.update(eventData);
             // TODO: this should replace the current screen in the stack
-            navigation.navigate('EventDetail', {
-                eventId,
-            });
+            if (eventId) {
+                navigation.goBack();
+            }
         },
         { prefix: 'Failed to create event' }
     );
@@ -172,6 +171,7 @@ function CreateEventScreen({ navigation, route }: EventsOverviewStackNavProps<'C
                             placeholder="Type out your event name..."
                             onChangeText={setName}
                             maxLength={64}
+                            defaultValue={name}
                         />
                     </View>
                 </View>
@@ -183,7 +183,13 @@ function CreateEventScreen({ navigation, route }: EventsOverviewStackNavProps<'C
                     <Ionicons
                         // TODO: this always opens the map picker to the default location,
                         // even if the user already picked a location
-                        onPress={() => navigation.navigate('MapPicker')}
+                        onPress={() => {
+                            navigation.navigate('MapPicker', {
+                                location: location,
+                                eventId: route.params.eventId,
+                                parent: 'EventDetailEdit',
+                            });
+                        }}
                         name={location ? 'location' : 'location-outline'}
                         size={26}
                         color={'orange'}
@@ -202,8 +208,8 @@ function CreateEventScreen({ navigation, route }: EventsOverviewStackNavProps<'C
                             region={{
                                 latitude: location.latitude,
                                 longitude: location.longitude,
-                                latitudeDelta: 0.001,
-                                longitudeDelta: 0.001,
+                                latitudeDelta: 0.002,
+                                longitudeDelta: 0.002,
                             }}
                         >
                             <Marker
@@ -232,6 +238,7 @@ function CreateEventScreen({ navigation, route }: EventsOverviewStackNavProps<'C
                             multiline
                             editable
                             numberOfLines={4}
+                            defaultValue={description}
                         />
                     </View>
                 </View>
@@ -320,7 +327,7 @@ function CreateEventScreen({ navigation, route }: EventsOverviewStackNavProps<'C
                 </View>
             </View>
 
-            <Button color="orange" title="Create event!" onPress={onCreateButton} />
+            <Button color="orange" title="Update event Info" onPress={onUpdateButton} />
         </ScrollView>
     );
 }
@@ -420,4 +427,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default CreateEventScreen;
+export default EventDetailEditScreen;

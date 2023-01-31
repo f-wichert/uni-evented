@@ -6,12 +6,11 @@ import { Media, MediaManager } from '../models';
 
 declare type Props = {
     item: Media;
-    navigateDetail: (id: string) => void;
     isPlay: boolean;
     isMute: boolean;
 };
 
-function VideoDiscover({ item, navigateDetail, isPlay, isMute }: Props) {
+function VideoDiscover({ item, isPlay, isMute }: Props) {
     const nodePlayerViewRef = useCallbackRef<NodePlayerView>(null, (_, oldValue) => {
         oldValue && oldValue.stop();
     });

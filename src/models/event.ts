@@ -76,6 +76,7 @@ export type EventListKeys = {
 }[keyof RelevantEventsResponse];
 
 export type EventCreateParams = Parameters<typeof EventManager.create>[0];
+export type EventUpdateParams = EventCreateParams & { eventId: string };
 
 export class EventManager {
     static async join(eventId: string) {
@@ -187,6 +188,32 @@ export class EventManager {
             state.currentEventId = event.id;
         });
         return event.id;
+    }
+
+    static async update(params: EventUpdateParams) {
+        let updateSuccessfull = true;
+        const update = await request<EventResponse>('POST', `/event/update/${params.eventId}`, {
+            name: params.name,
+            tags: params.tags,
+            lat: params.location.latitude,
+            lon: params.location.longitude,
+            description: params.description,
+            startDateTime: params.startDate?.toJSON() ?? null,
+            endDateTime: params.endDate?.toJSON() ?? null,
+        }).catch((err) => {
+            updateSuccessfull = false;
+            return err;
+        });
+
+        if (!updateSuccessfull) {
+            toast.show('Update was not successful!');
+            return;
+        }
+
+        useEventStore.setState((state) => {
+            addEvents(state, this.fromEventResponse(update));
+        });
+        return updateSuccessfull;
     }
 
     static async fetchAllTags(): Promise<Tag[]> {

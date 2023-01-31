@@ -1,19 +1,13 @@
 import { Slider } from '@miblanchard/react-native-slider';
 import Checkbox from 'expo-checkbox';
 import React, { useState } from 'react';
-import { AppRegistry, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import DropDownPicker from 'react-native-dropdown-picker';
 import { EventManager } from '../models';
 import { useAsyncEffects } from '../util';
 type TagWithValue = Tag & { value: string };
 
 function MapFilter(props) {
-    // const [showCurrentEvents, setShowCurrentEvents] = useState(true);
-    // const [currentDayRange, setCurrentDayRange] = useState(1);
-    // const [showFutureEvents, setShowFutureEvents] = useState(true);
-    // const [futureDayRangeStart, setFutureDayRangeStart] = useState(2);
-    // const [futureDayRangeEnd, setFutureDayRangeEnd] = useState(4);
-
     const showPlannedEvents = props.showPlannedEvents;
     const setShowPlannedEvents = props.setShowPlannedEvents;
     const showCurrentEvents = props.showCurrentEvents;
@@ -61,11 +55,9 @@ function MapFilter(props) {
                             <Slider
                                 minimumValue={0}
                                 maximumValue={7}
-                                step={true}
+                                step={1}
                                 value={currentDayRange}
-                                onValueChange={(e) => {
-                                    setCurrentDayRange(e[0]);
-                                }}
+                                onValueChange={onCurrentDayRangeChange}
                             />
                         </View>
                     </View>
@@ -127,7 +119,7 @@ function MapFilter(props) {
                 {/* TODO: make this space somehow  */}
                 {open ? <View style={{ height: dropdownHeight - 5 }}></View> : <></>}
                 {/* <View style={styles.section}>
-                    <Pressable 
+                    <Pressable
                         onPress={(e) => {
                             console.log("Update");
                             refresh();
@@ -176,7 +168,5 @@ const styles = StyleSheet.create({
         marginLeft: 5,
     },
 });
-
-AppRegistry.registerComponent('SliderExample', () => SliderExample);
 
 export default MapFilter;

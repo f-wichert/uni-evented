@@ -27,6 +27,7 @@ import { EventManager, UserManager } from '../models';
 import { CommonStackProps } from '../nav/types';
 import { useEventFetch } from '../state/event';
 import { useCurrentUser } from '../state/user';
+
 import { UnreachableCaseError, useAsyncCallback, useAsyncEffects } from '../util';
 
 const MAX_JOIN_RADIUS_METERS = 50;
@@ -42,17 +43,27 @@ function EventDetailScreen({ route, navigation, preview, evId }: Props) {
 
     const user = useCurrentUser();
 
-    // MediaCarousel
-    const [isPlay, setIsPlay] = useState<boolean>(true);
-    const [isMute, setIsMute] = useState<boolean>(true);
-    const [isOpenQuality, setIsOpenQuality] = useState<boolean>(false);
-    const [quality, setQuality] = useState<'auto' | '720' | '480' | '360'>('auto');
-
     const [location, setLocation] = useState<LatLng | null>(null);
 
     const [inRange, setInRange] = useState(false);
 
     const isPreview = preview ? preview : false;
+
+    const isHost = eventData!.hostId == user.id;
+
+    function onEdit() {
+        navigation.navigate('EventDetailEdit', { eventId: eventId });
+    }
+
+    if (isHost && !isPreview) {
+        navigation.setOptions({
+            headerRight: () => (
+                <Pressable onPress={onEdit}>
+                    <Ionicons name={'pencil-outline'} color={'black'} size={32} />
+                </Pressable>
+            ),
+        });
+    }
 
     useAsyncEffects(
         async () => {
@@ -333,17 +344,7 @@ function EventDetailScreen({ route, navigation, preview, evId }: Props) {
     const mediaCarousel = (
         <View style={styles.camera}>
             <GestureHandlerRootView>
-                <MediaCarousel
-                    item={eventData}
-                    isPlay={isPlay}
-                    isMute={isMute}
-                    setIsPlay={setIsPlay}
-                    setIsMute={setIsMute}
-                    isOpenQuality={isOpenQuality}
-                    setIsOpenQuality={setIsOpenQuality}
-                    quality={quality}
-                    setQuality={setQuality}
-                />
+                <MediaCarousel item={eventData} />
             </GestureHandlerRootView>
         </View>
     );
@@ -527,6 +528,16 @@ const styles = StyleSheet.create({
         width: '100%',
         height: 300,
         borderRadius: 5,
+    },
+    editButton: {
+        backgroundColor: 'dodgerblue',
+        padding: 5,
+        paddingLeft: 8,
+        paddingRight: 8,
+        marginLeft: 11,
+        marginRight: 11,
+        borderRadius: 3,
+        fontSize: 18,
     },
     activeIndicator: {
         marginLeft: 'auto',

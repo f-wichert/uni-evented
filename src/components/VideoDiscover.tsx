@@ -1,15 +1,14 @@
-import { AVPlaybackStatusToSet, ResizeMode } from 'expo-av';
+import { AVPlaybackStatus, ResizeMode, Video } from 'expo-av';
 import VideoPlayer from 'expo-video-player';
-import { useEffect, useRef, useState } from 'react';
+import { MutableRefObject, useCallback, useRef } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { useSafeAreaFrame } from 'react-native-safe-area-context';
 
 import { Media, MediaManager } from '../models';
-import { baseHeaders } from '../util';
+import { baseHeaders, useAsyncEffects } from '../util';
 
 declare type Props = {
     item: Media;
-    navigateDetail: (id: string) => void;
     isPlay: boolean;
     isMute: boolean;
     // setDuration: (dur: number) => void;
@@ -20,7 +19,6 @@ declare type Props = {
 
 function VideoDiscover({
     item,
-    navigateDetail,
     isPlay,
     isMute,
     quality,
@@ -28,49 +26,29 @@ function VideoDiscover({
     // setPosition,
     finishedVideo,
 }: Props) {
-    // I really can't manage to find the correct type for this thing -> checked the package
-    const video = useRef<any>(null);
-    const [status, setStatus] = useState<AVPlaybackStatusToSet | null>(null);
-    // const [score, setScore] = React.useState(Math.floor(Math.random() * 25));
+    const video = useRef<Video | null>(null);
+    // const [status, setStatus] = useState<AVPlaybackStatus | null>(null);
 
     const frame = useSafeAreaFrame();
 
-    useEffect(() => {
+    useAsyncEffects(async () => {
         // set play status for video
-        video.current &&
-            video.current.setStatusAsync({
-                shouldPlay: isPlay,
-            });
+        await video.current?.setStatusAsync({
+            shouldPlay: isPlay,
+        });
         // // give duration and position to parent component
         // if (!status || !status.positionMillis || !status.durationMillis) return;
         // setPosition(status.positionMillis);
-        // // might need AVPlaybackStatusSuccess here for durationMillis
         // setDuration(status.durationMillis);
     }, [isPlay]);
 
-    const updateStatus = (playState: AVPlaybackStatusToSet) => {
-        // setStatus(playState);
-        // might need AVPlaybackStatusSuccess here for durationMillis
-        playState.didJustFinish && finishedVideo();
-    };
-
-    // const upvote = () => {
-    //     setScore(score + 1);
-    //     updateScore('+');
-    // };
-
-    // const downvote = () => {
-    //     setScore(score - 1);
-    //     updateScore('-');
-    // };
-
-    // const updateScore = (vote: '+' | '-') => {
-    //     // TODO: update score and send it to server on vote
-    //     return;
-    //     asyncHandler(async () => {
-    //         await request('POST', 'event/vote', getToken(), { id: discoverData.id, vote: vote });
-    //     });
-    // };
+    const updateStatus = useCallback(
+        (playState: AVPlaybackStatus) => {
+            // setStatus(playState);
+            if (playState.isLoaded && playState.didJustFinish) finishedVideo();
+        },
+        [finishedVideo]
+    );
 
     return (
         <View style={styles.container}>
@@ -84,10 +62,9 @@ function VideoDiscover({
                     shouldPlay: isPlay,
                     isMuted: isMute,
                     isLooping: true,
-                    ref: video,
+                    ref: video as MutableRefObject<Video>,
                     useNativeControls: false,
                     progressUpdateIntervalMillis: 1000,
-                    // onPlaybackStatusUpdate: (status: AVPlaybackStatusToSet) => setStatus(() => status),
                 }}
                 style={{ ...styles.video, width: frame.width }}
                 slider={{ visible: false }}
@@ -98,28 +75,8 @@ function VideoDiscover({
                     fullscreen: <></>,
                     exitFullscreen: <></>,
                 }}
-                playbackCallback={(playState: AVPlaybackStatusToSet) => updateStatus(playState)}
+                playbackCallback={updateStatus}
             />
-
-            {/* <View style={{ ...styles.votingArea }}>
-                <Ionicons style={styles.voteIcon} name="chevron-up" size={36} onPress={upvote} />
-                <View>
-                    <Text
-                        style={{
-                            fontWeight: 'bold',
-                            color: '#c2c2c2',
-                        }}
-                    >
-                        {score}
-                    </Text>
-                </View>
-                <Ionicons
-                    style={styles.voteIcon}
-                    name="chevron-down"
-                    size={36}
-                    onPress={downvote}
-                />
-            </View> */}
         </View>
     );
 }
@@ -135,18 +92,6 @@ const styles = StyleSheet.create({
         borderRadius: 8,
         controlsBackgroundColor: 'transparent',
     },
-    // votingArea: {
-    //     width: 50,
-    //     height: '100%',
-    //     position: 'absolute',
-    //     right: 0,
-    //     justifyContent: 'center',
-    //     alignItems: 'center',
-    //     // backgroundColor: 'red'
-    // },
-    // voteIcon: {
-    //     color: '#7d7d7d',
-    // },
 });
 
 export default VideoDiscover;

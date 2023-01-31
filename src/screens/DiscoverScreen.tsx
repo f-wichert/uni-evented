@@ -1,7 +1,7 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import * as Location from 'expo-location';
 import React, { useCallback, useEffect, useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { LatLng } from 'react-native-maps';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -59,6 +59,15 @@ function DiscoverScreen({ navigation }: DiscoverStackNavProps<'DiscoverView'>) {
         { prefix: 'Failed to update media' }
     );
 
+    const refreshLocation = async () => {
+        toast.show('Refreshing location...', {
+            duration: 1000,
+            type: 'normal',
+            placement: 'top',
+        });
+        await Promise.all([getLastKnownPosition(), getCurrentPosition()]);
+    };
+
     // update once on load
     useEffect(updateMedia, [updateMedia]);
 
@@ -75,9 +84,30 @@ function DiscoverScreen({ navigation }: DiscoverStackNavProps<'DiscoverView'>) {
                         alignItems: 'center',
                     }}
                 >
-                    <Text style={location ? styles.locationAvailable : styles.locationNotAvailable}>
+                    {location ? (
+                        <Ionicons
+                            name="location"
+                            size={32}
+                            color="orange"
+                            onPress={refreshLocation}
+                            style={{
+                                marginRight: 10,
+                            }}
+                        />
+                    ) : (
+                        <Ionicons
+                            name="location-outline"
+                            size={32}
+                            color="orange"
+                            onPress={refreshLocation}
+                            style={{
+                                marginRight: 10,
+                            }}
+                        />
+                    )}
+                    {/* <Text style={location ? styles.locationAvailable : styles.locationNotAvailable}>
                         Location Available
-                    </Text>
+                    </Text> */}
                     <Ionicons
                         name="refresh-outline"
                         size={32}

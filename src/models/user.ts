@@ -3,6 +3,7 @@ import urlJoin from 'url-join';
 import config from '../config';
 import { addUsers, useUserStore } from '../state/user';
 import { request } from '../util';
+import { Tag } from './event';
 
 export const EventAttendeeStatuses = ['interested', 'attending', 'left', 'banned'] as const;
 export type EventAttendeeStatus = typeof EventAttendeeStatuses[number];
@@ -16,6 +17,7 @@ export interface UserResponse {
     readonly username: string;
     readonly displayName: string;
     readonly avatarHash: string | null;
+    readonly isAdmin: boolean;
     readonly bio: string;
     readonly eventAttendee?: PartialAttendee;
 }
@@ -25,12 +27,14 @@ export interface User {
     readonly username: string;
     readonly displayName: string;
     readonly avatarHash: string | null;
+    readonly isAdmin: boolean;
     readonly bio: string;
     readonly eventAttendee?: PartialAttendee;
 }
 
 export interface CurrentUser extends User {
     readonly email: string;
+    readonly favouriteTags: Tag[];
 }
 
 export interface CurrentUserResponse extends CurrentUser {

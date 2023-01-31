@@ -6,7 +6,10 @@ import MapView, { LatLng, Marker } from 'react-native-maps';
 import { EventsOverviewStackNavProps } from '../nav/types';
 import { useAsyncEffects } from '../util';
 
-export default function MapPickerScreen({ navigation }: EventsOverviewStackNavProps<'MapPicker'>) {
+export default function MapPickerScreen({
+    route,
+    navigation,
+}: EventsOverviewStackNavProps<'MapPicker'>) {
     const mapRef = React.useRef<MapView>(null);
     // TODO: remove placeholder values
     const [location, setLocation] = useState<LatLng>({
@@ -43,8 +46,14 @@ export default function MapPickerScreen({ navigation }: EventsOverviewStackNavPr
     };
 
     const pickLocation = () => {
-        // pass picked location back to create event screen
-        navigation.navigate('CreateEvent', { location: pickedLocation });
+        if (route.params && route.params!.parent) {
+            navigation.navigate('EventDetailEdit', {
+                location: pickedLocation,
+                eventId: route.params.eventId,
+            });
+        } else {
+            navigation.navigate('CreateEvent', { location: pickedLocation });
+        }
     };
 
     return (

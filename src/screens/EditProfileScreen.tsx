@@ -79,7 +79,6 @@ export default function EditProfileScreen({ navigation }: ProfileStackNavProps<'
                 return (
                     <Button
                         title="Save"
-                        color="green"
                         disabled={!hasChanged || !isValid}
                         onPress={() => void submit()}
                     />
