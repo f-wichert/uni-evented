@@ -39,7 +39,7 @@ export interface CurrentUser extends User {
 }
 
 export type RecommendationSettings = {
-    DistanceWeigt: number;
+    DistanceWeight: number;
     TagIntersectionWeight: number;
     FolloweeIntersectionWeight: number;
     AverageEventRatingWeight: number;
