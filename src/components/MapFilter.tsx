@@ -1,29 +1,39 @@
 import { Slider } from '@miblanchard/react-native-slider';
 import Checkbox from 'expo-checkbox';
-import React, { useState } from 'react';
+import React, { SetStateAction, useCallback, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import DropDownPicker from 'react-native-dropdown-picker';
+
 import { EventManager } from '../models';
+import { Tag } from '../models/event';
 import { useAsyncEffects } from '../util';
+
 type TagWithValue = Tag & { value: string };
 
-function MapFilter(props) {
-    const showPlannedEvents = props.showPlannedEvents;
-    const setShowPlannedEvents = props.setShowPlannedEvents;
-    const showCurrentEvents = props.showCurrentEvents;
-    const setShowCurrentEvents = props.setShowCurrentEvents;
-    const currentDayRange = props.currentDayRange;
-    const setCurrentDayRange = props.setCurrentDayRange;
-    const showFutureEvents = props.showFutureEvents;
-    const setShowFutureEvents = props.setShowFutureEvents;
-    const futureDayRange = props.futureDayRange;
-    const setFutureDayRange = props.setFutureDayRange;
+interface Props {
+    showPlannedEvents: boolean;
+    setShowPlannedEvents: (value: boolean) => void;
+    showCurrentEvents: boolean;
+    setShowCurrentEvents: (value: boolean) => void;
+    currentDayRange: number;
+    setCurrentDayRange: (value: number) => void;
+    selectedTags: string[];
+    setSelectedTags: (value: SetStateAction<string[]>) => void;
+}
 
+function MapFilter({
+    showPlannedEvents,
+    setShowPlannedEvents,
+    showCurrentEvents,
+    setShowCurrentEvents,
+    currentDayRange,
+    setCurrentDayRange,
+    selectedTags,
+    setSelectedTags,
+}: Props) {
     // Dropdown State
     const [open, setOpen] = useState(false);
     // const [selectedTags, setSelectedTags] = useState<string[]>([]);
-    const selectedTags = props.selectedTags;
-    const setSelectedTags = props.setSelectedTags;
     const dropdownHeight = 200;
 
     const [tags, setTags] = useState<TagWithValue[]>([]);
@@ -38,6 +48,16 @@ function MapFilter(props) {
         },
         [],
         { prefix: 'Failed to fetch tags' }
+    );
+
+    const onCurrentDayRangeChange = useCallback(
+        (value: number | number[]) => {
+            // https://github.com/miblanchard/react-native-slider/issues/341
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            if (Array.isArray(value)) value = value[0]!;
+            setCurrentDayRange(value);
+        },
+        [setCurrentDayRange]
     );
 
     return (

@@ -32,15 +32,6 @@ function MapScreen({ navigation, route }: MapStackNavProps<'MapView'>) {
     // const [showFutureEvents, setShowFutureEvents] = useState(true);
     // const [futureDayRange, setFutureDayRange] = useState(2);
 
-    // const updateCurrentRange = (up) => {
-    //     setCurrentDayRange(up);
-    // };
-
-    // const updateFutureRange = (up) => {
-    //     setFutureDayRange(up);
-    //     setCurrentDayRange(up[0]);
-    // };
-
     const getLastKnownPosition = async () => {
         const { coords } =
             (await Location.getLastKnownPositionAsync()) as unknown as LocationObject;
@@ -143,7 +134,7 @@ function MapScreen({ navigation, route }: MapStackNavProps<'MapView'>) {
                         <>
                             {events.map((el) => {
                                 // console.log('===');
-                                console.log(el);
+                                // console.log(el);
                                 // console.log(el.users?.length);
                                 // console.log('===');
 
@@ -191,8 +182,8 @@ function MapScreen({ navigation, route }: MapStackNavProps<'MapView'>) {
                                             longitude: el.lon,
                                         }}
                                         title={el.name}
-                                        numPeople={el.users?.length}
-                                        livestream={el.livstream}
+                                        numPeople={el.users?.length || 0}
+                                        livestream={!!el.livestream}
                                         // TODO: this might re-render every time since the
                                         // callback isn't memoized, not sure
                                         onCalloutPress={() => {
@@ -209,7 +200,11 @@ function MapScreen({ navigation, route }: MapStackNavProps<'MapView'>) {
             {selectedEvent ? (
                 <View style={styles.bottomOverlay}>
                     <EventDetailScreen
+                        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                        // @ts-ignore
                         navigation={navigation}
+                        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                        // @ts-ignore
                         route={route}
                         preview={true}
                         evId={selectedEvent.id}
@@ -223,8 +218,7 @@ function MapScreen({ navigation, route }: MapStackNavProps<'MapView'>) {
                     showCurrentEvents={showCurrentEvents}
                     setShowCurrentEvents={setShowCurrentEvents}
                     currentDayRange={currentDayRange}
-                    setCurrentDayRange={updateCurrentRange}
-                    refresh={refresh}
+                    setCurrentDayRange={setCurrentDayRange}
                     selectedTags={selectedTags}
                     setSelectedTags={setSelectedTags}
                 />

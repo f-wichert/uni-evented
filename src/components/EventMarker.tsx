@@ -7,8 +7,8 @@ import { EventStatus } from '../models';
 
 type Props = MapMarker['props'] & {
     state: EventStatus;
-    numPeople: Number;
-    livestream: Boolean;
+    numPeople: number;
+    livestream: boolean;
 };
 
 function EventMarker(props: Props) {
