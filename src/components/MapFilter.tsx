@@ -136,8 +136,9 @@ function MapFilter({
                         />
                     </View>
                 </View>
-                {/* TODO: make this space somehow  */}
-                {open ? <View style={{ height: dropdownHeight - 5 }}></View> : <></>}
+                {open ? (
+                    <View style={{ height: dropdownHeight - 5 }} pointerEvents="none"></View>
+                ) : null}
                 {/* <View style={styles.section}>
                     <Pressable
                         onPress={(e) => {
