@@ -1,11 +1,12 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useIsFocused } from '@react-navigation/native';
 import { useCallback, useRef, useState } from 'react';
-import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Carousel, { ICarouselInstance } from 'react-native-reanimated-carousel';
 import { useSafeAreaFrame } from 'react-native-safe-area-context';
 
-import { Event } from '../models';
+import yellowSplash from '../../assets/yellow_splash.png';
+import { Event, UserManager } from '../models';
 import { useMediaFetch } from '../state/event';
 import ImageDiscover from './ImageDiscover';
 import LiveDiscover from './LiveDiscover';
@@ -38,6 +39,7 @@ export default function MediaCarousel({
     const [quality, setQuality] = useState<'auto' | '720' | '480' | '360'>('auto');
 
     const { media } = useMediaFetch(item.id);
+    const hostAvatarUrl = UserManager.getAvatarUrl(item.host);
 
     const isLastItem = useCallback(() => {
         if (media?.length === undefined) return false;
@@ -292,6 +294,10 @@ export default function MediaCarousel({
                 </>
             )}
             <TouchableOpacity style={styles.headerContainer} onPress={maybeNavigateDetail}>
+                <Image
+                    style={styles.eventIcon}
+                    source={hostAvatarUrl ? { uri: hostAvatarUrl } : yellowSplash}
+                />
                 <Text style={styles.eventHeader}>
                     {item.name.length >= 25 ? item.name.slice(0, 22) + '...' : item.name}
                 </Text>
@@ -303,16 +309,19 @@ export default function MediaCarousel({
 const styles = StyleSheet.create({
     playPause: {
         position: 'absolute',
-        // backgroundColor: 'lightgreen',
+        // backgroundColor: 'green',
+        // opacity: 0.35,
     },
     nextVideo: {
         position: 'absolute',
-        // backgroundColor: 'lightblue',
+        // backgroundColor: 'blue',
+        // opacity: 0.35,
         right: 0,
     },
     prevVideo: {
         position: 'absolute',
-        // backgroundColor: 'lightyellow',
+        // backgroundColor: 'red',
+        // opacity: 0.35,
         left: 0,
     },
     mute: {
@@ -358,13 +367,14 @@ const styles = StyleSheet.create({
         display: 'flex',
         justifyContent: 'flex-start',
         flexDirection: 'row',
+        alignItems: 'center',
     },
     eventIcon: {
+        width: 35,
+        height: 35,
+        borderRadius: 100,
         borderWidth: 1,
         borderColor: 'white',
-        borderRadius: 50,
-        padding: 2,
-        textAlign: 'center',
     },
     eventHeader: {
         color: 'white',

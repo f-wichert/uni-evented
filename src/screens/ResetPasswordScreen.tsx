@@ -43,7 +43,7 @@ export default function ResetPasswordScreen({
             }}
             footer={[
                 {
-                    text: 'Remebered?',
+                    text: 'Remembered?',
                     buttonText: 'Sign in',
                     callback: () => navigation.navigate('LoginScreen'),
                 },

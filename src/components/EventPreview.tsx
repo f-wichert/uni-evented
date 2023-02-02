@@ -1,8 +1,9 @@
-import Ionicons from '@expo/vector-icons/Ionicons';
 import React, { useCallback } from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { EventStatus } from '../models';
 
+import yellowSplash from '../../assets/yellow_splash.png';
+import { UserManager } from '../models';
 import { useEvent } from '../state/event';
 
 declare type Props = {
@@ -21,13 +22,18 @@ function EventPreview({ id, navigateDetail, filter }: Props) {
         return <View />;
     }
 
+    const hostAvatarUrl = UserManager.getAvatarUrl(event.host);
+
     if (filter && !filter.includes(event.status)) {
         return <></>;
     }
 
     return (
         <TouchableOpacity style={[styles.container]} onPress={navigate}>
-            <Ionicons style={[styles.icon]} name="rocket-outline" color="#000" size={32} />
+            <Image
+                style={styles.icon}
+                source={hostAvatarUrl ? { uri: hostAvatarUrl } : yellowSplash}
+            />
             <View style={[styles.innerContainer]}>
                 <Text style={[styles.title]}>{event.name}</Text>
                 <Text>{event.description?.slice(0, 40) + '...'}</Text>
@@ -56,6 +62,11 @@ const styles = StyleSheet.create({
     },
     icon: {
         margin: 5,
+        width: 35,
+        height: 35,
+        borderRadius: 100,
+        borderWidth: 1,
+        borderColor: 'black',
     },
 });
 

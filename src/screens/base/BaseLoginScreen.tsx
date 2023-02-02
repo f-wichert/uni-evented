@@ -25,7 +25,7 @@ export default function BaseLoginScreen({ fields, submitButton, header, footer }
                 <View style={styles.headerText}>
                     <Text
                         style={{
-                            fontSize: 44,
+                            fontSize: 35,
                             fontWeight: 'bold',
                         }}
                     >
