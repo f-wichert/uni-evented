@@ -25,19 +25,12 @@ function MapScreen({ navigation, route }: MapStackNavProps<'MapView'>) {
     const { events, refresh } = useFindEvents();
 
     // Filter options
+    const [showPlannedEvents, setShowPlannedEvents] = useState(true);
     const [showCurrentEvents, setShowCurrentEvents] = useState(true);
-    const [currentDayRange, setCurrentDayRange] = useState(0);
-    const [showFutureEvents, setShowFutureEvents] = useState(true);
-    const [futureDayRange, setFutureDayRange] = useState(2);
-
-    // const updateCurrentRange = (up) => {
-    //     setCurrentDayRange(up);
-    // };
-
-    // const updateFutureRange = (up) => {
-    //     setFutureDayRange(up);
-    //     setCurrentDayRange(up[0]);
-    // };
+    const [currentDayRange, setCurrentDayRange] = useState(2);
+    const [selectedTags, setSelectedTags] = useState<string[]>([]);
+    // const [showFutureEvents, setShowFutureEvents] = useState(true);
+    // const [futureDayRange, setFutureDayRange] = useState(2);
 
     const getLastKnownPosition = async () => {
         const { coords } =
@@ -140,6 +133,11 @@ function MapScreen({ navigation, route }: MapStackNavProps<'MapView'>) {
                     >
                         <>
                             {events.map((el) => {
+                                // console.log('===');
+                                // console.log(el);
+                                // console.log(el.users?.length);
+                                // console.log('===');
+
                                 const diffDays = dateDiffInDays(el.startDate, new Date());
 
                                 // Remove events that are not in our day range
@@ -148,8 +146,32 @@ function MapScreen({ navigation, route }: MapStackNavProps<'MapView'>) {
                                 }
 
                                 // Remove events that are completed
-                                if (el.status == 'completed') {
+                                if (el.status === 'completed') {
                                     return;
+                                }
+
+                                // Remove active events
+                                if (el.status === 'active' && !showCurrentEvents) {
+                                    return;
+                                }
+
+                                // Remove planned events
+                                if (el.status === 'scheduled' && !showPlannedEvents) {
+                                    return;
+                                }
+
+                                // Filter for tags - remove if the event has no tag from selectedTags
+                                if (selectedTags.length >= 1) {
+                                    const eventTags = el.tags.map((t) => t.id);
+                                    let match = false;
+                                    for (const tag of selectedTags) {
+                                        if (eventTags.includes(tag)) {
+                                            match = true;
+                                        }
+                                    }
+                                    if (!match) {
+                                        return;
+                                    }
                                 }
 
                                 return (
@@ -160,6 +182,8 @@ function MapScreen({ navigation, route }: MapStackNavProps<'MapView'>) {
                                             longitude: el.lon,
                                         }}
                                         title={el.name}
+                                        numPeople={el.users?.length || 0}
+                                        livestream={!!el.livestream}
                                         // TODO: this might re-render every time since the
                                         // callback isn't memoized, not sure
                                         onCalloutPress={() => {
@@ -176,23 +200,27 @@ function MapScreen({ navigation, route }: MapStackNavProps<'MapView'>) {
             {selectedEvent ? (
                 <View style={styles.bottomOverlay}>
                     <EventDetailScreen
+                        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                        // @ts-ignore
                         navigation={navigation}
+                        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                        // @ts-ignore
                         route={route}
                         preview={true}
                         evId={selectedEvent.id}
                     />
                 </View>
             ) : null}
-            {menuVisible == true ? (
+            {menuVisible ? (
                 <MapFilter
+                    showPlannedEvents={showPlannedEvents}
+                    setShowPlannedEvents={setShowPlannedEvents}
                     showCurrentEvents={showCurrentEvents}
                     setShowCurrentEvents={setShowCurrentEvents}
                     currentDayRange={currentDayRange}
                     setCurrentDayRange={setCurrentDayRange}
-                    showFutureEvents={showFutureEvents}
-                    setShowFutureEvents={setShowFutureEvents}
-                    futureDayRange={futureDayRange}
-                    setFutureDayRange={setFutureDayRange}
+                    selectedTags={selectedTags}
+                    setSelectedTags={setSelectedTags}
                 />
             ) : null}
         </>

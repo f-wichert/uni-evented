@@ -298,8 +298,8 @@ export default function MediaCarousel({
                     style={styles.eventIcon}
                     source={hostAvatarUrl ? { uri: hostAvatarUrl } : yellowSplash}
                 />
-                <Text style={styles.eventHeader}>
-                    {item.name.length >= 25 ? item.name.slice(0, 22) + '...' : item.name}
+                <Text style={styles.eventHeader} numberOfLines={1} ellipsizeMode="tail">
+                    {item.name}
                 </Text>
             </TouchableOpacity>
         </>
@@ -363,7 +363,8 @@ const styles = StyleSheet.create({
     headerContainer: {
         position: 'absolute',
         top: 25,
-        left: 10,
+        left: 0,
+        marginHorizontal: 20,
         display: 'flex',
         justifyContent: 'flex-start',
         flexDirection: 'row',
@@ -380,7 +381,6 @@ const styles = StyleSheet.create({
         color: 'white',
         fontWeight: 'bold',
         fontSize: 16,
-        marginLeft: 10,
     },
     sadContainer: {
         backgroundColor: 'lightgrey',

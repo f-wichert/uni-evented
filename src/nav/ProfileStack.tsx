@@ -10,6 +10,7 @@ import AdminUsersScreen from '../screens/admin/AdminUsersScreen';
 
 import EditProfileScreen from '../screens/EditProfileScreen';
 import ManageAccountScreen from '../screens/ManageAccountScreen';
+import ManageDiscoverFeed from '../screens/ManageDiscoverFeed';
 import MyProfileScreen from '../screens/MyProfileScreen';
 import UserEventListScreen from '../screens/UserEventListScreen';
 import createCommonScreens from './commonScreensMixin';
@@ -80,6 +81,11 @@ function ProfileStack() {
                 name="AdminMediaScreen"
                 component={AdminMediaScreen}
                 options={{ title: 'Edit Media' }}
+            />
+            <Stack.Screen
+                name="ManageDiscoverFeed"
+                component={ManageDiscoverFeed}
+                options={{ title: 'Manage Discover Feed' }}
             />
             {createCommonScreens(Stack.Screen)}
         </Stack.Navigator>

@@ -53,7 +53,7 @@ function UserPreview({
 
     return (
         <View style={[styles.container]}>
-            <TouchableOpacity style={[styles.container]} onPress={showUserProfile}>
+            <TouchableOpacity style={[styles.innerContainer]} onPress={showUserProfile}>
                 {avatarUrl ? (
                     <Image style={styles.icon} source={{ uri: avatarUrl }} />
                 ) : (
@@ -64,9 +64,11 @@ function UserPreview({
                         size={32}
                     />
                 )}
-                <View style={[styles.innerContainer]}>
+                <View style={[styles.textContainer]}>
                     <Text style={[styles.title]}>{displayName ? displayName : username}</Text>
-                    <Text>{bio?.slice(0, 40) + '...'}</Text>
+                    <Text numberOfLines={1} ellipsizeMode="tail">
+                        {bio}
+                    </Text>
                 </View>
             </TouchableOpacity>
             {ban && !host ? (
@@ -95,11 +97,17 @@ const styles = StyleSheet.create({
         // borderBottomWidth: 1,
     },
     innerContainer: {
-        display: 'flex',
+        flex: 1,
+        flexDirection: 'row',
+        justifyContent: 'flex-start',
+        alignItems: 'center',
+    },
+    textContainer: {
+        flex: 1,
         flexDirection: 'column',
         alignItems: 'flex-start',
         justifyContent: 'center',
-        marginLeft: 5,
+        marginHorizontal: 5,
     },
     title: {
         fontWeight: 'bold',

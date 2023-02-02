@@ -144,7 +144,6 @@ function EventDetailEditScreen({ route, navigation }: EventDetailProps) {
                 description: description,
                 location: location,
                 startDate: start,
-                // endDate: end,
                 eventId: route.params.eventId,
             };
 

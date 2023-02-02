@@ -25,6 +25,7 @@ export default function MyProfileScreen({ navigation }: ProfileStackNavProps<'My
 
     const [open, setOpen] = useState(false);
     const currentFavouriteTags = user.favouriteTags.map((tag) => tag.id);
+    const recommendationSettings = user.recommendationSettings;
     const [selectedTags, setSelectedTags] = useState<string[]>(currentFavouriteTags);
     const [tags, setTags] = useState<TagWithValue[]>([]);
 
@@ -164,6 +165,16 @@ export default function MyProfileScreen({ navigation }: ProfileStackNavProps<'My
                             onPress={useCallback(() => {
                                 navigation.navigate('ManageAccount');
                             }, [navigation])}
+                        />
+                        <Cell
+                            image={getCellIcon('calculator-outline')}
+                            title="Manage Discover Feed"
+                            accessory="DisclosureIndicator"
+                            onPress={useCallback(() => {
+                                navigation.navigate('ManageDiscoverFeed', {
+                                    currentRecommendationSettings: recommendationSettings,
+                                });
+                            }, [user, navigation])}
                         />
                         <Cell
                             image={getCellIcon('exit-outline', 'red')}

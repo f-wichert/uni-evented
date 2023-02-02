@@ -36,7 +36,9 @@ function EventPreview({ id, navigateDetail, filter }: Props) {
             />
             <View style={[styles.innerContainer]}>
                 <Text style={[styles.title]}>{event.name}</Text>
-                <Text>{event.description?.slice(0, 40) + '...'}</Text>
+                <Text numberOfLines={2} ellipsizeMode="tail">
+                    {event.description}
+                </Text>
             </View>
         </TouchableOpacity>
     );
@@ -49,9 +51,10 @@ const styles = StyleSheet.create({
         justifyContent: 'flex-start',
         alignItems: 'center',
         margin: 5,
+        marginRight: 10,
     },
     innerContainer: {
-        display: 'flex',
+        flex: 1,
         flexDirection: 'column',
         alignItems: 'flex-start',
         justifyContent: 'center',

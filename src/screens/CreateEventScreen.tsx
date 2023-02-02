@@ -145,7 +145,6 @@ function CreateEventScreen({ navigation, route }: EventsOverviewStackNavProps<'C
                 description: description,
                 location: location,
                 startDate: start,
-                // endDate: end,
             };
 
             if (useEndtime) eventData.endDate = end;

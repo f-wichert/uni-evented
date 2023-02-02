@@ -175,7 +175,7 @@ export function abbreviateNumber(number: number) {
     const tier = (Math.log10(Math.abs(number)) / 3) | 0;
 
     // if zero, we don't need a suffix
-    if (tier == 0) return number;
+    if (tier === 0) return number;
 
     // get suffix and determine scale
     const suffix = ['', 'k', 'M', 'G', 'T', 'P', 'E'][tier] || '?';
