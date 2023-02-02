@@ -55,7 +55,7 @@ function DiscoverScreen({ navigation }: DiscoverStackNavProps<'DiscoverView'>) {
                 setEventData(await EventManager.fetchDiscoverData(location));
             }
         },
-        [],
+        [location],
         { prefix: 'Failed to update media' }
     );
 
