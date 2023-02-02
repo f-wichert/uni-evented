@@ -383,7 +383,7 @@ function EventDetailScreen({ route, navigation, preview, evId }: Props) {
                 >
                     <View style={styles.section}>
                         {/* @Jonas - please build in the media thing here. this logic is used for the map screen */}
-                        {isPreview == true ? (
+                        {isPreview ? (
                             <>
                                 <View style={styles.InformationArea}>
                                     {titleLine}

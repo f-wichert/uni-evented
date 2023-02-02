@@ -146,17 +146,17 @@ function MapScreen({ navigation, route }: MapStackNavProps<'MapView'>) {
                                 }
 
                                 // Remove events that are completed
-                                if (el.status == 'completed') {
+                                if (el.status === 'completed') {
                                     return;
                                 }
 
                                 // Remove active events
-                                if (el.status == 'active' && showCurrentEvents == false) {
+                                if (el.status === 'active' && !showCurrentEvents) {
                                     return;
                                 }
 
                                 // Remove planned events
-                                if (el.status == 'scheduled' && showPlannedEvents == false) {
+                                if (el.status === 'scheduled' && !showPlannedEvents) {
                                     return;
                                 }
 
@@ -211,7 +211,7 @@ function MapScreen({ navigation, route }: MapStackNavProps<'MapView'>) {
                     />
                 </View>
             ) : null}
-            {menuVisible == true ? (
+            {menuVisible ? (
                 <MapFilter
                     showPlannedEvents={showPlannedEvents}
                     setShowPlannedEvents={setShowPlannedEvents}

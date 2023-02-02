@@ -6,8 +6,6 @@ import MapView, { LatLng, Marker } from 'react-native-maps';
 
 import { useAsyncEffects } from '../util';
 
-MapPicker.propTypes = {};
-
 export default function MapPicker({ route, navigation }) {
     const { returnLocation } = route.params;
     const mapRef = React.useRef<MapView>(null);

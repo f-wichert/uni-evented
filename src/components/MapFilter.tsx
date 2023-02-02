@@ -68,7 +68,7 @@ function MapFilter({
                     <View style={styles.sectionBody}>
                         <View style={{ flex: 3 }}>
                             <Text>
-                                {currentDayRange == 0 ? 'Today' : `${currentDayRange} Days`}
+                                {currentDayRange === 0 ? 'Today' : `${currentDayRange} Days`}
                             </Text>
                         </View>
                         <View style={{ flex: 14 }}>

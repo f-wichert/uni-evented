@@ -36,5 +36,6 @@ module.exports = {
                 additionalHooks: '\\b(useAsyncEffects|useAsyncCallback)\\b',
             },
         ],
+        eqeqeq: 'error',
     },
 };

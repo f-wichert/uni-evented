@@ -5,7 +5,7 @@ import { useUserStore } from '../state/user';
 function Message(props) {
     const message = props.message;
     const userId = useUserStore((state) => state.currentUserId);
-    const left = props.message.senderId == userId;
+    const left = props.message.senderId === userId;
 
     const nameChar = (message.sender.displayName || message.sender.username)
         .charAt(0)
@@ -13,7 +13,7 @@ function Message(props) {
 
     return (
         <>
-            {left == false ? (
+            {!left ? (
                 <View style={styles.container}>
                     <View style={styles.userArea}>
                         <View style={styles.userCircle}>
