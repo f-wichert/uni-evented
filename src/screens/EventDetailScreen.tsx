@@ -49,21 +49,20 @@ function EventDetailScreen({ route, navigation, preview, evId }: Props) {
 
     const isPreview = preview ? preview : false;
 
-    const isHost = eventData!.hostId == user.id;
+    const shouldShowEditButton = !isPreview && eventData && eventData.hostId === user.id;
+    useEffect(() => {
+        const onEdit = () => navigation.navigate('EventDetailEdit', { eventId: eventId });
 
-    function onEdit() {
-        navigation.navigate('EventDetailEdit', { eventId: eventId });
-    }
-
-    if (isHost && !isPreview) {
-        navigation.setOptions({
-            headerRight: () => (
-                <Pressable onPress={onEdit}>
-                    <Ionicons name={'pencil-outline'} color={'black'} size={32} />
-                </Pressable>
-            ),
-        });
-    }
+        if (shouldShowEditButton) {
+            navigation.setOptions({
+                headerRight: () => (
+                    <Pressable onPress={onEdit}>
+                        <Ionicons name={'pencil-outline'} color={'black'} size={32} />
+                    </Pressable>
+                ),
+            });
+        }
+    }, [eventId, navigation, shouldShowEditButton]);
 
     useAsyncEffects(
         async () => {
