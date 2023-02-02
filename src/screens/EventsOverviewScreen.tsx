@@ -45,9 +45,9 @@ export default function EventsOverviewScreen({
             <ScrollView
                 refreshControl={<RefreshControl refreshing={loading} onRefresh={refresh} />}
             >
-                <Text style={{ ...styles.headerTitle, borderBottomColor: 'red' }}>
-                    Active event
-                </Text>
+                <View style={[styles.headerContainer, { borderBottomColor: 'red' }]}>
+                    <Text style={styles.headerTitle}>Active event</Text>
+                </View>
                 {events?.currentEvent ? (
                     <EventPreview
                         id={events.currentEvent}
@@ -55,9 +55,9 @@ export default function EventsOverviewScreen({
                         filter={['scheduled', 'active']}
                     />
                 ) : null}
-                <Text style={{ ...styles.headerTitle, borderBottomColor: 'orange' }}>
-                    Your Events
-                </Text>
+                <View style={[styles.headerContainer, { borderBottomColor: 'orange' }]}>
+                    <Text style={styles.headerTitle}>Your Events</Text>
+                </View>
                 {events?.hostedEvents.map((id) => {
                     return (
                         <EventPreview
@@ -68,9 +68,9 @@ export default function EventsOverviewScreen({
                         />
                     );
                 })}
-                <Text style={{ ...styles.headerTitle, borderBottomColor: 'purple' }}>
-                    Followed Events
-                </Text>
+                <View style={[styles.headerContainer, { borderBottomColor: 'purple' }]}>
+                    <Text style={styles.headerTitle}>Followed Events</Text>
+                </View>
                 {events?.interestedEvents.map((id) => {
                     return (
                         <EventPreview
@@ -93,15 +93,17 @@ const styles = StyleSheet.create({
         flexDirection: 'column',
         justifyContent: 'flex-start',
     },
-    headerTitle: {
-        fontSize: 20,
-        fontWeight: 'bold',
-        alignSelf: 'center',
+    headerContainer: {
         borderBottomColor: 'black',
         borderBottomWidth: 2,
         width: '100%',
-        textAlign: 'center',
+        alignSelf: 'center',
         marginTop: 5,
         marginBottom: 5,
+    },
+    headerTitle: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        textAlign: 'center',
     },
 });
