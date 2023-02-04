@@ -125,7 +125,7 @@ export type CommonStackParams = {
     EventDetail: { eventId: string };
     MediaCapture: { eventId: string };
     Chat: { eventId: string };
-    EventDetailEdit: { eventId: string };
+    EventDetailEdit: { eventId: string; location?: LatLng };
     EventAttendees: { eventId: string };
     UserProfile: { userId: string; /* this only works on the profile tab */ showEdit?: boolean };
 };

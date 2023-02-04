@@ -13,46 +13,30 @@ import {
     TouchableOpacity,
     View,
 } from 'react-native';
-import DropDownPicker from 'react-native-dropdown-picker';
 import MapView, { LatLng, Marker } from 'react-native-maps';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
+import TagDropdown from '../components/TagDropdown';
 
 import { INPUT_BACKGR_COLOR } from '../constants';
 import { EventManager } from '../models';
-import { EventUpdateParams, Tag } from '../models/event';
-import { EventDetailProps } from '../nav/types';
+import { EventUpdateParams } from '../models/event';
+import { CommonStackProps } from '../nav/types';
 import { useEventFetch } from '../state/event';
-import { asyncHandler, useAsyncEffects } from '../util';
+import { asyncHandler } from '../util';
+
 const width = Dimensions.get('window').width;
 
-// dropdown uses `value` prop on items, we put the tag's ID there
-type TagWithValue = Tag & { value: string };
-
-function EventDetailEditScreen({ route, navigation }: EventDetailProps) {
+function EventDetailEditScreen({ route, navigation }: CommonStackProps<'EventDetailEdit'>) {
     const { event: eventData, loading, refresh } = useEventFetch(route.params.eventId);
 
-    const [tags, setTags] = useState<TagWithValue[]>([]);
-    useAsyncEffects(
-        async () => {
-            const response = await EventManager.fetchAllTags();
-            const mappedTags = response.map((tag: Tag) => ({
-                ...tag,
-                value: tag.id,
-            }));
-            setTags(mappedTags);
-        },
-        [],
-        { prefix: 'Failed to fetch tags' }
-    );
-
+    // This is passed back from the map picker (https://reactnavigation.org/docs/params#passing-params-to-a-previous-screen).
+    // If `params.location` changed, we call `setLocation` with the new value.
     const locationParam = route.params?.location;
     useEffect(() => {
         if (locationParam) {
             setLocation(locationParam);
         }
     }, [locationParam]);
-
-    DropDownPicker.setListMode('SCROLLVIEW');
 
     const [name, setName] = useState(eventData!.name);
     const [description, setDescription] = useState(eventData!.description);
@@ -70,8 +54,6 @@ function EventDetailEditScreen({ route, navigation }: EventDetailProps) {
         eventData!.endDate ?? dayjs(eventData!.startDate).add(2, 'hours').toDate()
     );
 
-    // Dropdown State
-    const [open, setOpen] = useState(false);
     // (list of tag IDs)
     const [selectedTags, setSelectedTags] = useState<string[]>(
         eventData!.tags.map((tag) => tag.id)
@@ -298,30 +280,14 @@ function EventDetailEditScreen({ route, navigation }: EventDetailProps) {
                 <Text style={styles.sectionTitle}>Tags (up to 5)</Text>
 
                 <View style={styles.sectionBody}>
-                    <DropDownPicker
-                        style={[styles.dropdown]}
-                        multiple={true}
+                    <TagDropdown
+                        style={styles.dropdown}
+                        selectedTags={selectedTags}
+                        setSelectedTags={setSelectedTags}
+                        maxHeight={300}
+                        listMode="SCROLLVIEW"
                         min={1}
                         max={5}
-                        open={open}
-                        value={selectedTags}
-                        items={tags}
-                        setOpen={setOpen}
-                        setValue={setSelectedTags}
-                        setItems={setTags}
-                        placeholder="Select up to five tags"
-                        maxHeight={300}
-                        categorySelectable={false}
-                        mode="BADGE"
-                        badgeDotColors={[
-                            '#e76f51',
-                            '#00b4d8',
-                            '#e9c46a',
-                            '#e76f51',
-                            '#8ac926',
-                            '#00b4d8',
-                            '#e9c46a',
-                        ]}
                     />
                 </View>
             </View>

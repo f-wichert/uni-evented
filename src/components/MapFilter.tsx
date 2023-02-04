@@ -1,14 +1,9 @@
 import { Slider } from '@miblanchard/react-native-slider';
 import Checkbox from 'expo-checkbox';
-import React, { SetStateAction, useCallback, useState } from 'react';
+import React, { SetStateAction, useCallback } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import DropDownPicker from 'react-native-dropdown-picker';
 
-import { EventManager } from '../models';
-import { Tag } from '../models/event';
-import { useAsyncEffects } from '../util';
-
-type TagWithValue = Tag & { value: string };
+import TagDropdown from './TagDropdown';
 
 interface Props {
     showPlannedEvents: boolean;
@@ -31,25 +26,6 @@ function MapFilter({
     selectedTags,
     setSelectedTags,
 }: Props) {
-    // Dropdown State
-    const [open, setOpen] = useState(false);
-    // const [selectedTags, setSelectedTags] = useState<string[]>([]);
-    const dropdownHeight = 200;
-
-    const [tags, setTags] = useState<TagWithValue[]>([]);
-    useAsyncEffects(
-        async () => {
-            const response = await EventManager.fetchAllTags();
-            const mappedTags = response.map((tag: Tag) => ({
-                ...tag,
-                value: tag.id,
-            }));
-            setTags(mappedTags);
-        },
-        [],
-        { prefix: 'Failed to fetch tags' }
-    );
-
     const onCurrentDayRangeChange = useCallback(
         (value: number | number[]) => {
             // https://github.com/miblanchard/react-native-slider/issues/341
@@ -106,49 +82,18 @@ function MapFilter({
                 <View style={{ ...styles.section, paddingTop: 10 }}>
                     <Text style={styles.sectionHeader}>Tag Filter:</Text>
                     <View style={styles.sectionBody}>
-                        <DropDownPicker
+                        <TagDropdown
                             style={styles.dropdown}
-                            multiple={true}
+                            selectedTags={selectedTags}
+                            setSelectedTags={setSelectedTags}
+                            showBackground={true}
+                            maxHeight={200}
+                            listMode="SCROLLVIEW"
                             min={0}
                             max={3}
-                            open={open}
-                            onClose={() => {
-                                setOpen(false);
-                            }}
-                            value={selectedTags}
-                            items={tags}
-                            setOpen={setOpen}
-                            setValue={setSelectedTags}
-                            setItems={setTags}
-                            placeholder="Select tags"
-                            maxHeight={dropdownHeight}
-                            categorySelectable={false}
-                            mode="BADGE"
-                            badgeDotColors={[
-                                '#e76f51',
-                                '#00b4d8',
-                                '#e9c46a',
-                                '#e76f51',
-                                '#8ac926',
-                                '#00b4d8',
-                                '#e9c46a',
-                            ]}
                         />
                     </View>
                 </View>
-                {open ? (
-                    <View style={{ height: dropdownHeight - 5 }} pointerEvents="none"></View>
-                ) : null}
-                {/* <View style={styles.section}>
-                    <Pressable
-                        onPress={(e) => {
-                            console.log("Update");
-                            refresh();
-                        }}
-                    >
-                        <Text>Update</Text>
-                    </Pressable>
-                </View> */}
             </View>
         </View>
     );
