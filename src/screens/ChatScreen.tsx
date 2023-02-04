@@ -81,6 +81,7 @@ function ChatScreen({ route }: CommonStackProps<'Chat'>) {
                         name="send"
                         size={25}
                         color={'#fcba03'}
+                        styles={{ opacity: text ? 1 : 0.5 }}
                         onPress={() => sendMessage()}
                     ></Ionicons>
                 </View>
