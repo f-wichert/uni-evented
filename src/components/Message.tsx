@@ -1,16 +1,21 @@
 import React from 'react';
 import { Image, StyleSheet, Text, View } from 'react-native';
+
 import yellowSplash from '../../assets/yellow_splash.png';
 import { UserManager } from '../models';
+import { Message as MessageModel } from '../models/message';
 import { useUserStore } from '../state/user';
 
-function Message(props) {
-    const message = props.message;
+interface Props {
+    message: MessageModel;
+}
+
+function Message({ message }: Props) {
     const userId = useUserStore((state) => state.currentUserId);
-    const left = props.message.senderId === userId;
+    const left = message.sender.id === userId;
     const hostAvatarUrl = UserManager.getAvatarUrl(message.sender);
 
-    const sendTime = new Date(message.sendTime).toLocaleString();
+    const sendTime = message.sendTime.toLocaleString();
 
     return (
         <>

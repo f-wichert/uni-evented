@@ -1,21 +1,19 @@
 import { EmptyObject } from '../types';
 import { request } from '../util';
-import { UserResponse } from './user';
-
-type PartialMessageSender = Pick<UserResponse, 'displayName' | 'username'>;
+import { User, UserResponse } from './user';
 
 export interface MessageResponse {
     readonly id: string;
     readonly message: string;
     readonly sendTime: string;
-    readonly sender: PartialMessageSender;
+    readonly sender: UserResponse;
 }
 
 export interface Message {
     readonly id: string;
     readonly message: string;
     readonly sendTime: Date;
-    readonly sender: PartialMessageSender;
+    readonly sender: User;
 }
 
 export class MessageManager {

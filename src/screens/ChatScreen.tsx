@@ -58,13 +58,7 @@ function ChatScreen({ route }: CommonStackProps<'Chat'>) {
                             scrollViewRef.current?.scrollToEnd({ animated: false })
                         }
                     >
-                        {messages ? (
-                            messages.map((e, i) => (
-                                <Message key={`message-${i}`} message={messages[i]} />
-                            ))
-                        ) : (
-                            <></>
-                        )}
+                        {messages?.map((msg) => <Message key={msg.id} message={msg} />) ?? null}
                     </ScrollView>
                 </SafeAreaView>
             </View>
