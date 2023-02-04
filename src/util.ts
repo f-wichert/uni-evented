@@ -112,6 +112,9 @@ export function useAsync<T>(func: () => Promise<T>, immediate = true) {
             setValue(await func());
         } catch (err) {
             setError(err as Error);
+            if (config.NODE_ENV === 'development') {
+                handleError(err, { prefix: '[development warning]' });
+            }
         } finally {
             setLoading(false);
         }
