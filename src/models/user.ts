@@ -7,6 +7,8 @@ import { request } from '../util';
 export const EventAttendeeStatuses = ['interested', 'attending', 'left', 'banned'] as const;
 export type EventAttendeeStatus = typeof EventAttendeeStatuses[number];
 
+export type FollowType = 'following' | 'followers';
+
 export interface PartialAttendee {
     status: EventAttendeeStatus;
 }
@@ -103,5 +105,10 @@ export class UserManager {
 
     static async unregisterPush(token: string) {
         await request('POST', '/auth/unregisterPush', { token }, { noAuth: true });
+    }
+
+    static async fetchFollows(userId: string, type: FollowType) {
+        const data = await request<UserResponse[]>('GET', `/user/${userId}/${type}`);
+        return data.map((u) => this.fromUserResponse(u));
     }
 }

@@ -13,7 +13,7 @@ import { Media, User } from '../models';
 import { EventExtra } from '../models/event';
 
 import type { EventListKeys } from '../models/event';
-import { RecommendationSettings } from '../models/user';
+import { FollowType, RecommendationSettings } from '../models/user';
 
 // ==========
 // root navigators, only one of these is active at a time
@@ -128,6 +128,7 @@ export type CommonStackParams = {
     EventDetailEdit: { eventId: string; location?: LatLng };
     EventAttendees: { eventId: string };
     UserProfile: { userId: string; /* this only works on the profile tab */ showEdit?: boolean };
+    FollowList: { userId: string; type: FollowType };
 };
 
 export type CommonStackProps<T extends keyof CommonStackParams = keyof CommonStackParams> =

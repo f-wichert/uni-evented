@@ -15,8 +15,21 @@ import { useRelevantEvents } from '../state/event';
 import { useUserFetch } from '../state/user';
 import { identity } from '../util';
 
-function MainView({ user, details }: { user: User | undefined; details: UserDetails | undefined }) {
-    if (!user) return <View style={styles.mainEmpty}></View>;
+interface MainViewProps {
+    user: User;
+    details: UserDetails | undefined;
+    navigation: CommonStackProps<'UserProfile'>['navigation'];
+}
+
+function MainView({ user, details, navigation }: MainViewProps) {
+    const showFollowing = useCallback(
+        () => navigation.navigate('FollowList', { userId: user.id, type: 'following' }),
+        [user.id, navigation]
+    );
+    const showFollowers = useCallback(
+        () => navigation.navigate('FollowList', { userId: user.id, type: 'followers' }),
+        [user.id, navigation]
+    );
 
     return (
         <View style={styles.container}>
@@ -38,8 +51,16 @@ function MainView({ user, details }: { user: User | undefined; details: UserDeta
             ) : null}
 
             <View style={styles.values}>
-                <ValueDisplay value={details?.numFollowing} name="Following" />
-                <ValueDisplay value={details?.numFollowers} name="Followers" />
+                <ValueDisplay
+                    value={details?.numFollowing}
+                    name="Following"
+                    onPress={showFollowing}
+                />
+                <ValueDisplay
+                    value={details?.numFollowers}
+                    name="Followers"
+                    onPress={showFollowers}
+                />
                 <ValueDisplay value={details?.numEvents} name="Events" />
             </View>
         </View>
@@ -93,8 +114,13 @@ export default function UserProfileScreen({ navigation, route }: CommonStackProp
     );
 
     const renderMain = useCallback(
-        () => <MainView user={user} details={details ?? undefined} />,
-        [user, details]
+        () =>
+            user ? (
+                <MainView user={user} details={details ?? undefined} navigation={navigation} />
+            ) : (
+                <View style={styles.mainEmpty} />
+            ),
+        [user, details, navigation]
     );
     const renderEventItem: ListRenderItem<string> = useCallback(
         ({ item }) => <EventPreview id={item} navigateDetail={navigateDetail} />,

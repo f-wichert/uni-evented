@@ -6,6 +6,7 @@ import ChatScreen from '../screens/ChatScreen';
 import EventAttendees from '../screens/EventAttendees';
 import EventDetailEditScreen from '../screens/EventDetailEditScreen';
 import EventDetailScreen from '../screens/EventDetailScreen';
+import FollowList from '../screens/FollowList';
 import UserProfileScreen from '../screens/UserProfileScreen';
 import { CommonStackParams } from './types';
 
@@ -41,6 +42,7 @@ export default function createCommonScreens(Screen: ScreenType) {
                 component={UserProfileScreen}
                 options={{ title: 'User Profile' }}
             />
+            <Screen name="FollowList" component={FollowList} />
         </>
     );
 }
