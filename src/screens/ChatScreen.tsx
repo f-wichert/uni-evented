@@ -42,6 +42,7 @@ function ChatScreen({ route }: CommonStackProps<'Chat'>) {
             if (!text) return;
             await MessageManager.sendMessage(eventId, text);
             textInputRef.current?.clear();
+            setText('');
         },
         [eventId, text, textInputRef],
         { prefix: 'Failed to send message' }
@@ -80,7 +81,7 @@ function ChatScreen({ route }: CommonStackProps<'Chat'>) {
                         name="send"
                         size={25}
                         color={'#fcba03'}
-                        onPress={sendMessage}
+                        onPress={() => sendMessage()}
                     ></Ionicons>
                 </View>
             </View>
