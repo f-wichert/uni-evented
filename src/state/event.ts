@@ -101,9 +101,10 @@ export function useMediaFetch(eventId: string) {
     return { refresh, loading, media, ...rest };
 }
 
-export function useRelevantEvents() {
+export function useRelevantEvents(userId?: string) {
     const fetchFunc = useCallback(async () => {
-        const data = await request<RelevantEventsResponse>('GET', 'event/relevantEvents');
+        const body = userId ? { userId } : null;
+        const data = await request<RelevantEventsResponse>('GET', 'event/relevantEvents', body);
 
         // add event objects to store
         useEventStore.setState((state) => {
@@ -130,7 +131,7 @@ export function useRelevantEvents() {
                 .map((e) => e.id),
             pastEvents: data.pastEvents.map((e) => e.id),
         };
-    }, []);
+    }, [userId]);
 
     return useAsync(fetchFunc);
 }

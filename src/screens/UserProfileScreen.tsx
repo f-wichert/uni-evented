@@ -48,10 +48,14 @@ function MainView({ user }: { user: User | undefined }) {
 export default function UserProfileScreen({ navigation, route }: CommonStackProps<'UserProfile'>) {
     const showEdit = route.params.showEdit ?? false;
     const userId = route.params.userId;
-    const { user, loading, refresh } = useUserFetch(userId);
 
-    // TODO: fetch events (and other profile data) for user ID
-    const { value: events } = useRelevantEvents();
+    const { user, loading, refresh: refreshUser } = useUserFetch(userId);
+    const { value: events, refresh: refreshEvents } = useRelevantEvents(userId);
+
+    const refresh = useCallback(() => {
+        refreshUser();
+        refreshEvents();
+    }, [refreshUser, refreshEvents]);
 
     useFocusEffect(useCallback(() => void refresh(), [refresh]));
 
