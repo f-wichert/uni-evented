@@ -170,11 +170,11 @@ export default function MyProfileScreen({ navigation }: ProfileStackNavProps<'My
                             image={getCellIcon('calculator-outline')}
                             title="Manage Discover Feed"
                             accessory="DisclosureIndicator"
-                            onPress={useCallback(() => {
+                            onPress={() => {
                                 navigation.navigate('ManageDiscoverFeed', {
                                     currentRecommendationSettings: recommendationSettings,
                                 });
-                            }, [user, navigation])}
+                            }}
                         />
                         <Cell
                             image={getCellIcon('exit-outline', 'red')}

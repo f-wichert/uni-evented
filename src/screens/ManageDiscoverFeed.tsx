@@ -4,6 +4,7 @@ import { RecommendationSettings } from '../models/user';
 
 import { useState } from 'react';
 import { CommonStackProps } from '../nav/types';
+import { useUserStore } from '../state/user';
 import { EmptyObject } from '../types';
 import { asyncHandler, request } from '../util';
 
@@ -24,6 +25,8 @@ function ManageDiscoverFeed({ route, navigation }: Props) {
         await request<EmptyObject>('POST', `/user/setRecommendationSettings`, {
             ...currentSettings,
         }).catch(() => toast.show('Could not submit preferences'));
+        useUserStore.getState().fetchCurrentUser();
+        navigation.navigate('MyProfileView');
     });
 
     return (

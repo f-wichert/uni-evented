@@ -5,6 +5,7 @@ import * as Location from 'expo-location';
 import { getDistance } from 'geolib';
 import React, { useCallback, useEffect, useState } from 'react';
 import {
+    ActivityIndicator,
     Image,
     Pressable,
     RefreshControl,
@@ -64,6 +65,23 @@ function EventDetailScreen({ route, navigation, preview, evId }: Props) {
         }
     }, [eventId, navigation, shouldShowEditButton]);
 
+    const getLastKnownPosition = useCallback(async () => {
+        const location = await Location.getLastKnownPositionAsync();
+        if (!location) return;
+        const lastLocation = {
+            latitude: location.coords.latitude,
+            longitude: location.coords.longitude,
+        };
+
+        setLocation(lastLocation);
+    }, []);
+
+    const getCurrentPosition = useCallback(async () => {
+        const location = await Location.getCurrentPositionAsync();
+        const latlng = { latitude: location.coords.latitude, longitude: location.coords.longitude };
+        setLocation(latlng);
+    }, []);
+
     useAsyncEffects(
         async () => {
             const { status } = await Location.requestForegroundPermissionsAsync();
@@ -72,7 +90,7 @@ function EventDetailScreen({ route, navigation, preview, evId }: Props) {
             }
             await Promise.all([getLastKnownPosition(), getCurrentPosition()]);
         },
-        [],
+        [getCurrentPosition, getLastKnownPosition],
         { prefix: 'Failed to fetch location' }
     );
 
@@ -136,14 +154,13 @@ function EventDetailScreen({ route, navigation, preview, evId }: Props) {
         return (
             <View
                 style={{
-                    display: 'flex',
+                    width: '100%',
+                    height: '100%',
                     justifyContent: 'center',
                     alignItems: 'center',
-                    alignSelf: 'stretch',
-                    flex: 1,
                 }}
             >
-                <Text style={{ fontSize: 30 }}>Please select an Event</Text>
+                <ActivityIndicator size="large" />
             </View>
         );
     }
@@ -152,23 +169,6 @@ function EventDetailScreen({ route, navigation, preview, evId }: Props) {
         // return if loading or the event has no users
         const eventUser = eventData.users?.find((el) => el.id === user.id);
         return eventUser?.eventAttendee?.status;
-    };
-
-    const getLastKnownPosition = async () => {
-        const location = await Location.getLastKnownPositionAsync();
-        if (!location) return;
-        const lastLocation = {
-            latitude: location.coords.latitude,
-            longitude: location.coords.longitude,
-        };
-
-        setLocation(lastLocation);
-    };
-
-    const getCurrentPosition = async () => {
-        const location = await Location.getCurrentPositionAsync();
-        const latlng = { latitude: location.coords.latitude, longitude: location.coords.longitude };
-        setLocation(latlng);
     };
 
     const formatDateTime = (date: Date) => {
