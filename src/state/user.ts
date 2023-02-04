@@ -1,7 +1,7 @@
 import { WritableDraft } from 'immer/dist/types/types-external';
 import { useCallback, useEffect } from 'react';
 
-import { CurrentUser, CurrentUserResponse, User, UserResponse } from '../models';
+import { CurrentUser, CurrentUserResponse, User, UserManager, UserResponse } from '../models';
 import { request, useAsync } from '../util';
 import { useEventStore } from './event';
 import { createStore } from './utils/createStore';
@@ -10,26 +10,26 @@ interface State {
     users: Readonly<{ [id: string]: User | CurrentUser }>;
     currentUserId: string | null;
 
-    fetchUser: (id: string) => Promise<User>;
-    fetchCurrentUser: () => Promise<CurrentUser>;
+    fetchUser: (id: string, details?: boolean) => Promise<UserResponse>;
+    fetchCurrentUser: (details?: boolean) => Promise<CurrentUserResponse>;
 }
 
 export const useUserStore = createStore<State>('user')((set, get) => ({
     users: {},
     currentUserId: null,
 
-    fetchUser: async (id: string | '@me') => {
-        // TODO: validate types
-        const user = await request<UserResponse>('GET', `/user/${id}`);
+    fetchUser: async (id: string | '@me', details?: boolean) => {
+        const query = details ? { details: true } : null;
+        const user = await request<UserResponse>('GET', `/user/${id}`, query);
 
         set((state) => {
-            addUsers(state, user);
+            addUsers(state, UserManager.fromUserResponse(user));
         });
 
         return user;
     },
-    fetchCurrentUser: async () => {
-        const user = (await get().fetchUser('@me')) as CurrentUserResponse;
+    fetchCurrentUser: async (details?: boolean) => {
+        const user = (await get().fetchUser('@me', details)) as CurrentUserResponse;
 
         set((state) => {
             state.currentUserId = user.id;
@@ -70,14 +70,15 @@ export function useUser(id: string): User | undefined {
     return useUserStore((state) => state.users[id]);
 }
 
-export function useUserFetch(id: string) {
+export function useUserFetch(id: string, details?: boolean) {
     if (!id) throw new Error(`Invalid user ID: ${id}`);
     const fetchFunc = useCallback(async () => {
         // this already adds the user to the store
-        await useUserStore.getState().fetchUser(id);
-    }, [id]);
+        const data = await useUserStore.getState().fetchUser(id, details);
+        return data.details;
+    }, [id, details]);
 
-    const { refresh, loading, value: _ignored, ...rest } = useAsync(fetchFunc, false);
+    const { refresh, loading, value: detailData, ...rest } = useAsync(fetchFunc, false);
 
     const user = useUser(id);
     useEffect(() => {
@@ -87,5 +88,5 @@ export function useUserFetch(id: string) {
         }
     }, [user, refresh]);
 
-    return { refresh, loading, user, ...rest };
+    return { refresh, loading, user, details: detailData, ...rest };
 }

@@ -1,19 +1,25 @@
-import { StyleSheet, Text, TouchableOpacity } from 'react-native';
+import { ReactNode } from 'react';
+import { ActivityIndicator, StyleSheet, Text, TouchableOpacity } from 'react-native';
 
 import { abbreviateNumber } from '../util';
 
 interface ValueDisplayProps {
-    value: number;
+    value: number | undefined;
     name: string;
     onPress?: () => void;
 }
 
 export default function ValueDisplay({ value, name, onPress }: ValueDisplayProps) {
-    const formattedValue = abbreviateNumber(value);
+    let valueNode: ReactNode;
+    if (value !== undefined) {
+        valueNode = <Text style={styles.value}>{abbreviateNumber(value)}</Text>;
+    } else {
+        valueNode = <ActivityIndicator size="small" />;
+    }
 
     return (
         <TouchableOpacity style={styles.container} onPress={onPress} disabled={!onPress}>
-            <Text style={styles.value}>{formattedValue}</Text>
+            {valueNode}
             <Text style={styles.name}>{name}</Text>
         </TouchableOpacity>
     );
@@ -22,6 +28,7 @@ export default function ValueDisplay({ value, name, onPress }: ValueDisplayProps
 const styles = StyleSheet.create({
     container: {
         alignItems: 'center',
+        justifyContent: 'center',
         flexDirection: 'column',
     },
     value: {

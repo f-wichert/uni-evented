@@ -19,6 +19,7 @@ export interface UserResponse {
     readonly isAdmin: boolean;
     readonly bio: string;
     readonly eventAttendee?: PartialAttendee;
+    readonly details?: UserDetails;
 }
 
 export interface User {
@@ -37,13 +38,19 @@ export interface CurrentUser extends User {
     readonly recommendationSettings: RecommendationSettings;
 }
 
-export type RecommendationSettings = {
+export interface RecommendationSettings {
     DistanceWeight: number;
     TagIntersectionWeight: number;
     FolloweeIntersectionWeight: number;
     AverageEventRatingWeight: number;
     NumberOfMediasWeigth: number;
-};
+}
+
+export interface UserDetails {
+    numFollowing: number;
+    numFollowers: number;
+    numEvents: number;
+}
 
 export interface CurrentUserResponse extends UserResponse {
     currentEventId: string | null;
