@@ -1,3 +1,4 @@
+import dayjs from 'dayjs';
 import React from 'react';
 import { Image, StyleSheet, Text, View } from 'react-native';
 
@@ -13,9 +14,11 @@ interface Props {
 
 function Message({ message }: Props) {
     const userId = useUserStore((state) => state.currentUserId);
-    const hostAvatarUrl = UserManager.getAvatarUrl(message.sender);
 
-    const sendTime = message.sendTime.toLocaleString();
+    const avatarUrl = UserManager.getAvatarUrl(message.sender);
+    const username = message.sender.displayName || message.sender.username;
+
+    const formattedTime = dayjs(message.sendTime).format('HH:mm');
 
     const right = message.sender.id === userId;
     const _styles = right ? rightStyles : styles;
@@ -24,14 +27,16 @@ function Message({ message }: Props) {
         <View style={_styles.userArea}>
             <Image
                 style={_styles.userIcon}
-                source={hostAvatarUrl ? { uri: hostAvatarUrl } : yellowSplash}
+                source={avatarUrl ? { uri: avatarUrl } : yellowSplash}
             />
         </View>
     );
 
     const messageView = (
         <View style={_styles.messageArea}>
-            <Text style={_styles.time}>{sendTime}</Text>
+            <Text style={_styles.time}>
+                {username} &ndash; {formattedTime}
+            </Text>
             <View style={_styles.message}>
                 <Text>{message.message}</Text>
             </View>
