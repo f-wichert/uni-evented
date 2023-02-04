@@ -1,26 +1,38 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Image, StyleSheet, Text, View } from 'react-native';
+import yellowSplash from '../../assets/yellow_splash.png';
+import { UserManager } from '../models';
 import { useUserStore } from '../state/user';
 
 function Message(props) {
     const message = props.message;
     const userId = useUserStore((state) => state.currentUserId);
     const left = props.message.senderId === userId;
+    const hostAvatarUrl = UserManager.getAvatarUrl(message.sender);
 
-    const nameChar = (message.sender.displayName || message.sender.username)
-        .charAt(0)
-        .toUpperCase();
+    const sendTime = new Date(message.sendTime).toLocaleString();
 
     return (
         <>
             {!left ? (
                 <View style={styles.container}>
                     <View style={styles.userArea}>
-                        <View style={styles.userCircle}>
-                            <Text style={styles.userText}>{nameChar}</Text>
-                        </View>
+                        <Image
+                            style={styles.eventIcon}
+                            source={hostAvatarUrl ? { uri: hostAvatarUrl } : yellowSplash}
+                        />
                     </View>
+
                     <View style={styles.messageArea}>
+                        <View
+                            style={{
+                                ...styles.messageBox,
+                                alignSelf: 'flex-start',
+                                backgroundColor: '#fff',
+                            }}
+                        >
+                            <Text style={{ fontSize: 10 }}>{sendTime}</Text>
+                        </View>
                         <View
                             style={{
                                 ...styles.messageBox,
@@ -32,12 +44,21 @@ function Message(props) {
                             <Text>{message.message}</Text>
                         </View>
                     </View>
-                    <View style={styles.userArea}></View>
                 </View>
             ) : (
                 <View style={styles.container}>
-                    <View style={styles.userArea}></View>
                     <View style={styles.messageArea}>
+                        <View
+                            style={{
+                                ...styles.messageBox,
+                                alignSelf: 'flex-end',
+                                backgroundColor: '#fff',
+                            }}
+                        >
+                            <View>
+                                <Text style={{ fontSize: 10 }}>{sendTime}</Text>
+                            </View>
+                        </View>
                         <View
                             style={{
                                 ...styles.messageBox,
@@ -52,9 +73,10 @@ function Message(props) {
                         </View>
                     </View>
                     <View style={styles.userArea}>
-                        <View style={styles.userCircle}>
-                            <Text style={styles.userText}>{nameChar}</Text>
-                        </View>
+                        <Image
+                            style={styles.eventIcon}
+                            source={hostAvatarUrl ? { uri: hostAvatarUrl } : yellowSplash}
+                        />
                     </View>
                 </View>
             )}
@@ -116,6 +138,13 @@ const styles = StyleSheet.create({
     elevation: {
         elevation: 6.5,
         shadowColor: '#71717',
+    },
+    eventIcon: {
+        width: 35,
+        height: 35,
+        borderRadius: 100,
+        borderWidth: 1,
+        borderColor: 'white',
     },
 });
 
