@@ -57,6 +57,7 @@ function ChatScreen({ route }: CommonStackProps<'Chat'>) {
                         onContentSizeChange={() =>
                             scrollViewRef.current?.scrollToEnd({ animated: false })
                         }
+                        contentContainerStyle={{ paddingBottom: 16 }}
                     >
                         {messages?.map((msg) => <Message key={msg.id} message={msg} />) ?? null}
                     </ScrollView>
@@ -91,7 +92,6 @@ const styles = StyleSheet.create({
     },
     chatArea: {
         flex: 1,
-        // backgroundColor: 'red'
     },
     menuArea: {
         height: 65,

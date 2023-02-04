@@ -5,6 +5,7 @@ import yellowSplash from '../../assets/yellow_splash.png';
 import { UserManager } from '../models';
 import { Message as MessageModel } from '../models/message';
 import { useUserStore } from '../state/user';
+import { mergeStyleSheets } from '../util';
 
 interface Props {
     message: MessageModel;
@@ -12,144 +13,88 @@ interface Props {
 
 function Message({ message }: Props) {
     const userId = useUserStore((state) => state.currentUserId);
-    const left = message.sender.id === userId;
     const hostAvatarUrl = UserManager.getAvatarUrl(message.sender);
 
     const sendTime = message.sendTime.toLocaleString();
 
-    return (
-        <>
-            {!left ? (
-                <View style={styles.container}>
-                    <View style={styles.userArea}>
-                        <Image
-                            style={styles.eventIcon}
-                            source={hostAvatarUrl ? { uri: hostAvatarUrl } : yellowSplash}
-                        />
-                    </View>
+    const right = message.sender.id === userId;
+    const _styles = right ? rightStyles : styles;
 
-                    <View style={styles.messageArea}>
-                        <View
-                            style={{
-                                ...styles.messageBox,
-                                alignSelf: 'flex-start',
-                                backgroundColor: '#fff',
-                            }}
-                        >
-                            <Text style={{ fontSize: 10 }}>{sendTime}</Text>
-                        </View>
-                        <View
-                            style={{
-                                ...styles.messageBox,
-                                ...styles.elevation,
-                                alignSelf: 'flex-start',
-                                backgroundColor: '#ebe9e4',
-                            }}
-                        >
-                            <Text>{message.message}</Text>
-                        </View>
-                    </View>
-                </View>
-            ) : (
-                <View style={styles.container}>
-                    <View style={styles.messageArea}>
-                        <View
-                            style={{
-                                ...styles.messageBox,
-                                alignSelf: 'flex-end',
-                                backgroundColor: '#fff',
-                            }}
-                        >
-                            <View>
-                                <Text style={{ fontSize: 10 }}>{sendTime}</Text>
-                            </View>
-                        </View>
-                        <View
-                            style={{
-                                ...styles.messageBox,
-                                ...styles.elevation,
-                                alignSelf: 'flex-end',
-                                backgroundColor: '#fcba03',
-                            }}
-                        >
-                            <View>
-                                <Text>{message.message}</Text>
-                            </View>
-                        </View>
-                    </View>
-                    <View style={styles.userArea}>
-                        <Image
-                            style={styles.eventIcon}
-                            source={hostAvatarUrl ? { uri: hostAvatarUrl } : yellowSplash}
-                        />
-                    </View>
-                </View>
-            )}
-        </>
+    const userView = (
+        <View style={_styles.userArea}>
+            <Image
+                style={_styles.userIcon}
+                source={hostAvatarUrl ? { uri: hostAvatarUrl } : yellowSplash}
+            />
+        </View>
+    );
+
+    const messageView = (
+        <View style={_styles.messageArea}>
+            <Text style={_styles.time}>{sendTime}</Text>
+            <View style={_styles.message}>
+                <Text>{message.message}</Text>
+            </View>
+        </View>
+    );
+
+    return (
+        <View style={_styles.container}>
+            {userView}
+            {messageView}
+        </View>
     );
 }
 
 const styles = StyleSheet.create({
     container: {
-        // flex: 1,
-        // backgroundColor: 'yellow',
         minHeight: 45,
         flexDirection: 'row',
     },
     userArea: {
-        // flex: 1,
         width: 50,
-        // backgroundColor: 'blue',
         justifyContent: 'center',
         alignItems: 'center',
         marginTop: 5,
-    },
-    userCircle: {
-        borderWidth: 1,
-        borderRadius: 15,
-        borderColor: 'black',
-        backgroundColor: 'grey',
-        width: 30,
-        height: 30,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    userText: {
-        fontSize: 13,
-        fontWeight: 'bold',
     },
     messageArea: {
         flex: 1,
-        // backgroundColor: 'grey',
-        marginTop: 5,
-        // borderWidth: 1,
-        // borderRadius: 6,
+        flexDirection: 'column',
         justifyContent: 'center',
-        // alignItems: 'center',
-        // alignSelf: 'flex-start
+        alignItems: 'flex-start',
+        marginTop: 5,
     },
-    messageBox: {
-        // borderWidth: 1,
+    time: {
+        fontSize: 10,
+        marginVertical: 4,
+    },
+    message: {
         borderRadius: 6,
-        // flex: 1,
-        alignSelf: 'flex-start',
         paddingHorizontal: 13,
         paddingVertical: 4,
-    },
-    bufferArea: {
-        width: 50,
-        backgroundColor: 'brown',
-    },
-    elevation: {
         elevation: 6.5,
         shadowColor: '#71717',
+        backgroundColor: '#ebe9e4',
+        maxWidth: '70%',
     },
-    eventIcon: {
+    userIcon: {
         width: 35,
         height: 35,
         borderRadius: 100,
         borderWidth: 1,
         borderColor: 'white',
+    },
+});
+
+const rightStyles = mergeStyleSheets(styles, {
+    container: {
+        flexDirection: 'row-reverse',
+    },
+    messageArea: {
+        alignItems: 'flex-end',
+    },
+    message: {
+        backgroundColor: '#fcba03',
     },
 });
 
