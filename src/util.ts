@@ -22,7 +22,7 @@ export async function request<ResponseType>(
     }
 ): Promise<ResponseType> {
     // join given route to base url, removing leading `/` if exists
-    const url = urlJoin(config.BASE_URL, 'api', route.replace(/^\//, ''));
+    let url = urlJoin(config.BASE_URL, 'api', route.replace(/^\//, ''));
 
     const headers: Record<string, string> = { ...baseHeaders };
 
@@ -38,12 +38,27 @@ export async function request<ResponseType>(
     }
 
     let body: FormData | string | null = null;
-    if (data instanceof FormData) {
-        headers['Content-Type'] = 'multipart/form-data';
-        body = data;
-    } else if (typeof data === 'object') {
-        headers['Content-Type'] = 'application/json';
-        body = JSON.stringify(data);
+    let params: URLSearchParams | null = null;
+    if (!data) {
+        // do nothing
+    } else if (['GET', 'HEAD'].includes(method)) {
+        if (typeof data === 'object') {
+            params = new URLSearchParams(data as Record<string, string>);
+        } else {
+            throw new Error(`${method} does not support '${typeof data}' data`);
+        }
+    } else {
+        if (data instanceof FormData) {
+            headers['Content-Type'] = 'multipart/form-data';
+            body = data;
+        } else if (typeof data === 'object') {
+            headers['Content-Type'] = 'application/json';
+            body = JSON.stringify(data);
+        }
+    }
+
+    if (params) {
+        url += '?' + params.toString();
     }
 
     const response = await fetch(url, {
