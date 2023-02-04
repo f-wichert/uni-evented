@@ -1,8 +1,10 @@
+import _ from 'lodash';
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, Button, Keyboard, ScrollView, StyleSheet } from 'react-native';
+import { ActivityIndicator, Button, Keyboard, ScrollView, StyleSheet, Text } from 'react-native';
 
 import AvatarEditView from '../components/AvatarEditView';
 import FancyTextInput from '../components/FancyTextInput';
+import TagDropdown from '../components/TagDropdown';
 import { BIO_VALIDATION, DISPLAYNAME_VALIDATION, USERNAME_VALIDATION } from '../constants';
 import { UserManager } from '../models';
 import { ProfileStackNavProps } from '../nav/types';
@@ -48,7 +50,21 @@ export default function EditProfileScreen({ navigation }: ProfileStackNavProps<'
     const [bio, setBio] = useState<string>(currentUser.bio);
     const bioResult = validate(bio, currentUser.bio, BIO_VALIDATION);
 
-    const results = [avatarResult, usernameResult, displayNameResult, bioResult];
+    const [favouriteTags, setFavouriteTags] = useState<string[]>(currentUser.favouriteTags);
+    const tagsChanged = !_.isEqual(new Set(currentUser.favouriteTags), new Set(favouriteTags));
+    const favouriteTagsResult = {
+        error: false,
+        changed: tagsChanged,
+        submitValue: tagsChanged ? favouriteTags : undefined,
+    };
+
+    const results = [
+        avatarResult,
+        usernameResult,
+        displayNameResult,
+        bioResult,
+        favouriteTagsResult,
+    ];
     const hasChanged = results.some((r) => r.changed);
     const isValid = results.every((r) => !r.error);
 
@@ -63,6 +79,7 @@ export default function EditProfileScreen({ navigation }: ProfileStackNavProps<'
                 username: usernameResult.submitValue,
                 displayName: displayNameResult.submitValue,
                 bio: bioResult.submitValue,
+                favouriteTags: favouriteTagsResult.submitValue,
             });
         } catch (e) {
             handleError(e, { prefix: 'Failed to update profile' });
@@ -129,6 +146,16 @@ export default function EditProfileScreen({ navigation }: ProfileStackNavProps<'
                 textInputProps={{ numberOfLines: 3 }}
                 style={styles.input}
             />
+
+            <Text style={styles.header}>Favourite Tags</Text>
+            <TagDropdown
+                style={styles.dropdown}
+                dropdownStyle={{ borderColor: 'dimgrey' }}
+                selectedTags={favouriteTags}
+                setSelectedTags={setFavouriteTags}
+                showBackground={true}
+                listMode="SCROLLVIEW"
+            />
         </ScrollView>
     );
 }
@@ -146,6 +173,16 @@ const styles = StyleSheet.create({
     },
 
     input: {
+        marginBottom: 16,
+    },
+
+    header: {
+        marginLeft: 10,
+        color: 'dimgrey',
+        fontSize: 12,
+    },
+    dropdown: {
+        marginTop: 6,
         marginBottom: 16,
     },
 });

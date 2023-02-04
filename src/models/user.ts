@@ -3,7 +3,6 @@ import urlJoin from 'url-join';
 import config from '../config';
 import { addUsers, useUserStore } from '../state/user';
 import { request } from '../util';
-import { Tag } from './event';
 
 export const EventAttendeeStatuses = ['interested', 'attending', 'left', 'banned'] as const;
 export type EventAttendeeStatus = typeof EventAttendeeStatuses[number];
@@ -34,7 +33,7 @@ export interface User {
 
 export interface CurrentUser extends User {
     readonly email: string;
-    readonly favouriteTags: Tag[];
+    readonly favouriteTags: string[];
     readonly recommendationSettings: RecommendationSettings;
 }
 
@@ -46,8 +45,11 @@ export type RecommendationSettings = {
     NumberOfMediasWeigth: number;
 };
 
-export interface CurrentUserResponse extends CurrentUser {
-    readonly currentEventId: string | null;
+export interface CurrentUserResponse extends UserResponse {
+    currentEventId: string | null;
+    email: string;
+    favouriteTags?: string[];
+    recommendationSettings?: RecommendationSettings;
 }
 
 export interface AuthResponse {
@@ -71,15 +73,20 @@ export class UserManager {
         username?: string;
         displayName?: string;
         bio?: string;
+        favouriteTags?: string[];
 
         // account fields
         email?: string;
         password?: string;
     }) {
-        const user = await request<CurrentUserResponse>('PATCH', '/user/@me', params);
+        const userData = await request<CurrentUserResponse>('PATCH', '/user/@me', params);
 
         useUserStore.setState((state) => {
-            addUsers(state, this.fromUserResponse(user));
+            if (params.favouriteTags)
+                // we don't get this data back from the server
+                userData.favouriteTags = params.favouriteTags;
+
+            addUsers(state, this.fromUserResponse(userData));
         });
     }
 

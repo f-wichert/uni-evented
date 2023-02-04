@@ -1,5 +1,5 @@
 import { Dispatch, SetStateAction, useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
 import DropDownPicker, { DropDownPickerProps } from 'react-native-dropdown-picker';
 
 import { EventManager, Tag } from '../models/event';
@@ -16,13 +16,16 @@ type Props = DropdownProps & {
     // tag IDs (not full tag objects)
     selectedTags: TagValue[];
     setSelectedTags: Dispatch<SetStateAction<TagValue[]>>;
+
     showBackground?: boolean;
+    dropdownStyle?: StyleProp<ViewStyle>;
 };
 
 export default function TagDropdown({
     selectedTags,
     setSelectedTags,
     showBackground,
+    dropdownStyle,
     maxHeight,
     style,
     ...props
@@ -47,6 +50,7 @@ export default function TagDropdown({
     return (
         <View style={[styles.container, style]}>
             <DropDownPicker<TagValue>
+                style={dropdownStyle}
                 multiple={true}
                 open={open}
                 setOpen={setOpen}
