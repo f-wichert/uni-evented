@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import React, { useCallback } from 'react';
 import { Alert, ScrollView, StyleSheet, View } from 'react-native';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Cell, Section, TableView } from 'react-native-tableview-simple';
 
 import yellowSplash from '../../assets/yellow_splash.png';
@@ -34,7 +34,7 @@ export default function MyProfileScreen({ navigation }: ProfileStackNavProps<'My
     );
 
     return (
-        <SafeAreaProvider style={styles.container}>
+        <SafeAreaView style={styles.container}>
             <View style={styles.profileHeader}>
                 <ProfileHeader
                     imageUri={UserManager.getAvatarUrl(user)}
@@ -126,7 +126,7 @@ export default function MyProfileScreen({ navigation }: ProfileStackNavProps<'My
                     </Section>
                 </TableView>
             </ScrollView>
-        </SafeAreaProvider>
+        </SafeAreaView>
     );
 }
 
@@ -139,7 +139,7 @@ const styles = StyleSheet.create({
         height: '100%',
     },
     profileHeader: {
-        marginTop: 40,
+        marginTop: 20,
         marginBottom: 20,
         marginHorizontal: 20,
     },
