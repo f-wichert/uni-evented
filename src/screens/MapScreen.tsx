@@ -183,7 +183,7 @@ function MapScreen({ navigation, route }: MapStackNavProps<'MapView'>) {
                                         }}
                                         title={el.name}
                                         numPeople={el.users?.length || 0}
-                                        livestream={!!el.livestream}
+                                        livestream={el.livestream}
                                         // TODO: this might re-render every time since the
                                         // callback isn't memoized, not sure
                                         onCalloutPress={() => {

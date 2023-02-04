@@ -27,6 +27,7 @@ export interface EventResponse {
     readonly media: MediaResponse[] | null;
     readonly attendees: UserResponse[] | null;
     readonly tags: Tag[];
+    readonly livestream: boolean;
 }
 
 export interface Event {
@@ -47,7 +48,7 @@ export interface Event {
     readonly host: User;
     readonly users?: User[];
     readonly tags: Tag[];
-    readonly livestream: Media[];
+    readonly livestream: boolean;
 }
 
 // transient type for processed API responses by `fromEventResponse`
@@ -146,11 +147,21 @@ export class EventManager {
     }
 
     static fromEventResponse(response: EventResponse): EventExtra {
-        const { media, attendees, host, startDateTime, endDateTime, lat, lon, ...fields } =
-            response;
+        const {
+            media: rawMedia,
+            attendees,
+            host,
+            startDateTime,
+            endDateTime,
+            lat,
+            lon,
+            ...fields
+        } = response;
 
         // TODO: add these to user store
         const users = attendees?.map((user) => UserManager.fromUserResponse(user));
+
+        const media = rawMedia?.map((med) => MediaManager.fromMediaResponse(med));
 
         return {
             ...fields,
@@ -161,7 +172,7 @@ export class EventManager {
             endDate: endDateTime ? new Date(endDateTime) : null,
             ...(users ? { users: users } : undefined),
             host: UserManager.fromUserResponse(host),
-            media: media?.map((med) => MediaManager.fromMediaResponse(med)),
+            ...(media ? { media: media } : undefined),
         };
     }
 
