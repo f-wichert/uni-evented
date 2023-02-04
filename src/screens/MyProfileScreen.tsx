@@ -92,6 +92,7 @@ export default function MyProfileScreen({ navigation }: ProfileStackNavProps<'My
                                 image={getCellIcon('construct-outline')}
                                 title="Moderation"
                                 accessory="DisclosureIndicator"
+                                // eslint-disable-next-line react-hooks/rules-of-hooks
                                 onPress={useCallback(() => {
                                     navigation.navigate('AdminMainScreen');
                                 }, [navigation])}

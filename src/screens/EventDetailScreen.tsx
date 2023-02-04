@@ -58,7 +58,7 @@ function EventDetailScreen({ route, navigation, preview, evId }: Props) {
             navigation.setOptions({
                 headerRight: () => (
                     <Pressable onPress={onEdit}>
-                        <Ionicons name={'pencil-outline'} color={'black'} size={32} />
+                        <Ionicons name={'create-outline'} color={'black'} size={32} />
                     </Pressable>
                 ),
             });
