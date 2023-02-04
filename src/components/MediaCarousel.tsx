@@ -364,11 +364,14 @@ const styles = StyleSheet.create({
         position: 'absolute',
         top: 25,
         left: 0,
-        marginHorizontal: 20,
+        marginHorizontal: 5,
         display: 'flex',
         justifyContent: 'flex-start',
         flexDirection: 'row',
         alignItems: 'center',
+        backgroundColor: 'darkorange',
+        borderRadius: 100,
+        padding: 5,
     },
     eventIcon: {
         width: 35,
@@ -378,6 +381,7 @@ const styles = StyleSheet.create({
         borderColor: 'white',
     },
     eventHeader: {
+        marginLeft: 5,
         color: 'white',
         fontWeight: 'bold',
         fontSize: 16,
