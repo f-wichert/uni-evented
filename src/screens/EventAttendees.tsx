@@ -1,7 +1,7 @@
-import React, { useCallback, useMemo } from 'react';
-import { ActivityIndicator, RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
+import React, { useMemo } from 'react';
+import { RefreshControl, ScrollView, StyleSheet } from 'react-native';
 
-import UserPreview from '../components/UserPreview';
+import EventUserPreview from '../components/EventUserPreview';
 import { UserManager } from '../models';
 import { CommonStackProps } from '../nav/types';
 import { useEventFetch } from '../state/event';
@@ -27,45 +27,29 @@ function EventAttendees({ navigation, route }: CommonStackProps<'EventAttendees'
             );
     }, [event]);
 
-    const showProfile = useCallback(
-        (userId: string) => {
-            navigation.navigate('UserProfile', { userId: userId });
-        },
-        [navigation]
-    );
-
-    // is event data is not there yet
-    if (!event || loading) {
-        return (
-            <>
-                <View style={{ flex: 1, justifyContent: 'center' }}>
-                    <ActivityIndicator size="large" />
-                </View>
-            </>
-        );
-    }
-
     return (
         <ScrollView refreshControl={<RefreshControl refreshing={loading} onRefresh={refresh} />}>
-            {sortedUsers.map((user) => {
-                const avatarUrl = UserManager.getAvatarUrl(user);
-                return (
-                    <UserPreview
-                        key={user.id}
-                        username={user.username}
-                        displayName={user.displayName}
-                        id={user.id}
-                        bio={user.bio}
-                        status={user.eventAttendee?.status}
-                        avatarUrl={avatarUrl}
-                        host={event.hostId === user.id}
-                        ban={event.hostId === currentUser.id}
-                        showProfile={showProfile}
-                        eventId={event.id}
-                        refresh={refresh}
-                    />
-                );
-            })}
+            {event
+                ? sortedUsers.map((user) => {
+                      const avatarUrl = UserManager.getAvatarUrl(user);
+                      return (
+                          <EventUserPreview
+                              key={user.id}
+                              username={user.username}
+                              displayName={user.displayName}
+                              id={user.id}
+                              bio={user.bio}
+                              avatarUrl={avatarUrl}
+                              navigation={navigation}
+                              status={user.eventAttendee?.status}
+                              host={event.hostId === user.id}
+                              ban={event.hostId === currentUser.id}
+                              eventId={event.id}
+                              refresh={refresh}
+                          />
+                      );
+                  })
+                : null}
         </ScrollView>
     );
 }

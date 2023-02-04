@@ -70,6 +70,7 @@ export function useUser(id: string): User | undefined {
     return useUserStore((state) => state.users[id]);
 }
 
+// note: this doesn't automatically fetch detail data if the user is already cached, even if we don't have detail data
 export function useUserFetch(id: string, details?: boolean) {
     if (!id) throw new Error(`Invalid user ID: ${id}`);
     const fetchFunc = useCallback(async () => {

@@ -1,59 +1,29 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
-import React, { useCallback } from 'react';
+import React, { ReactNode, useCallback } from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { EventManager } from '../models';
 
-import { EventAttendeeStatus } from '../models/user';
+import { CommonStackProps } from '../nav/types';
 
 declare type Props = {
     id: string;
     username: string;
     displayName: string;
     bio: string;
-    status?: EventAttendeeStatus;
     avatarUrl: string | null;
-    host: boolean;
-    ban: boolean;
-    showProfile: (userId: string) => void;
-    eventId: string;
-    refresh: () => void;
+
+    navigation: CommonStackProps['navigation'];
+    children?: ReactNode;
 };
 
-function UserPreview({
-    id,
-    username,
-    displayName,
-    status,
-    bio,
-    avatarUrl,
-    host,
-    ban,
-    showProfile,
-    eventId,
-    refresh,
-}: Props) {
-    const statusIcon = () => {
-        if (host) return 'home-outline';
-        switch (status) {
-            case 'attending':
-                return 'checkmark-circle-outline';
-            case 'interested':
-                return 'help-outline';
-            case 'left':
-                return 'close-circle-outline';
-        }
-    };
-
-    const showUserProfile = useCallback(() => showProfile(id), [showProfile, id]);
-
-    const banUser = async () => {
-        await EventManager.banUser(eventId, id);
-        refresh();
-    };
+function UserPreview({ id, username, displayName, bio, avatarUrl, navigation, children }: Props) {
+    const showProfile = useCallback(
+        () => navigation.navigate('UserProfile', { userId: id }),
+        [navigation, id]
+    );
 
     return (
         <View style={[styles.container]}>
-            <TouchableOpacity style={[styles.innerContainer]} onPress={showUserProfile}>
+            <TouchableOpacity style={[styles.innerContainer]} onPress={showProfile}>
                 {avatarUrl ? (
                     <Image style={styles.icon} source={{ uri: avatarUrl }} />
                 ) : (
@@ -71,16 +41,7 @@ function UserPreview({
                     </Text>
                 </View>
             </TouchableOpacity>
-            {ban && !host ? (
-                <TouchableOpacity
-                    style={styles.statusIcon}
-                    // ToDo: add ban user endpoint
-                    onPress={banUser}
-                >
-                    <Ionicons name="close-circle-outline" color={'red'} size={32} />
-                </TouchableOpacity>
-            ) : null}
-            <Ionicons style={styles.statusIcon} name={statusIcon()} color={'black'} size={32} />
+            <View>{children}</View>
         </View>
     );
 }
@@ -92,12 +53,10 @@ const styles = StyleSheet.create({
         justifyContent: 'flex-start',
         alignItems: 'center',
         margin: 5,
-        // borderBottomColor: 'black',
-        // paddingBottom: 2,
-        // borderBottomWidth: 1,
     },
     innerContainer: {
         flex: 1,
+        flexGrow: 2,
         flexDirection: 'row',
         justifyContent: 'flex-start',
         alignItems: 'center',
