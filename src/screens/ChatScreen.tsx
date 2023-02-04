@@ -8,7 +8,7 @@ import { Message as MessageModel, MessageManager } from '../models/message';
 import { CommonStackProps } from '../nav/types';
 import { useAsyncCallback } from '../util';
 
-function ChatScreen({ route }: CommonStackProps<'Chat'>) {
+function ChatScreen({ route, navigation }: CommonStackProps<'Chat'>) {
     const eventId = route.params?.eventId ?? null;
     const [messages, setMessages] = useState<MessageModel[]>();
     const [text, setText] = useState('');
@@ -48,6 +48,13 @@ function ChatScreen({ route }: CommonStackProps<'Chat'>) {
         { prefix: 'Failed to send message' }
     );
 
+    const showProfile = useCallback(
+        (userId: string) => {
+            navigation.navigate('UserProfile', { userId: userId });
+        },
+        [navigation]
+    );
+
     return (
         <View style={styles.container}>
             <View style={styles.chatArea}>
@@ -59,7 +66,9 @@ function ChatScreen({ route }: CommonStackProps<'Chat'>) {
                         }
                         contentContainerStyle={{ paddingBottom: 16 }}
                     >
-                        {messages?.map((msg) => <Message key={msg.id} message={msg} />) ?? null}
+                        {messages?.map((msg) => (
+                            <Message key={msg.id} message={msg} showProfile={showProfile} />
+                        )) ?? null}
                     </ScrollView>
                 </SafeAreaView>
             </View>

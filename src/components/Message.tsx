@@ -1,6 +1,6 @@
 import dayjs from 'dayjs';
-import React from 'react';
-import { Image, StyleSheet, Text, View } from 'react-native';
+import React, { useCallback } from 'react';
+import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 import yellowSplash from '../../assets/yellow_splash.png';
 import { UserManager } from '../models';
@@ -10,26 +10,29 @@ import { mergeStyleSheets } from '../util';
 
 interface Props {
     message: MessageModel;
+    showProfile: (userId: string) => void;
 }
 
-function Message({ message }: Props) {
-    const userId = useUserStore((state) => state.currentUserId);
+function Message({ message, showProfile }: Props) {
+    const myId = useUserStore((state) => state.currentUserId);
+    const senderId = message.sender.id;
 
     const avatarUrl = UserManager.getAvatarUrl(message.sender);
     const username = message.sender.displayName || message.sender.username;
 
     const formattedTime = dayjs(message.sendTime).format('HH:mm');
 
-    const right = message.sender.id === userId;
-    const _styles = right ? rightStyles : styles;
+    const _styles = senderId === myId ? rightStyles : styles;
+
+    const showUserProfile = useCallback(() => showProfile(senderId), [showProfile, senderId]);
 
     const userView = (
-        <View style={_styles.userArea}>
+        <TouchableOpacity style={_styles.userArea} onPress={showUserProfile}>
             <Image
                 style={_styles.userIcon}
                 source={avatarUrl ? { uri: avatarUrl } : yellowSplash}
             />
-        </View>
+        </TouchableOpacity>
     );
 
     const messageView = (
