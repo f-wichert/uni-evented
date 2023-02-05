@@ -20,16 +20,17 @@ import { UserDetails } from '../models/user';
 import { CommonStackProps, ProfileStackNavProps } from '../nav/types';
 import { useRelevantEvents } from '../state/event';
 import { useCurrentUser, useUserFetch } from '../state/user';
-import { identity } from '../util';
+import { identity, useAsyncCallback } from '../util';
 
 interface MainViewProps {
     user: User;
     details: UserDetails | undefined;
     detailsLoading: boolean;
+    followAction: (type: 'follow' | 'unfollow') => void;
     navigation: CommonStackProps<'UserProfile'>['navigation'];
 }
 
-function MainView({ user, details, detailsLoading, navigation }: MainViewProps) {
+function MainView({ user, details, detailsLoading, followAction, navigation }: MainViewProps) {
     const showFollowing = useCallback(
         () => navigation.navigate('FollowList', { userId: user.id, type: 'following' }),
         [user.id, navigation]
@@ -38,6 +39,8 @@ function MainView({ user, details, detailsLoading, navigation }: MainViewProps) 
         () => navigation.navigate('FollowList', { userId: user.id, type: 'followers' }),
         [user.id, navigation]
     );
+    const follow = useCallback(() => followAction('follow'), [followAction]);
+    const unfollow = useCallback(() => followAction('unfollow'), [followAction]);
 
     const currentUser = useCurrentUser();
     const canFollow = currentUser.id !== user.id;
@@ -81,6 +84,7 @@ function MainView({ user, details, detailsLoading, navigation }: MainViewProps) 
                 <View style={styles.followButton}>
                     <Button
                         text={followed ? 'Unfollow' : 'Follow'}
+                        onPress={followed ? unfollow : follow}
                         icon={followed ? 'person-remove' : 'person-add'}
                         loading={detailsLoading}
                     />
@@ -146,6 +150,15 @@ export default function UserProfileScreen({ navigation, route }: CommonStackProp
 
     useFocusEffect(useCallback(() => void refresh(), [refresh]));
 
+    const followAction = useAsyncCallback(
+        async (type: 'follow' | 'unfollow') => {
+            await UserManager.follow(userId, type);
+            refresh();
+        },
+        [userId, refresh],
+        { prefix: 'Failed to (un)follow user' }
+    );
+
     // show edit header button if needed
     useEffect(() => {
         navigation.setOptions({
@@ -185,12 +198,13 @@ export default function UserProfileScreen({ navigation, route }: CommonStackProp
                     user={user}
                     details={details ?? undefined}
                     detailsLoading={detailsLoading}
+                    followAction={followAction}
                     navigation={navigation}
                 />
             ) : (
                 <View style={styles.mainEmpty} />
             ),
-        [user, details, detailsLoading, navigation]
+        [user, details, detailsLoading, followAction, navigation]
     );
     const renderTabBar = useCallback(
         (props: TabBarProps<TabName>) => <MaterialTabBar TabItemComponent={TabLabel} {...props} />,
