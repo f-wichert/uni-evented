@@ -52,6 +52,7 @@ export interface UserDetails {
     numFollowing: number;
     numFollowers: number;
     numEvents: number;
+    followed: boolean;
 }
 
 export interface CurrentUserResponse extends UserResponse {

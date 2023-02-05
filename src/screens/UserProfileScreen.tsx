@@ -11,6 +11,7 @@ import {
 } from 'react-native-collapsible-tab-view';
 
 import yellowSplash from '../../assets/yellow_splash.png';
+import Button from '../components/Button';
 import EventPreview from '../components/EventPreview';
 import ProfileHeader from '../components/ProfileHeader';
 import ValueDisplay from '../components/ValueDisplay';
@@ -18,16 +19,17 @@ import { User, UserManager } from '../models';
 import { UserDetails } from '../models/user';
 import { CommonStackProps, ProfileStackNavProps } from '../nav/types';
 import { useRelevantEvents } from '../state/event';
-import { useUserFetch } from '../state/user';
+import { useCurrentUser, useUserFetch } from '../state/user';
 import { identity } from '../util';
 
 interface MainViewProps {
     user: User;
     details: UserDetails | undefined;
+    detailsLoading: boolean;
     navigation: CommonStackProps<'UserProfile'>['navigation'];
 }
 
-function MainView({ user, details, navigation }: MainViewProps) {
+function MainView({ user, details, detailsLoading, navigation }: MainViewProps) {
     const showFollowing = useCallback(
         () => navigation.navigate('FollowList', { userId: user.id, type: 'following' }),
         [user.id, navigation]
@@ -36,6 +38,11 @@ function MainView({ user, details, navigation }: MainViewProps) {
         () => navigation.navigate('FollowList', { userId: user.id, type: 'followers' }),
         [user.id, navigation]
     );
+
+    const currentUser = useCurrentUser();
+    const canFollow = currentUser.id !== user.id;
+    // whether the current user is following `user`
+    const followed = details?.followed;
 
     return (
         <View style={styles.container}>
@@ -69,6 +76,16 @@ function MainView({ user, details, navigation }: MainViewProps) {
                 />
                 <ValueDisplay value={details?.numEvents} name="Events" />
             </View>
+
+            {canFollow ? (
+                <View style={styles.followButton}>
+                    <Button
+                        text={followed ? 'Unfollow' : 'Follow'}
+                        icon={followed ? 'person-remove' : 'person-add'}
+                        loading={detailsLoading}
+                    />
+                </View>
+            ) : null}
         </View>
     );
 }
@@ -110,8 +127,17 @@ export default function UserProfileScreen({ navigation, route }: CommonStackProp
     const showEdit = route.params.showEdit ?? false;
     const userId = route.params.userId;
 
-    const { user, details, loading, refresh: refreshUser } = useUserFetch(userId, true);
-    const { value: events, refresh: refreshEvents } = useRelevantEvents(userId);
+    const {
+        user,
+        details,
+        loading: userLoading,
+        refresh: refreshUser,
+    } = useUserFetch(userId, true);
+    const {
+        value: events,
+        loading: detailsLoading,
+        refresh: refreshEvents,
+    } = useRelevantEvents(userId);
 
     const refresh = useCallback(() => {
         refreshUser();
@@ -155,11 +181,16 @@ export default function UserProfileScreen({ navigation, route }: CommonStackProp
     const renderMain = useCallback(
         () =>
             user ? (
-                <MainView user={user} details={details ?? undefined} navigation={navigation} />
+                <MainView
+                    user={user}
+                    details={details ?? undefined}
+                    detailsLoading={detailsLoading}
+                    navigation={navigation}
+                />
             ) : (
                 <View style={styles.mainEmpty} />
             ),
-        [user, details, navigation]
+        [user, details, detailsLoading, navigation]
     );
     const renderTabBar = useCallback(
         (props: TabBarProps<TabName>) => <MaterialTabBar TabItemComponent={TabLabel} {...props} />,
@@ -177,7 +208,7 @@ export default function UserProfileScreen({ navigation, route }: CommonStackProp
             contentContainerStyle={{
                 height: '100%',
             }}
-            refreshControl={<RefreshControl refreshing={loading} onRefresh={refresh} />}
+            refreshControl={<RefreshControl refreshing={userLoading} onRefresh={refresh} />}
         >
             <Tabs.Container renderHeader={renderMain} renderTabBar={renderTabBar}>
                 {/* see comment further above */}
@@ -240,6 +271,11 @@ const styles = StyleSheet.create({
         backgroundColor: '#f0f0f0',
         flexDirection: 'row',
         justifyContent: 'space-between',
+    },
+
+    followButton: {
+        alignSelf: 'center',
+        marginTop: 10,
     },
 
     tabLabel: {
