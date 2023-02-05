@@ -212,7 +212,7 @@ export default function UserProfileScreen({ navigation, route }: CommonStackProp
         >
             <Tabs.Container renderHeader={renderMain} renderTabBar={renderTabBar}>
                 {/* see comment further above */}
-                <Tabs.Tab name="Hosted Events" label={events?.hostedEvents.length.toString()}>
+                <Tabs.Tab name="Hosted" label={events?.hostedEvents.length.toString()}>
                     <Tabs.FlatList
                         data={events?.hostedEvents}
                         renderItem={renderEventItem}
@@ -229,7 +229,7 @@ export default function UserProfileScreen({ navigation, route }: CommonStackProp
                         nestedScrollEnabled
                     />
                 </Tabs.Tab>
-                <Tabs.Tab name="Visited Events" label={events?.pastEvents.length.toString()}>
+                <Tabs.Tab name="Visited" label={events?.pastEvents.length.toString()}>
                     <Tabs.FlatList
                         data={events?.pastEvents}
                         renderItem={renderEventItem}
