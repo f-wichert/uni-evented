@@ -2,7 +2,13 @@ import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
 import React, { useCallback, useEffect } from 'react';
 import { ListRenderItem, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { Tabs } from 'react-native-collapsible-tab-view';
+import {
+    MaterialTabBar,
+    MaterialTabItem,
+    MaterialTabItemProps,
+    TabBarProps,
+    Tabs,
+} from 'react-native-collapsible-tab-view';
 
 import yellowSplash from '../../assets/yellow_splash.png';
 import EventPreview from '../components/EventPreview';
@@ -67,6 +73,39 @@ function MainView({ user, details, navigation }: MainViewProps) {
     );
 }
 
+type TabName = string | number;
+
+/**
+ * Doing somewhat cursed things here since the tab view library doesn't really
+ * support tab item customization.
+ * We want to pass a number from the `<Tabs.Tab />` call below to `TabLabel`,
+ * and do so by passing it through the `label` prop, which is a string.
+ * `MaterialTabItem.label` is also meant to be a string, but arbitrary elements work fine.
+ */
+function TabLabel({ name, label, ...props }: MaterialTabItemProps<TabName>) {
+    const num = parseInt(label);
+
+    const labelComponent = (
+        <View style={styles.tabLabel}>
+            <Text style={styles.tabLabelText}>{name}</Text>
+            {!isNaN(num) ? (
+                <View style={styles.tabLabelNumber}>
+                    <Text style={styles.tabLabelNumberText}>{num}</Text>
+                </View>
+            ) : null}
+        </View>
+    );
+
+    return (
+        <MaterialTabItem
+            {...props}
+            name={name}
+            // this is meant to only accept strings, but arbitrary elements technically work fine too
+            label={labelComponent as unknown as string}
+        />
+    );
+}
+
 export default function UserProfileScreen({ navigation, route }: CommonStackProps<'UserProfile'>) {
     const showEdit = route.params.showEdit ?? false;
     const userId = route.params.userId;
@@ -122,6 +161,11 @@ export default function UserProfileScreen({ navigation, route }: CommonStackProp
             ),
         [user, details, navigation]
     );
+    const renderTabBar = useCallback(
+        (props: TabBarProps<TabName>) => <MaterialTabBar TabItemComponent={TabLabel} {...props} />,
+        []
+    );
+
     const renderEventItem: ListRenderItem<string> = useCallback(
         ({ item }) => <EventPreview id={item} navigateDetail={navigateDetail} />,
         [navigateDetail]
@@ -135,8 +179,9 @@ export default function UserProfileScreen({ navigation, route }: CommonStackProp
             }}
             refreshControl={<RefreshControl refreshing={loading} onRefresh={refresh} />}
         >
-            <Tabs.Container renderHeader={renderMain}>
-                <Tabs.Tab name="Hosted Events">
+            <Tabs.Container renderHeader={renderMain} renderTabBar={renderTabBar}>
+                {/* see comment further above */}
+                <Tabs.Tab name="Hosted Events" label={events?.hostedEvents.length.toString()}>
                     <Tabs.FlatList
                         data={events?.hostedEvents}
                         renderItem={renderEventItem}
@@ -145,7 +190,7 @@ export default function UserProfileScreen({ navigation, route }: CommonStackProp
                     />
                 </Tabs.Tab>
                 {/* TODO: rename this tab? can't think of a better name */}
-                <Tabs.Tab name="Interested">
+                <Tabs.Tab name="Interested" label={events?.interestedEvents.length.toString()}>
                     <Tabs.FlatList
                         data={events?.interestedEvents}
                         renderItem={renderEventItem}
@@ -153,7 +198,7 @@ export default function UserProfileScreen({ navigation, route }: CommonStackProp
                         nestedScrollEnabled
                     />
                 </Tabs.Tab>
-                <Tabs.Tab name="Visited Events">
+                <Tabs.Tab name="Visited Events" label={events?.pastEvents.length.toString()}>
                     <Tabs.FlatList
                         data={events?.pastEvents}
                         renderItem={renderEventItem}
@@ -195,5 +240,23 @@ const styles = StyleSheet.create({
         backgroundColor: '#f0f0f0',
         flexDirection: 'row',
         justifyContent: 'space-between',
+    },
+
+    tabLabel: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    tabLabelText: {
+        textTransform: 'uppercase',
+    },
+    tabLabelNumber: {
+        paddingHorizontal: 4,
+        paddingVertical: 2,
+        marginLeft: 8,
+        borderRadius: 8,
+        backgroundColor: 'lightgrey',
+    },
+    tabLabelNumberText: {
+        fontSize: 10,
     },
 });
