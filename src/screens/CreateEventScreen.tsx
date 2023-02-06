@@ -1,4 +1,5 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { StackActions } from '@react-navigation/native';
 import dayjs from 'dayjs';
 import Checkbox from 'expo-checkbox';
 import React, { useCallback, useEffect, useState } from 'react';
@@ -128,10 +129,7 @@ function CreateEventScreen({ navigation, route }: EventsOverviewStackNavProps<'C
 
             const eventId = await EventManager.create(eventData);
 
-            // TODO: this should replace the current screen in the stack
-            navigation.navigate('EventDetail', {
-                eventId,
-            });
+            navigation.dispatch(StackActions.replace('EventDetail', { eventId }));
         },
         { prefix: 'Failed to create event' }
     );
