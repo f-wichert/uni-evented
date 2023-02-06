@@ -86,7 +86,12 @@ function EventMarker(props: Props) {
                         </View>) : (<></>)} */}
                     </View>
                 </View>
-                <Ionicons name="location" size={40} color={pinColor} />
+                <Ionicons
+                    name="location"
+                    size={40}
+                    color={pinColor}
+                    style={{ textShadowColor: 'black', textShadowRadius: 2 }}
+                />
             </View>
         </MapMarker>
         // <MapMarker
