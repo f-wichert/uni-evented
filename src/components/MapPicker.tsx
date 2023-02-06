@@ -3,6 +3,7 @@ import { LocationObject } from 'expo-location';
 import React, { useState } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import MapView, { LatLng, Marker } from 'react-native-maps';
+import { GOOGLE_MAPS_STYLE } from '../constants';
 
 import { useAsyncEffects } from '../util';
 
@@ -53,6 +54,7 @@ export default function MapPicker({ route, navigation }) {
     return (
         <View style={styles.container}>
             <MapView
+                customMapStyle={GOOGLE_MAPS_STYLE}
                 style={styles.map}
                 // ref={(ref) => mapRef.current = current}
                 ref={mapRef}

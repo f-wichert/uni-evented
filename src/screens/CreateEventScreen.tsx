@@ -18,7 +18,7 @@ import MapView, { LatLng, Marker } from 'react-native-maps';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import TagDropdown from '../components/TagDropdown';
 
-import { INPUT_BACKGR_COLOR } from '../constants';
+import { GOOGLE_MAPS_STYLE, INPUT_BACKGR_COLOR } from '../constants';
 import { EventManager } from '../models';
 import { EventCreateParams } from '../models/event';
 import { EventsOverviewStackNavProps } from '../nav/types';
@@ -169,6 +169,7 @@ function CreateEventScreen({ navigation, route }: EventsOverviewStackNavProps<'C
                 <View style={styles.sectionBody}>
                     {location ? (
                         <MapView
+                            customMapStyle={GOOGLE_MAPS_STYLE}
                             style={styles.locationPreviewMap}
                             // TODO: do something on press, or disable touch event instead?
                             zoomEnabled={false}

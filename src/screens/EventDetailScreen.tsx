@@ -24,6 +24,7 @@ import yellowSplash from '../../assets/yellow_splash.png';
 import DetailActionButton, { EventActionState } from '../components/DetailActionButton';
 import MediaCarousel from '../components/MediaCarousel';
 import { Tag } from '../components/Tag';
+import { GOOGLE_MAPS_STYLE } from '../constants';
 import { EventManager, UserManager } from '../models';
 import { CommonStackProps } from '../nav/types';
 import { useEventFetch } from '../state/event';
@@ -350,6 +351,7 @@ function EventDetailScreen({ route, navigation, preview, evId }: Props) {
 
     const mapView = (
         <MapView
+            customMapStyle={GOOGLE_MAPS_STYLE}
             style={styles.locationPreviewMap}
             // TODO: do something on press, or disable touch event instead?
             zoomEnabled={true}
