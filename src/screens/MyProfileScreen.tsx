@@ -34,7 +34,8 @@ export default function MyProfileScreen({ navigation }: ProfileStackNavProps<'My
     );
 
     return (
-        <SafeAreaView style={styles.container}>
+        // https://github.com/th3rdwave/react-native-safe-area-context/issues/107#issuecomment-652616230
+        <SafeAreaView edges={['top', 'left', 'right']} style={styles.container}>
             <View style={styles.profileHeader}>
                 <ProfileHeader
                     imageUri={UserManager.getAvatarUrl(user)}
@@ -134,6 +135,7 @@ export default function MyProfileScreen({ navigation }: ProfileStackNavProps<'My
 const styles = StyleSheet.create({
     container: {
         alignItems: 'center',
+        flex: 1,
     },
     tableContainer: {
         width: '100%',
