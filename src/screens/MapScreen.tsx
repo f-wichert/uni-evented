@@ -94,7 +94,7 @@ function MapScreen({ navigation, route }: MapStackNavProps<'MapView'>) {
 
     const navigateDetail = useCallback(
         (id: string) => {
-            navigation.navigate('EventDetail', { eventId: id });
+            navigation.push('EventDetail', { eventId: id });
         },
         [navigation]
     );

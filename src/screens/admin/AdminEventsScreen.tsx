@@ -29,7 +29,7 @@ export default function AdminEventsScreen({
                     <Cell
                         title={`${item.name}`}
                         onPress={() => {
-                            navigation.navigate('AdminEventScreen', { event: item });
+                            navigation.push('AdminEventScreen', { event: item });
                         }}
                     />
                 );

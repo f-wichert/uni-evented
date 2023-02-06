@@ -50,7 +50,7 @@ function ChatScreen({ route, navigation }: CommonStackProps<'Chat'>) {
 
     const showProfile = useCallback(
         (userId: string) => {
-            navigation.navigate('UserProfile', { userId: userId });
+            navigation.push('UserProfile', { userId: userId });
         },
         [navigation]
     );

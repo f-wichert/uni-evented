@@ -32,11 +32,11 @@ interface MainViewProps {
 
 function MainView({ user, details, detailsLoading, followAction, navigation }: MainViewProps) {
     const showFollowing = useCallback(
-        () => navigation.navigate('FollowList', { userId: user.id, type: 'following' }),
+        () => navigation.push('FollowList', { userId: user.id, type: 'following' }),
         [user.id, navigation]
     );
     const showFollowers = useCallback(
-        () => navigation.navigate('FollowList', { userId: user.id, type: 'followers' }),
+        () => navigation.push('FollowList', { userId: user.id, type: 'followers' }),
         [user.id, navigation]
     );
     const follow = useCallback(() => followAction('follow'), [followAction]);
@@ -169,9 +169,7 @@ export default function UserProfileScreen({ navigation, route }: CommonStackProp
                         size={32}
                         color="black"
                         onPress={() =>
-                            (navigation as ProfileStackNavProps['navigation']).navigate(
-                                'EditProfile'
-                            )
+                            (navigation as ProfileStackNavProps['navigation']).push('EditProfile')
                         }
                     />
                 ) : null,
@@ -187,7 +185,7 @@ export default function UserProfileScreen({ navigation, route }: CommonStackProp
     }, [navigation, username]);
 
     const navigateDetail = useCallback(
-        (id: string) => navigation.navigate('EventDetail', { eventId: id }),
+        (id: string) => navigation.push('EventDetail', { eventId: id }),
         [navigation]
     );
 

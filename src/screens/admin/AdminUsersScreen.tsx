@@ -28,7 +28,7 @@ export default function AdminUsersScreen({ navigation }: ProfileStackNavProps<'A
                             item.displayName ? `, ${item.displayName}` : ''
                         }`}
                         onPress={() => {
-                            navigation.navigate('AdminUserScreen', { user: item });
+                            navigation.push('AdminUserScreen', { user: item });
                         }}
                     />
                 );

@@ -16,7 +16,7 @@ export default function AdminMainScreen({ navigation }: ProfileStackNavProps<'Ad
                             title="All Users"
                             accessory="DisclosureIndicator"
                             onPress={useCallback(() => {
-                                navigation.navigate('AdminUsersScreen');
+                                navigation.push('AdminUsersScreen');
                             }, [navigation])}
                         />
                     </Section>
@@ -26,7 +26,7 @@ export default function AdminMainScreen({ navigation }: ProfileStackNavProps<'Ad
                             title="All Events"
                             accessory="DisclosureIndicator"
                             onPress={useCallback(() => {
-                                navigation.navigate('AdminEventsScreen');
+                                navigation.push('AdminEventsScreen');
                             }, [navigation])}
                         />
                     </Section>

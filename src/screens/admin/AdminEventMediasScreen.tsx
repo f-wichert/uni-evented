@@ -38,7 +38,7 @@ export default function AdminEventMediasScreen({
                         image={image}
                         title={item.id}
                         onPress={() => {
-                            navigation.navigate('AdminMediaScreen', { media: item });
+                            navigation.push('AdminMediaScreen', { media: item });
                         }}
                     />
                 );

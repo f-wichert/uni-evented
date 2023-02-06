@@ -159,7 +159,7 @@ function CreateEventScreen({ navigation, route }: EventsOverviewStackNavProps<'C
                     <Ionicons
                         // TODO: this always opens the map picker to the default location,
                         // even if the user already picked a location
-                        onPress={() => navigation.navigate('MapPicker')}
+                        onPress={() => navigation.push('MapPicker')}
                         name={location ? 'location' : 'location-outline'}
                         size={26}
                         color={'orange'}

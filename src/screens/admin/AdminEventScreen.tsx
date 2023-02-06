@@ -34,7 +34,7 @@ export default function AdminEventScreen({
                             title="Media"
                             accessory="DisclosureIndicator"
                             onPress={useCallback(() => {
-                                navigation.navigate('AdminEventMediasScreen', {
+                                navigation.push('AdminEventMediasScreen', {
                                     eventId: event.id,
                                 });
                             }, [])}

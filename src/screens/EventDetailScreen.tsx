@@ -53,7 +53,7 @@ function EventDetailScreen({ route, navigation, preview, evId }: Props) {
 
     const shouldShowEditButton = !isPreview && eventData && eventData.hostId === user.id;
     useEffect(() => {
-        const onEdit = () => navigation.navigate('EventDetailEdit', { eventId: eventId });
+        const onEdit = () => navigation.push('EventDetailEdit', { eventId: eventId });
 
         if (shouldShowEditButton) {
             navigation.setOptions({
@@ -140,7 +140,7 @@ function EventDetailScreen({ route, navigation, preview, evId }: Props) {
 
     const showProfile = useCallback(() => {
         if (!eventData?.hostId) return;
-        navigation.navigate('UserProfile', { userId: eventData.hostId });
+        navigation.push('UserProfile', { userId: eventData.hostId });
     }, [navigation, eventData?.hostId]);
 
     const sendRating = useAsyncCallback(
@@ -187,7 +187,7 @@ function EventDetailScreen({ route, navigation, preview, evId }: Props) {
                         ...styles.chatButton,
                         opacity: getEventRelationship() === 'banned' ? 0.5 : 1,
                     }}
-                    onPress={() => navigation.navigate('Chat', { eventId: eventId })}
+                    onPress={() => navigation.push('Chat', { eventId: eventId })}
                     disabled={getEventRelationship() === 'banned'}
                 >
                     <Ionicons name={'chatbox-ellipses-outline'} size={37} color={'white'} />
@@ -205,7 +205,7 @@ function EventDetailScreen({ route, navigation, preview, evId }: Props) {
                 {isPreview ? (
                     <Pressable
                         style={styles.chatButton}
-                        onPress={() => navigation.navigate('EventDetail', { eventId: eventId })}
+                        onPress={() => navigation.push('EventDetail', { eventId: eventId })}
                     >
                         <Ionicons name={'arrow-redo-outline'} size={37} color={'white'} />
                     </Pressable>
@@ -219,7 +219,7 @@ function EventDetailScreen({ route, navigation, preview, evId }: Props) {
                                     ? 0.5
                                     : 1,
                         }}
-                        onPress={() => navigation.navigate('MediaCapture', { eventId: eventId })}
+                        onPress={() => navigation.push('MediaCapture', { eventId: eventId })}
                         disabled={
                             eventData.hostId !== user.id && getEventRelationship() !== 'attending'
                         }
@@ -284,7 +284,7 @@ function EventDetailScreen({ route, navigation, preview, evId }: Props) {
                 }}
             >
                 <Pressable
-                    onPress={() => navigation.navigate('EventAttendees', { eventId: eventId })}
+                    onPress={() => navigation.push('EventAttendees', { eventId: eventId })}
                     style={{ flexDirection: 'row', alignItems: 'center' }}
                 >
                     <Ionicons name="people" size={28} />

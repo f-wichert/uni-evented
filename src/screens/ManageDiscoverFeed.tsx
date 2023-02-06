@@ -18,7 +18,7 @@ function ManageDiscoverFeed({ route, navigation }: ProfileStackNavProps<'ManageD
             ...currentSettings,
         });
         await useUserStore.getState().fetchCurrentUser();
-        navigation.navigate('MyProfileView');
+        navigation.goBack();
     });
 
     return (

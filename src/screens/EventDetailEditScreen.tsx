@@ -165,7 +165,7 @@ function EventDetailEditScreen({ route, navigation }: CommonStackProps<'EventDet
                         // TODO: this always opens the map picker to the default location,
                         // even if the user already picked a location
                         onPress={() => {
-                            navigation.navigate('MapPicker', {
+                            navigation.push('MapPicker', {
                                 location: location,
                                 eventId: route.params.eventId,
                                 parent: 'EventDetailEdit',
