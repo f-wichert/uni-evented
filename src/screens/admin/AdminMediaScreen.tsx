@@ -10,8 +10,7 @@ import { useCallbackRef } from 'use-callback-ref';
 import Separator from '../../components/Separator';
 import { MediaManager } from '../../models';
 import { ProfileStackNavProps } from '../../nav/types';
-import { asyncHandler, baseHeaders, request } from '../../util';
-import { confirmationAlert, getCellIcon } from './util';
+import { asyncHandler, baseHeaders, confirmationAlert, getCellIcon, request } from '../../util';
 
 export default function AdminMediaScreen({
     navigation,

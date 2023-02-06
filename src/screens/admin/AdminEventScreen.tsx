@@ -4,8 +4,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { Cell, Section, TableView } from 'react-native-tableview-simple';
 
 import { ProfileStackNavProps } from '../../nav/types';
-import { asyncHandler, request } from '../../util';
-import { confirmationAlert, getCellIcon } from './util';
+import { asyncHandler, confirmationAlert, getCellIcon, request } from '../../util';
 
 export default function AdminEventScreen({
     navigation,

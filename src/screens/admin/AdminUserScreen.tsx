@@ -8,8 +8,7 @@ import ProfileHeader from '../../components/ProfileHeader';
 import Separator from '../../components/Separator';
 import { UserManager } from '../../models';
 import { ProfileStackNavProps } from '../../nav/types';
-import { asyncHandler, request } from '../../util';
-import { confirmationAlert, getCellIcon } from './util';
+import { asyncHandler, confirmationAlert, getCellIcon, request } from '../../util';
 
 export default function AdminUserScreen({
     navigation,
