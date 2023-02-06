@@ -228,9 +228,7 @@ function CreateEventScreen({ navigation, route }: EventsOverviewStackNavProps<'C
                     </View>
                 </View>
                 <View style={styles.endRow}>
-                    <Text style={{ ...styles.sectionSubtitle, marginTop: 10 }}>
-                        {useEndtime ? 'Open End?' : 'Use end time?'}
-                    </Text>
+                    <Text style={{ ...styles.sectionSubtitle, marginTop: 10 }}>Set End Time?</Text>
                     <Checkbox
                         style={styles.checkbox}
                         value={useEndtime}
@@ -290,7 +288,7 @@ const styles = StyleSheet.create({
     endRow: {
         display: 'flex',
         flexDirection: 'row',
-        alignItems: 'baseline',
+        alignItems: 'flex-end',
     },
     checkbox: {
         marginLeft: 10,
