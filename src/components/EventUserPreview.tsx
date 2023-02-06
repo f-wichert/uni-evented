@@ -1,11 +1,11 @@
 import { Ionicons } from '@expo/vector-icons';
-import { ComponentProps } from 'react';
+import { ComponentProps, useCallback } from 'react';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
 
 import { EventManager } from '../models';
 import { EventAttendeeStatus } from '../models/user';
 import { IoniconsName } from '../types';
-import { useAsyncCallback } from '../util';
+import { confirmationAlert, useAsyncCallback } from '../util';
 import UserPreview from './UserPreview';
 
 type BaseProps = Omit<ComponentProps<typeof UserPreview>, 'children'>;
@@ -27,6 +27,7 @@ export default function EventUserPreview({
     refresh,
     ...props
 }: Props) {
+    const { username } = props;
     const banUser = useAsyncCallback(
         async () => {
             await EventManager.banUser(eventId, id);
@@ -35,6 +36,13 @@ export default function EventUserPreview({
         [eventId, id, refresh],
         { prefix: 'Failed to ban user' }
     );
+    const onBanPress = useCallback(() => {
+        confirmationAlert(
+            'Confirm Ban',
+            `Are you sure you want to ban @${username} from this event?`,
+            banUser
+        );
+    }, [username, banUser]);
 
     let statusIcon: IoniconsName | null = null;
     if (host) statusIcon = 'home-outline';
@@ -55,7 +63,7 @@ export default function EventUserPreview({
         <UserPreview id={id} {...props}>
             <View style={styles.container}>
                 {ban && !host ? (
-                    <TouchableOpacity style={styles.statusIcon} onPress={banUser}>
+                    <TouchableOpacity style={styles.statusIcon} onPress={onBanPress}>
                         <Ionicons name="close-circle-outline" color={'red'} size={32} />
                     </TouchableOpacity>
                 ) : null}

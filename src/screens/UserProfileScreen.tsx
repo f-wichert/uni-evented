@@ -20,7 +20,7 @@ import { UserDetails } from '../models/user';
 import { CommonStackProps, ProfileStackNavProps } from '../nav/types';
 import { useRelevantEvents } from '../state/event';
 import { useCurrentUser, useUserFetch } from '../state/user';
-import { identity, useAsyncCallback } from '../util';
+import { confirmationAlert, identity, useAsyncCallback } from '../util';
 
 interface MainViewProps {
     user: User;
@@ -40,7 +40,15 @@ function MainView({ user, details, detailsLoading, followAction, navigation }: M
         [user.id, navigation]
     );
     const follow = useCallback(() => followAction('follow'), [followAction]);
-    const unfollow = useCallback(() => followAction('unfollow'), [followAction]);
+    const unfollow = useCallback(
+        () =>
+            confirmationAlert(
+                'Unfollow User',
+                `Are you sure you want to unfollow @${user.username}?`,
+                () => followAction('unfollow')
+            ),
+        [user.username, followAction]
+    );
 
     const currentUser = useCurrentUser();
     const canFollow = currentUser.id !== user.id;
