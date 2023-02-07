@@ -23,10 +23,10 @@ const config: ExpoConfig = {
     version: '1.0.0',
 
     orientation: 'portrait',
-    icon: './assets/icon.png',
+    icon: './assets/evented_logo_blue.png',
     userInterfaceStyle: 'light',
     splash: {
-        image: './assets/splash.png',
+        image: './assets/splash_evented.png',
         resizeMode: 'contain',
         backgroundColor: '#ffffff',
     },
@@ -38,10 +38,10 @@ const config: ExpoConfig = {
         supportsTablet: true,
     },
     android: {
-        adaptiveIcon: {
-            foregroundImage: './assets/adaptive-icon.png',
-            backgroundColor: '#FFFFFF',
-        },
+        // adaptiveIcon: {
+        //     foregroundImage: './assets/adaptive-icon.png',
+        //     backgroundColor: '#FFFFFF',
+        // },
         package: 'com.evented.Evented',
         config: {
             googleMaps: {
