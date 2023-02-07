@@ -12,16 +12,17 @@ export default function AdminUsersScreen({ navigation }: ProfileStackNavProps<'A
         <SearchableList<User>
             fetchItems={async () => {
                 const usersResponse = (await request('GET', '/admin/user/all')) as UserResponse[];
-                return usersResponse.map((user) => UserManager.fromUserResponse(user));
+                return usersResponse
+                    .map((user) => UserManager.fromUserResponse(user))
+                    .sort((user1, user2) => user1.username.localeCompare(user2.username));
             }}
             filterItems={(users, searchText) => {
                 const search = searchText.toLowerCase();
-                return users.filter((user) => {
-                    return (
+                return users.filter(
+                    (user) =>
                         user.username.toLowerCase().includes(search) ||
                         user.displayName.toLowerCase().includes(search)
-                    );
-                });
+                );
             }}
             extractItemKey={(user) => user.id}
             renderItem={({ index, item, separators }) => {
