@@ -2,9 +2,12 @@ import { Cell } from 'react-native-tableview-simple';
 import SearchableList from '../../components/SearchableList';
 import { User, UserManager, UserResponse } from '../../models';
 import { ProfileStackNavProps } from '../../nav/types';
+import { useCurrentUser } from '../../state/user';
 import { request } from '../../util';
 
 export default function AdminUsersScreen({ navigation }: ProfileStackNavProps<'AdminUsersScreen'>) {
+    const currentUser = useCurrentUser();
+
     return (
         <SearchableList<User>
             fetchItems={async () => {
@@ -22,14 +25,19 @@ export default function AdminUsersScreen({ navigation }: ProfileStackNavProps<'A
             }}
             extractItemKey={(user) => user.id}
             renderItem={({ index, item, separators }) => {
+                const isCurrentUser = item.id === currentUser.id;
+
                 return (
                     <Cell
                         title={`@${item.username}${
                             item.displayName ? `, ${item.displayName}` : ''
-                        }`}
-                        onPress={() => {
-                            navigation.push('AdminUserScreen', { user: item });
-                        }}
+                        }${isCurrentUser ? ', cant edit current user' : ''}`}
+                        onPress={
+                            isCurrentUser
+                                ? undefined
+                                : () => navigation.push('AdminUserScreen', { user: item })
+                        }
+                        isDisabled={isCurrentUser}
                     />
                 );
             }}
