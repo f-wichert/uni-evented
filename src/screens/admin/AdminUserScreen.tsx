@@ -8,8 +8,7 @@ import ProfileHeader from '../../components/ProfileHeader';
 import Separator from '../../components/Separator';
 import { UserManager } from '../../models';
 import { ProfileStackNavProps } from '../../nav/types';
-import { asyncHandler, request } from '../../util';
-import { confirmationAlert, getCellIcon } from './util';
+import { asyncHandler, confirmationAlert, getCellIcon, request } from '../../util';
 
 export default function AdminUserScreen({
     navigation,
@@ -27,6 +26,23 @@ export default function AdminUserScreen({
             })
         );
     };
+
+    const toggleAdmin = () => {
+        confirmationAlert(
+            'Confirm Admin status change',
+            `Are you sure that you want to ${
+                user.isAdmin ? 'remove this users admin status' : 'make this user an admin'
+            }?`,
+            asyncHandler(async () => {
+                await request('POST', '/admin/user/set-admin', {
+                    userId: user.id,
+                    isAdmin: !user.isAdmin,
+                });
+                setUser({ ...user, isAdmin: !user.isAdmin });
+            })
+        );
+    };
+
     const deleteUser = () => {
         confirmationAlert(
             'Confirm User Deletion',
@@ -58,6 +74,12 @@ export default function AdminUserScreen({
                             title="Clear Avatar"
                             accessory="DisclosureIndicator"
                             onPress={clearAvatar}
+                        />
+                        <Cell
+                            image={getCellIcon('build-outline', 'red')}
+                            title={`${user.isAdmin ? 'Remove' : 'Make'} Admin`}
+                            accessory="DisclosureIndicator"
+                            onPress={toggleAdmin}
                         />
                         <Cell
                             image={getCellIcon('trash-bin-outline', 'red')}

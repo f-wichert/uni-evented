@@ -112,4 +112,8 @@ export class UserManager {
         const data = await request<UserResponse[]>('GET', `/user/${userId}/${type}`);
         return data.map((u) => this.fromUserResponse(u));
     }
+
+    static async follow(userId: string, type: 'follow' | 'unfollow') {
+        await request('POST', `/user/${userId}/${type}`);
+    }
 }

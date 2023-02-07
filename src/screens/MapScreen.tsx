@@ -8,6 +8,7 @@ import MapView, { LatLng } from 'react-native-maps';
 
 import EventMarker from '../components/EventMarker';
 import MapFilter from '../components/MapFilter';
+import { GOOGLE_MAPS_STYLE } from '../constants';
 import { Event } from '../models/event';
 import { MapStackNavProps } from '../nav/types';
 import { useFindEvents } from '../state/event';
@@ -93,7 +94,7 @@ function MapScreen({ navigation, route }: MapStackNavProps<'MapView'>) {
 
     const navigateDetail = useCallback(
         (id: string) => {
-            navigation.navigate('EventDetail', { eventId: id });
+            navigation.push('EventDetail', { eventId: id });
         },
         [navigation]
     );
@@ -109,6 +110,7 @@ function MapScreen({ navigation, route }: MapStackNavProps<'MapView'>) {
             <View style={styles.container}>
                 {location ? (
                     <MapView
+                        customMapStyle={GOOGLE_MAPS_STYLE}
                         initialRegion={{
                             latitude: location.latitude,
                             longitude: location.longitude,

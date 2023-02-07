@@ -2,8 +2,7 @@ import { Cell } from 'react-native-tableview-simple';
 import SearchableList from '../../components/SearchableList';
 import { Media, MediaManager, MediaResponse } from '../../models';
 import { ProfileStackNavProps } from '../../nav/types';
-import { request } from '../../util';
-import { getCellIcon } from './util';
+import { getCellIcon, request } from '../../util';
 
 export default function AdminEventMediasScreen({
     navigation,
@@ -38,7 +37,7 @@ export default function AdminEventMediasScreen({
                         image={image}
                         title={item.id}
                         onPress={() => {
-                            navigation.navigate('AdminMediaScreen', { media: item });
+                            navigation.push('AdminMediaScreen', { media: item });
                         }}
                     />
                 );

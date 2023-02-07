@@ -17,7 +17,7 @@ declare type Props = {
 
 function UserPreview({ id, username, displayName, bio, avatarUrl, navigation, children }: Props) {
     const showProfile = useCallback(
-        () => navigation.navigate('UserProfile', { userId: id }),
+        () => navigation.push('UserProfile', { userId: id }),
         [navigation, id]
     );
 

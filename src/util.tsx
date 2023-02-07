@@ -1,10 +1,12 @@
 import Constants from 'expo-constants';
-import { ImageStyle, StyleSheet, TextStyle, ViewStyle } from 'react-native';
+import { Alert, ImageStyle, StyleSheet, TextStyle, ViewStyle } from 'react-native';
 import urlJoin from 'url-join';
 
+import { Ionicons } from '@expo/vector-icons';
 import { DependencyList, useCallback, useEffect, useState } from 'react';
 import config from './config';
 import { getToken } from './state/auth';
+import { IoniconsName } from './types';
 
 export const baseHeaders = Object.freeze({
     // Currently required to access main API
@@ -208,4 +210,22 @@ export function abbreviateNumber(number: number) {
 
 export function identity<T>(t: T): T {
     return t;
+}
+
+export function confirmationAlert(title: string, message: string, onConfirm: () => void) {
+    Alert.alert(title, message, [
+        {
+            text: 'Cancel',
+            style: 'cancel',
+        },
+        {
+            text: 'Confirm',
+            style: 'destructive',
+            onPress: onConfirm,
+        },
+    ]);
+}
+
+export function getCellIcon(name: IoniconsName, color?: string) {
+    return <Ionicons name={name} size={27} color={color} />;
 }

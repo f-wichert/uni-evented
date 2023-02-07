@@ -1,6 +1,5 @@
-import { Ionicons } from '@expo/vector-icons';
 import React, { useCallback } from 'react';
-import { Alert, ScrollView, StyleSheet, View } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Cell, Section, TableView } from 'react-native-tableview-simple';
 
@@ -11,7 +10,7 @@ import { UserManager } from '../models';
 import { ProfileStackNavProps } from '../nav/types';
 import { useAuthStore } from '../state/auth';
 import { useCurrentUser } from '../state/user';
-import { IoniconsName } from '../types';
+import { confirmationAlert, getCellIcon } from '../util';
 
 export default function MyProfileScreen({ navigation }: ProfileStackNavProps<'MyProfileView'>) {
     const user = useCurrentUser();
@@ -20,21 +19,12 @@ export default function MyProfileScreen({ navigation }: ProfileStackNavProps<'My
     const recommendationSettings = user.recommendationSettings;
 
     const confirmLogout = useCallback(() => {
-        Alert.alert('Confirm Logout', 'Are you sure that you want to log out?', [
-            {
-                text: 'Cancel',
-                style: 'cancel',
-            },
-            { text: 'Confirm', style: 'destructive', onPress: signout },
-        ]);
+        confirmationAlert('Confirm Logout', 'Are you sure that you want to log out?', signout);
     }, [signout]);
 
-    const getCellIcon = (name: IoniconsName, color?: string) => (
-        <Ionicons name={name} size={27} color={color} />
-    );
-
     return (
-        <SafeAreaView style={styles.container}>
+        // https://github.com/th3rdwave/react-native-safe-area-context/issues/107#issuecomment-652616230
+        <SafeAreaView edges={['top', 'left', 'right']} style={styles.container}>
             <View style={styles.profileHeader}>
                 <ProfileHeader
                     imageUri={UserManager.getAvatarUrl(user)}
@@ -54,7 +44,7 @@ export default function MyProfileScreen({ navigation }: ProfileStackNavProps<'My
                             title="My Profile"
                             accessory="DisclosureIndicator"
                             onPress={useCallback(() => {
-                                navigation.navigate('UserProfile', {
+                                navigation.push('UserProfile', {
                                     userId: user.id,
                                     showEdit: true,
                                 });
@@ -65,7 +55,7 @@ export default function MyProfileScreen({ navigation }: ProfileStackNavProps<'My
                             title="My Hosted Events"
                             accessory="DisclosureIndicator"
                             onPress={useCallback(() => {
-                                navigation.navigate('UserEventList', { type: 'hostedEvents' });
+                                navigation.push('UserEventList', { type: 'hostedEvents' });
                             }, [navigation])}
                         />
                         <Cell
@@ -74,7 +64,7 @@ export default function MyProfileScreen({ navigation }: ProfileStackNavProps<'My
                             title="Interested Events"
                             accessory="DisclosureIndicator"
                             onPress={useCallback(() => {
-                                navigation.navigate('UserEventList', { type: 'interestedEvents' });
+                                navigation.push('UserEventList', { type: 'interestedEvents' });
                             }, [navigation])}
                         />
                         <Cell
@@ -82,7 +72,7 @@ export default function MyProfileScreen({ navigation }: ProfileStackNavProps<'My
                             title="Visited Events"
                             accessory="DisclosureIndicator"
                             onPress={useCallback(() => {
-                                navigation.navigate('UserEventList', { type: 'pastEvents' });
+                                navigation.push('UserEventList', { type: 'pastEvents' });
                             }, [navigation])}
                         />
                     </Section>
@@ -94,7 +84,7 @@ export default function MyProfileScreen({ navigation }: ProfileStackNavProps<'My
                                 accessory="DisclosureIndicator"
                                 // eslint-disable-next-line react-hooks/rules-of-hooks
                                 onPress={useCallback(() => {
-                                    navigation.navigate('AdminMainScreen');
+                                    navigation.push('AdminMainScreen');
                                 }, [navigation])}
                             />
                         </Section>
@@ -105,7 +95,7 @@ export default function MyProfileScreen({ navigation }: ProfileStackNavProps<'My
                             title="Manage Account"
                             accessory="DisclosureIndicator"
                             onPress={useCallback(() => {
-                                navigation.navigate('ManageAccount');
+                                navigation.push('ManageAccount');
                             }, [navigation])}
                         />
                         <Cell
@@ -113,7 +103,7 @@ export default function MyProfileScreen({ navigation }: ProfileStackNavProps<'My
                             title="Manage Discover Feed"
                             accessory="DisclosureIndicator"
                             onPress={() => {
-                                navigation.navigate('ManageDiscoverFeed', {
+                                navigation.push('ManageDiscoverFeed', {
                                     currentRecommendationSettings: recommendationSettings,
                                 });
                             }}
@@ -134,6 +124,7 @@ export default function MyProfileScreen({ navigation }: ProfileStackNavProps<'My
 const styles = StyleSheet.create({
     container: {
         alignItems: 'center',
+        flex: 1,
     },
     tableContainer: {
         width: '100%',

@@ -3,122 +3,93 @@ import { Button, StyleSheet, Text, View } from 'react-native';
 import { RecommendationSettings } from '../models/user';
 
 import { useState } from 'react';
-import { CommonStackProps } from '../nav/types';
+import { ProfileStackNavProps } from '../nav/types';
 import { useUserStore } from '../state/user';
 import { EmptyObject } from '../types';
 import { asyncHandler, request } from '../util';
 
-interface Props extends CommonStackProps<'EventDetail'> {
-    currentRecommendationSettings: any;
-}
-
-function ManageDiscoverFeed({ route, navigation }: Props) {
+function ManageDiscoverFeed({ route, navigation }: ProfileStackNavProps<'ManageDiscoverFeed'>) {
     const [currentSettings, setCurrentSettings] = useState<RecommendationSettings>(
-        route.params.currentRecommendationSettings as RecommendationSettings
+        route.params.currentRecommendationSettings
     );
-
-    console.log('Current Settings');
-    console.log(currentSettings);
-    console.log('End of Current Settings');
 
     const onSubmit = asyncHandler(async () => {
         await request<EmptyObject>('POST', `/user/setRecommendationSettings`, {
             ...currentSettings,
-        }).catch(() => toast.show('Could not submit preferences'));
-        useUserStore.getState().fetchCurrentUser();
-        navigation.navigate('MyProfileView');
+        });
+        await useUserStore.getState().fetchCurrentUser();
+        navigation.goBack();
     });
 
     return (
         <View>
             <View style={styles.settingsWrapper}>
-                <Text style={styles.titleHeader}> How important is distance for you?</Text>
+                <Text style={styles.titleHeader}>How important is distance to you?</Text>
                 <Text style={styles.valueShow}>
-                    {' '}
-                    {Math.floor(currentSettings.DistanceWeight * 100)}
+                    {Math.round(currentSettings.DistanceWeight * 100)}
                 </Text>
                 <Slider
                     value={currentSettings.DistanceWeight}
                     onValueChange={(newValue) =>
-                        setCurrentSettings(
-                            Object.assign({ ...currentSettings }, { DistanceWeight: newValue })
-                        )
+                        setCurrentSettings((old) => ({ ...old, DistanceWeight: newValue }))
                     }
                 />
             </View>
 
             <View style={styles.settingsWrapper}>
-                <Text style={styles.titleHeader}> How important are the right tags?</Text>
+                <Text style={styles.titleHeader}>How important are matching tags?</Text>
                 <Text style={styles.valueShow}>
-                    {' '}
-                    {Math.floor(currentSettings.TagIntersectionWeight * 100)}
+                    {Math.round(currentSettings.TagIntersectionWeight * 100)}
                 </Text>
                 <Slider
                     value={currentSettings.TagIntersectionWeight}
                     onValueChange={(newValue) =>
-                        setCurrentSettings(
-                            Object.assign(
-                                { ...currentSettings },
-                                { TagIntersectionWeight: newValue }
-                            )
-                        )
+                        setCurrentSettings((old) => ({ ...old, TagIntersectionWeight: newValue }))
                     }
                 />
             </View>
 
             <View style={styles.settingsWrapper}>
-                <Text style={styles.titleHeader}> How important are friends?</Text>
+                <Text style={styles.titleHeader}>How important are friends?</Text>
                 <Text style={styles.valueShow}>
-                    {' '}
-                    {Math.floor(currentSettings.FolloweeIntersectionWeight * 100)}
+                    {Math.round(currentSettings.FolloweeIntersectionWeight * 100)}
                 </Text>
                 <Slider
                     value={currentSettings.FolloweeIntersectionWeight}
                     onValueChange={(newValue) =>
-                        setCurrentSettings(
-                            Object.assign(
-                                { ...currentSettings },
-                                { FolloweeIntersectionWeight: newValue }
-                            )
-                        )
+                        setCurrentSettings((old) => ({
+                            ...old,
+                            FolloweeIntersectionWeight: newValue,
+                        }))
                     }
                 />
             </View>
 
             <View style={styles.settingsWrapper}>
-                <Text style={styles.titleHeader}> How important are Ratings?</Text>
+                <Text style={styles.titleHeader}>How important are event ratings?</Text>
                 <Text style={styles.valueShow}>
-                    {' '}
-                    {Math.floor(currentSettings.AverageEventRatingWeight * 100)}
+                    {Math.round(currentSettings.AverageEventRatingWeight * 100)}
                 </Text>
                 <Slider
                     value={currentSettings.AverageEventRatingWeight}
                     onValueChange={(newValue) =>
-                        setCurrentSettings(
-                            Object.assign(
-                                { ...currentSettings },
-                                { AverageEventRatingWeight: newValue }
-                            )
-                        )
+                        setCurrentSettings((old) => ({
+                            ...old,
+                            AverageEventRatingWeight: newValue,
+                        }))
                     }
                 />
             </View>
 
             <View style={styles.settingsWrapper}>
-                <Text style={styles.titleHeader}> Would you like more media?</Text>
+                <Text style={styles.titleHeader}>Would you like more media?</Text>
                 <Text style={styles.valueShow}>
-                    {' '}
-                    {Math.floor(currentSettings.NumberOfMediasWeigth * 100)}
+                    {Math.round(currentSettings.NumberOfMediasWeigth * 100)}
                 </Text>
                 <Slider
                     value={currentSettings.NumberOfMediasWeigth}
                     onValueChange={(newValue) =>
-                        setCurrentSettings(
-                            Object.assign(
-                                { ...currentSettings },
-                                { NumberOfMediasWeigth: newValue }
-                            )
-                        )
+                        setCurrentSettings((old) => ({ ...old, NumberOfMediasWeigth: newValue }))
                     }
                 />
             </View>
@@ -139,10 +110,12 @@ const styles = StyleSheet.create({
     titleHeader: {
         fontSize: 20,
         fontWeight: 'bold',
+        marginLeft: 8,
     },
     valueShow: {
         fontSize: 20,
         color: 'deepskyblue',
+        marginLeft: 8,
     },
 });
 

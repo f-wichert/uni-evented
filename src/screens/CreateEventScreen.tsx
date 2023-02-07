@@ -1,4 +1,5 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { StackActions } from '@react-navigation/native';
 import dayjs from 'dayjs';
 import Checkbox from 'expo-checkbox';
 import React, { useCallback, useEffect, useState } from 'react';
@@ -18,7 +19,7 @@ import MapView, { LatLng, Marker } from 'react-native-maps';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import TagDropdown from '../components/TagDropdown';
 
-import { INPUT_BACKGR_COLOR } from '../constants';
+import { GOOGLE_MAPS_STYLE, INPUT_BACKGR_COLOR } from '../constants';
 import { EventManager } from '../models';
 import { EventCreateParams } from '../models/event';
 import { EventsOverviewStackNavProps } from '../nav/types';
@@ -128,10 +129,7 @@ function CreateEventScreen({ navigation, route }: EventsOverviewStackNavProps<'C
 
             const eventId = await EventManager.create(eventData);
 
-            // TODO: this should replace the current screen in the stack
-            navigation.navigate('EventDetail', {
-                eventId,
-            });
+            navigation.dispatch(StackActions.replace('EventDetail', { eventId }));
         },
         { prefix: 'Failed to create event' }
     );
@@ -159,7 +157,7 @@ function CreateEventScreen({ navigation, route }: EventsOverviewStackNavProps<'C
                     <Ionicons
                         // TODO: this always opens the map picker to the default location,
                         // even if the user already picked a location
-                        onPress={() => navigation.navigate('MapPicker')}
+                        onPress={() => navigation.push('MapPicker')}
                         name={location ? 'location' : 'location-outline'}
                         size={26}
                         color={'orange'}
@@ -169,6 +167,7 @@ function CreateEventScreen({ navigation, route }: EventsOverviewStackNavProps<'C
                 <View style={styles.sectionBody}>
                     {location ? (
                         <MapView
+                            customMapStyle={GOOGLE_MAPS_STYLE}
                             style={styles.locationPreviewMap}
                             // TODO: do something on press, or disable touch event instead?
                             zoomEnabled={false}
@@ -227,9 +226,7 @@ function CreateEventScreen({ navigation, route }: EventsOverviewStackNavProps<'C
                     </View>
                 </View>
                 <View style={styles.endRow}>
-                    <Text style={{ ...styles.sectionSubtitle, marginTop: 10 }}>
-                        {useEndtime ? 'Open End?' : 'Use end time?'}
-                    </Text>
+                    <Text style={{ ...styles.sectionSubtitle, marginTop: 10 }}>Set End Time?</Text>
                     <Checkbox
                         style={styles.checkbox}
                         value={useEndtime}
@@ -289,7 +286,7 @@ const styles = StyleSheet.create({
     endRow: {
         display: 'flex',
         flexDirection: 'row',
-        alignItems: 'baseline',
+        alignItems: 'flex-end',
     },
     checkbox: {
         marginLeft: 10,

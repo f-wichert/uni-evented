@@ -19,3 +19,15 @@ export const PASSWORD_VALIDATION: StringValidateOptions = {
     minLength: 8,
     maxLength: 64,
 };
+
+// https://mapstyle.withgoogle.com/
+export const GOOGLE_MAPS_STYLE = [
+    {
+        featureType: 'poi.business',
+        stylers: [
+            {
+                visibility: 'off',
+            },
+        ],
+    },
+];

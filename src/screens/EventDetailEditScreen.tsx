@@ -17,7 +17,7 @@ import MapView, { LatLng, Marker } from 'react-native-maps';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import TagDropdown from '../components/TagDropdown';
 
-import { INPUT_BACKGR_COLOR } from '../constants';
+import { GOOGLE_MAPS_STYLE, INPUT_BACKGR_COLOR } from '../constants';
 import { EventManager } from '../models';
 import { EventUpdateParams } from '../models/event';
 import { CommonStackProps } from '../nav/types';
@@ -165,7 +165,7 @@ function EventDetailEditScreen({ route, navigation }: CommonStackProps<'EventDet
                         // TODO: this always opens the map picker to the default location,
                         // even if the user already picked a location
                         onPress={() => {
-                            navigation.navigate('MapPicker', {
+                            navigation.push('MapPicker', {
                                 location: location,
                                 eventId: route.params.eventId,
                                 parent: 'EventDetailEdit',
@@ -180,6 +180,7 @@ function EventDetailEditScreen({ route, navigation }: CommonStackProps<'EventDet
                 <View style={styles.sectionBody}>
                     {location ? (
                         <MapView
+                            customMapStyle={GOOGLE_MAPS_STYLE}
                             style={styles.locationPreviewMap}
                             // TODO: do something on press, or disable touch event instead?
                             zoomEnabled={false}
@@ -239,9 +240,7 @@ function EventDetailEditScreen({ route, navigation }: CommonStackProps<'EventDet
                     </View>
                 </View>
                 <View style={styles.endRow}>
-                    <Text style={{ ...styles.sectionSubtitle, marginTop: 10 }}>
-                        {useEndtime ? 'Open End?' : 'Use end time?'}
-                    </Text>
+                    <Text style={{ ...styles.sectionSubtitle, marginTop: 10 }}>Set End Time?</Text>
                     <Checkbox
                         style={styles.checkbox}
                         value={useEndtime}
@@ -301,7 +300,7 @@ const styles = StyleSheet.create({
     endRow: {
         display: 'flex',
         flexDirection: 'row',
-        alignItems: 'baseline',
+        alignItems: 'flex-end',
     },
     checkbox: {
         marginLeft: 10,

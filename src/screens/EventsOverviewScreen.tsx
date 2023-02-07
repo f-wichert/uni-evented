@@ -23,7 +23,7 @@ export default function EventsOverviewScreen({
                     name="add-circle-outline"
                     size={40}
                     color="black"
-                    onPress={() => navigation.navigate('CreateEvent')}
+                    onPress={() => navigation.push('CreateEvent')}
                 />
             ),
         });
@@ -32,7 +32,7 @@ export default function EventsOverviewScreen({
     const { loading, value: events, refresh } = useRelevantEvents();
 
     const navigateDetail = useCallback(
-        (id: string) => navigation.navigate('EventDetail', { eventId: id }),
+        (id: string) => navigation.push('EventDetail', { eventId: id }),
         [navigation]
     );
 
