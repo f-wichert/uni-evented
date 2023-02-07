@@ -149,3 +149,4 @@ web-build/
 
 .env
 *.apk
+!deliverables/*
